@@ -240,7 +240,7 @@ const ContentSection = ({ title, children }) => (
     <div 
         className="bg-white dark:bg-black dark:bg-opacity-60 border border-gray-200 dark:border-green-700 p-8 mb-8 dark:backdrop-blur-sm font-mono"
     >
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-green-400 border-b-2 border-gray-300 dark:border-green-700 pb-2 mb-6" style={{ textShadow: '0 0 5px #33ff33' }}>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-green-400 border-b-2 border-gray-300 dark:border-green-700 pb-2 mb-6 break-words" style={{ textShadow: '0 0 5px #33ff33' }}>
             {title}
         </h2>
         {children}
@@ -252,7 +252,7 @@ const ContentSection = ({ title, children }) => (
 const HomePage = ({ navigateTo, playClick }) => (
     <div className="text-center flex flex-col items-center justify-center min-h-[60vh]">
         <h1 
-            className="text-5xl font-bold text-gray-800 dark:text-green-400 glitch font-mono"
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 dark:text-green-400 glitch font-mono"
         >
             <span className="text-py-keyword">print</span>(<span className="text-py-string">"Open_Knowledge, Shared_Insights"</span>)
         </h1>
@@ -299,8 +299,8 @@ const ArchivePage = () => {
                 {talks.map((talk, index) => (
                     <div key={index} className="border-l-4 border-gray-400 dark:border-green-500 pl-6 mb-8">
                         <p><span className="text-py-variable">talk_{index + 1}</span> = &#123;</p>
-                        <p className="pl-4"><span className="text-py-string">'title'</span>: <span className="text-py-string">"{talk.title}"</span>,</p>
-                        <p className="pl-4"><span className="text-py-string">'speaker'</span>: <span className="text-py-string">"{talk.speaker}"</span>,</p>
+                        <p className="pl-4 break-words"><span className="text-py-string">'title'</span>: <span className="text-py-string">"{talk.title}"</span>,</p>
+                        <p className="pl-4 break-words"><span className="text-py-string">'speaker'</span>: <span className="text-py-string">"{talk.speaker}"</span>,</p>
                         <p className="pl-4"><span className="text-py-string">'date'</span>: <span className="text-py-string">"{talk.date}"</span></p>
                         <p>&#125;</p>
                         <div className="flex gap-4 mt-2">
