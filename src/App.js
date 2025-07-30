@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Helper to apply classes conditionally
 const cx = (...classes) => classes.filter(Boolean).join(' ');
@@ -88,14 +89,25 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme }) => {
     const navItems = ['home', 'about', 'archive', 'gallery', 'submit'];
     return (
         <header className="flex flex-wrap justify-between items-center gap-x-6 gap-y-4 pb-8 border-b border-gray-300 dark:border-green-500 mb-12">
-            <div className="text-3xl font-bold text-gray-800 dark:text-green-400" style={{ textShadow: theme === 'dark' ? '0 0 5px #33ff33, 0 0 10px #33ff33' : 'none' }}>
+            <motion.div 
+                className="text-3xl font-bold text-gray-800 dark:text-green-400" 
+                style={{ textShadow: theme === 'dark' ? '0 0 5px #33ff33, 0 0 10px #33ff33' : 'none' }}
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+            >
                 OpenBoard
-            </div>
+            </motion.div>
             <nav>
                 <ul className="flex items-center flex-wrap gap-x-4 gap-y-2">
-                    {navItems.map(item => (
-                        <li key={item}>
-                            <button
+                    {navItems.map((item, i) => (
+                        <motion.li 
+                            key={item}
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.2 + i * 0.1 }}
+                        >
+                            <motion.button
                                 onClick={() => navigateTo(item)}
                                 className={cx(
                                     'text-sm uppercase px-3 py-1 border border-transparent transition-all duration-300 whitespace-nowrap',
@@ -103,16 +115,27 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme }) => {
                                     'dark:text-green-400 dark:hover:text-green-300 dark:hover:border-green-400 dark:hover:shadow-[inset_0_0_10px_rgba(51,255,51,0.3)]',
                                     currentPage === item && 'border-gray-400 dark:border-green-400 dark:text-green-200 dark:shadow-[inset_0_0_10px_rgba(51,255,51,0.3)]'
                                 )}
+                                whileHover={{ y: -2 }}
+                                whileTap={{ y: 1 }}
                             >
                                 [ {item} ]
-                            </button>
+                            </motion.button>
                         </li>
                     ))}
-                    <li>
-                        <button onClick={toggleTheme} className="ml-2 px-3 py-1 border border-gray-400 dark:border-green-500 text-gray-600 dark:text-green-400 text-sm uppercase hover:bg-gray-200 dark:hover:bg-green-500/20 transition-colors whitespace-nowrap">
+                    <motion.li
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.8 }}
+                    >
+                        <motion.button 
+                            onClick={toggleTheme} 
+                            className="ml-2 px-3 py-1 border border-gray-400 dark:border-green-500 text-gray-600 dark:text-green-400 text-sm uppercase hover:bg-gray-200 dark:hover:bg-green-500/20 transition-colors whitespace-nowrap"
+                            whileHover={{ y: -2 }}
+                            whileTap={{ y: 1 }}
+                        >
                            {theme === 'dark' ? '[ LITE ]' : '[ DARK ]'}
-                        </button>
-                    </li>
+                        </motion.button>
+                    </motion.li>
                 </ul>
             </nav>
         </header>
@@ -127,30 +150,50 @@ const Footer = ({ status }) => (
 );
 
 const ContentSection = ({ title, children }) => (
-    <div className="bg-white dark:bg-black dark:bg-opacity-60 border border-gray-200 dark:border-green-700 p-8 mb-8 dark:backdrop-blur-sm">
+    <motion.div 
+        className="bg-white dark:bg-black dark:bg-opacity-60 border border-gray-200 dark:border-green-700 p-8 mb-8 dark:backdrop-blur-sm"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+    >
         <h2 className="text-3xl font-bold text-gray-800 dark:text-green-400 border-b-2 border-gray-300 dark:border-green-700 pb-2 mb-6" style={{ textShadow: '0 0 5px #33ff33' }}>
             // {title}
         </h2>
         {children}
-    </div>
+    </motion.div>
 );
 
 // --- [3] Page Components ---
 
 const HomePage = ({ navigateTo }) => (
     <div className="text-center flex flex-col items-center justify-center min-h-[60vh]">
-        <h1 className="text-5xl font-bold text-gray-800 dark:text-green-400 glitch">
+        <motion.h1 
+            className="text-5xl font-bold text-gray-800 dark:text-green-400 glitch"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+        >
             Open Knowledge, Shared Insights.
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-green-400 max-w-2xl mx-auto my-6">
+        </motion.h1>
+        <motion.p 
+            className="text-lg text-gray-600 dark:text-green-400 max-w-2xl mx-auto my-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+        >
             An interdisciplinary pedagogical initiative. We bring together students from diverse fields to share, learn, and ignite curiosity.
-        </p>
-        <button
+        </motion.p>
+        <motion.button
             onClick={() => navigateTo('about')}
             className="px-6 py-3 border border-gray-800 dark:border-green-400 text-gray-800 dark:text-green-400 bg-gray-500/10 dark:bg-green-400/10 uppercase tracking-widest font-bold transition-all duration-300 hover:bg-gray-800 hover:text-white dark:hover:bg-green-400 dark:hover:text-black dark:hover:shadow-[0_0_20px_rgba(51,255,51,0.7)]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            whileHover={{ y: -3, scale: 1.05 }}
+            whileTap={{ y: 1, scale: 0.95 }}
         >
             Learn More &gt;
-        </button>
+        </motion.button>
     </div>
 );
 
@@ -172,19 +215,40 @@ const ArchivePage = () => {
         { title: 'The Geopolitics of Submarine Internet Cables', speaker: 'Alex Ray (Dept. of International Relations)', date: '2024-05-10' },
     ];
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.2
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: { y: 0, opacity: 1 }
+    };
+
     return (
         <ContentSection title="Session Archives">
             <p className="text-gray-500 dark:text-green-500 mb-8">Accessing data logs... Below are the records of past transmissions.</p>
-            {talks.map((talk, index) => (
-                <div key={index} className="border-l-4 border-gray-400 dark:border-green-500 pl-6 mb-8">
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-green-400">{talk.title}</h3>
-                    <p className="text-xs text-gray-500 dark:text-green-500 mb-2">{talk.speaker} | Date: {talk.date}</p>
-                    <div className="flex gap-4">
-                        <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ View Summary ]</a>
-                        <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ Download Slides ]</a>
-                    </div>
-                </div>
-            ))}
+            <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                {talks.map((talk, index) => (
+                    <motion.div key={index} variants={itemVariants} className="border-l-4 border-gray-400 dark:border-green-500 pl-6 mb-8">
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-green-400">{talk.title}</h3>
+                        <p className="text-xs text-gray-500 dark:text-green-500 mb-2">{talk.speaker} | Date: {talk.date}</p>
+                        <div className="flex gap-4">
+                            <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ View Summary ]</a>
+                            <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ Download Slides ]</a>
+                        </div>
+                    </motion.div>
+                ))}
+            </motion.div>
         </ContentSection>
     );
 };
@@ -201,9 +265,16 @@ const GalleryPage = () => {
             <p className="text-gray-500 dark:text-green-500 mb-8">Image captures from previous sessions.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {images.map((src, index) => (
-                    <div key={index} className="border-2 border-gray-400 dark:border-green-500 p-1 transition-all duration-300 hover:shadow-lg dark:hover:shadow-[0_0_15px_rgba(51,255,51,0.7)] hover:scale-105">
+                    <motion.div 
+                        key={index} 
+                        className="border-2 border-gray-400 dark:border-green-500 p-1"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.15 }}
+                        whileHover={{ scale: 1.05, y: -5, boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.5)" }}
+                    >
                         <img src={src} alt={`Gallery image ${index + 1}`} className="w-full h-auto" />
-                    </div>
+                    </motion.div>
                 ))}
             </div>
         </ContentSection>
@@ -264,11 +335,19 @@ const SubmitPage = () => {
                 </div>
                 
                 <div className="flex items-center gap-4">
-                    <button type="submit" disabled={status === 'submitting'} className="self-start px-6 py-3 border border-gray-800 dark:border-green-400 text-gray-800 dark:text-green-400 bg-gray-500/10 dark:bg-green-400/10 uppercase tracking-widest font-bold transition-all duration-300 hover:bg-gray-800 hover:text-white dark:hover:bg-green-400 dark:hover:text-black disabled:opacity-50 disabled:cursor-not-allowed">
+                    <motion.button 
+                        type="submit" 
+                        disabled={status === 'submitting'} 
+                        className="self-start px-6 py-3 border border-gray-800 dark:border-green-400 text-gray-800 dark:text-green-400 bg-gray-500/10 dark:bg-green-400/10 uppercase tracking-widest font-bold transition-all duration-300 hover:bg-gray-800 hover:text-white dark:hover:bg-green-400 dark:hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                        whileHover={{ y: -3, scale: 1.05 }}
+                        whileTap={{ y: 1, scale: 0.95 }}
+                    >
                         {status === 'submitting' ? 'Transmitting...' : 'Transmit Data'}
-                    </button>
-                    {status === 'success' && <p className="text-green-400">Success! Submission received.</p>}
-                    {status === 'error' && <p className="text-red-500">Error! Please try again.</p>}
+                    </motion.button>
+                    <AnimatePresence>
+                        {status === 'success' && <motion.p initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className="text-green-400">Success! Submission received.</motion.p>}
+                        {status === 'error' && <motion.p initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className="text-red-500">Error! Please try again.</motion.p>}
+                    </AnimatePresence>
                 </div>
             </form>
         </ContentSection>
@@ -289,6 +368,27 @@ export default function App() {
 
     const toggleTheme = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark');
+    };
+
+    const pageVariants = {
+        initial: {
+            opacity: 0,
+            y: 20
+        },
+        in: {
+            opacity: 1,
+            y: 0
+        },
+        out: {
+            opacity: 0,
+            y: -20
+        }
+    };
+
+    const pageTransition = {
+        type: "tween",
+        ease: "anticipate",
+        duration: 0.5
     };
 
     const renderPage = () => {
@@ -351,8 +451,19 @@ export default function App() {
             <div className="text-gray-800 dark:text-green-300 min-h-screen transition-colors duration-500">
                 <div className="relative z-10 container mx-auto p-8 max-w-5xl">
                     <Header currentPage={page} navigateTo={setPage} toggleTheme={toggleTheme} theme={theme} />
-                    <main className="min-h-[70vh]">
-                        {renderPage()}
+                    <main>
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={page}
+                                initial="initial"
+                                animate="in"
+                                exit="out"
+                                variants={pageVariants}
+                                transition={pageTransition}
+                            >
+                                {renderPage()}
+                            </motion.div>
+                        </AnimatePresence>
                     </main>
                     <Footer status={footerStatus[page]} />
                 </div>
