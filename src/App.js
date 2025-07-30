@@ -238,7 +238,7 @@ const Footer = ({ status }) => (
 
 const ContentSection = ({ title, children }) => (
     <div 
-        className="bg-white dark:bg-black dark:bg-opacity-60 border border-gray-200 dark:border-green-700 p-8 mb-8 dark:backdrop-blur-sm font-mono"
+        className="bg-white dark:bg-black dark:bg-opacity-60 border border-gray-200 dark:border-green-700 p-4 md:p-8 mb-8 dark:backdrop-blur-sm font-mono"
     >
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-green-400 border-b-2 border-gray-300 dark:border-green-700 pb-2 mb-6 break-words" style={{ textShadow: '0 0 5px #33ff33' }}>
             {title}
@@ -252,7 +252,7 @@ const ContentSection = ({ title, children }) => (
 const HomePage = ({ navigateTo, playClick }) => (
     <div className="text-center flex flex-col items-center justify-center min-h-[60vh]">
         <h1 
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 dark:text-green-400 glitch font-mono"
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 dark:text-green-400 glitch font-mono break-words"
         >
             <span className="text-py-keyword">print</span>(<span className="text-py-string">"Open_Knowledge, Shared_Insights"</span>)
         </h1>
@@ -303,7 +303,7 @@ const ArchivePage = () => {
                         <p className="pl-4 break-words"><span className="text-py-string">'speaker'</span>: <span className="text-py-string">"{talk.speaker}"</span>,</p>
                         <p className="pl-4"><span className="text-py-string">'date'</span>: <span className="text-py-string">"{talk.date}"</span></p>
                         <p>&#125;</p>
-                        <div className="flex gap-4 mt-2">
+                        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
                             <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ <span className="text-py-function">view_summary</span>() ]</a>
                             <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ <span className="text-py-function">download_slides</span>() ]</a>
                         </div>
@@ -615,7 +615,7 @@ export default function App() {
             
             <BackgroundAnimation theme={theme} />
             <div className="text-gray-800 dark:text-green-300 min-h-screen transition-colors duration-500">
-                <div className="relative z-10 container mx-auto p-8 max-w-5xl">
+                <div className="relative z-10 container mx-auto p-4 sm:p-8 max-w-5xl">
                     <Header 
                         currentPage={page} 
                         navigateTo={setPage} 
