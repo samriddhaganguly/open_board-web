@@ -154,7 +154,7 @@ const MoonIcon = () => (
 
 const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const navItems = ['home', 'about', 'archive', 'gallery', 'submit'];
+    const navItems = ['home', 'about', 'archive', 'gallery', 'submit', 'contact'];
 
     const handleNavClick = (page) => {
         playClick();
@@ -399,6 +399,93 @@ const SubmitPage = ({ playSwish }) => {
     );
 };
 
+const SubscribeForm = ({ playSwish }) => {
+    const [status, setStatus] = useState('idle');
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        playSwish();
+        setStatus('subscribing');
+
+        const form = event.target;
+        const data = { email: form.email.value };
+
+        const scriptURL = "https://script.google.com/macros/s/AKfycbyjnJlKboO36YUzfFTjfuoQCCbKJUXaqlcgUdEaPSu_qmH8nCWY8EvJY95ruvw7tvM4GA/exec";
+
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            console.log('Success!', response);
+            setStatus('success');
+            form.reset();
+        })
+        .catch(error => {
+            console.error('Error!', error.message);
+            setStatus('error');
+        });
+    };
+
+    return (
+        <div className="my-8 font-mono">
+            <h4 className="text-lg mb-2 text-gray-800 dark:text-green-400"><span className="text-py-comment"># subscribe_to_mailing_list</span></h4>
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 items-center">
+                <input 
+                    type="email" 
+                    name="email" 
+                    placeholder="your_email@domain.com"
+                    required 
+                    className="w-full sm:w-auto flex-grow p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono"
+                />
+                <button 
+                    type="submit" 
+                    disabled={status === 'subscribing'}
+                    className="w-full sm:w-auto px-6 py-2 border border-gray-800 dark:border-green-400 text-gray-800 dark:text-green-400 bg-gray-500/10 dark:bg-green-400/10 uppercase tracking-widest font-bold transition-all duration-300 hover:bg-gray-800 hover:text-white dark:hover:bg-green-400 dark:hover:text-black disabled:opacity-50"
+                >
+                    {status === 'subscribing' ? 'subscribing...' : 'subscribe()'}
+                </button>
+            </form>
+            {status === 'success' && <p className="text-green-400 mt-2"><span className="text-py-keyword">return</span> <span className="text-py-string">"Success! Welcome aboard."</span></p>}
+            {status === 'error' && <p className="text-red-500 mt-2"><span className="text-py-keyword">raise</span> Exception(<span className="text-py-string">"Error! Please try again."</span>)</p>}
+        </div>
+    );
+};
+
+const ContactPage = ({ playSwish }) => {
+    const coordinators = [
+        { name: 'Alex_Doe', designation: 'Lead_Coordinator', gmail: 'alex.doe@example.com', linkedin: 'linkedin.com/in/alexdoe' },
+        { name: 'Sam_Jones', designation: 'Events_Coordinator', gmail: 'sam.jones@example.com', linkedin: 'linkedin.com/in/samjones' }
+    ];
+
+    return (
+        <>
+            <ContentSection title={<><span className="text-py-keyword">class</span> <span className="text-py-function">Coordinators</span>:</>}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {coordinators.map((coord, index) => (
+                        <div key={index}>
+                            <p><span className="text-py-variable">coordinator_{index+1}</span> = &#123;</p>
+                            <p className="pl-4"><span className="text-py-string">'name'</span>: <span className="text-py-string">"{coord.name}"</span>,</p>
+                            <p className="pl-4"><span className="text-py-string">'designation'</span>: <span className="text-py-string">"{coord.designation}"</span>,</p>
+                            <p className="pl-4"><span className="text-py-string">'gmail'</span>: <span className="text-py-string">"{coord.gmail}"</span>,</p>
+                            <p className="pl-4"><span className="text-py-string">'linkedin'</span>: <span className="text-py-string">"{coord.linkedin}"</span></p>
+                            <p>&#125;</p>
+                        </div>
+                    ))}
+                </div>
+            </ContentSection>
+            <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">get_updates</span>(<span className="text-py-params">email</span>):</>}>
+                <p className="text-gray-700 dark:text-green-400 mb-4">
+                    <span className="text-py-string">"""Subscribe to receive information about our talks."""</span>
+                </p>
+                <SubscribeForm playSwish={playSwish} />
+            </ContentSection>
+        </>
+    );
+};
+
 
 // --- [4] Main App Component ---
 export default function App() {
@@ -422,6 +509,7 @@ export default function App() {
             case 'archive': return <ArchivePage />;
             case 'gallery': return <GalleryPage />;
             case 'submit': return <SubmitPage playSwish={playSwish} />;
+            case 'contact': return <ContactPage playSwish={playSwish} />;
             case 'home':
             default:
                 return <HomePage navigateTo={setPage} playClick={playClick} />;
@@ -434,6 +522,7 @@ export default function App() {
         archive: 'Archive_integrity_verified.',
         gallery: 'Visuals_rendered.',
         submit: 'Awaiting_transmission.',
+        contact: 'Connection_established.',
     };
 
     return (
