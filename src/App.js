@@ -8,7 +8,7 @@ const cx = (...classes) => classes.filter(Boolean).join(' ');
 // Manages interactive sound effects for the application.
 const useSoundEffects = () => {
     const clickSynth = useRef(null);
-    const explosionSynth = useRef(null);
+    const submitSynth = useRef(null);
     const isAudioReady = useRef(false);
 
     useEffect(() => {
@@ -16,34 +16,17 @@ const useSoundEffects = () => {
             if (window.Tone && !isAudioReady.current) {
                 await window.Tone.start();
                 
-                // Futuristic Click Sound: A high-pitched, metallic synth
-                clickSynth.current = new window.Tone.MetalSynth({
-                    frequency: 400,
-                    envelope: { attack: 0.001, decay: 0.1, release: 0.01 },
-                    harmonicity: 3.1,
-                    modulationIndex: 32,
-                    resonance: 4000,
-                    octaves: 1.5
+                // Game Console Click Sound: A simple, clean sine wave with a sharp decay.
+                clickSynth.current = new window.Tone.Synth({
+                    oscillator: { type: 'triangle' },
+                    envelope: { attack: 0.001, decay: 0.1, sustain: 0.01, release: 0.1 },
                 }).toDestination();
 
-                // Explosive Sound: A combination of a deep kick and white noise with distortion
-                const kick = new window.Tone.MembraneSynth({
-                    pitchDecay: 0.05,
-                    octaves: 10,
-                    oscillator: { type: "sine" },
-                    envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 },
-                });
-                
-                const noise = new window.Tone.NoiseSynth({
-                    noise: { type: "white" },
-                    envelope: { attack: 0.005, decay: 0.2, sustain: 0 },
-                });
-
-                const distortion = new window.Tone.Distortion(0.4).toDestination();
-                
-                explosionSynth.current = { kick, noise };
-                explosionSynth.current.kick.connect(distortion);
-                explosionSynth.current.noise.connect(distortion);
+                // "Power-up" sound for submission: A quick ascending arpeggio.
+                submitSynth.current = new window.Tone.PolySynth(window.Tone.Synth, {
+                    oscillator: { type: 'fmsquare' },
+                    envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.2 },
+                }).toDestination();
 
                 isAudioReady.current = true;
                 console.log("Audio context and synths ready.");
@@ -60,19 +43,18 @@ const useSoundEffects = () => {
 
     const playClick = () => {
         if (clickSynth.current) {
-            clickSynth.current.triggerAttackRelease("C6", "32n");
+            clickSynth.current.triggerAttackRelease("C5", "32n");
         }
     };
 
-    const playExplosion = () => {
-        if (explosionSynth.current) {
+    const playSubmitSound = () => {
+        if (submitSynth.current) {
             const now = window.Tone.now();
-            explosionSynth.current.kick.triggerAttackRelease("C2", "8n", now);
-            explosionSynth.current.noise.triggerAttackRelease("16n", now + 0.01);
+            submitSynth.current.triggerAttackRelease(["C5", "E5", "G5"], "16n", now);
         }
     };
 
-    return { playClick, playSwish: playExplosion }; // Exporting playExplosion as playSwish for compatibility
+    return { playClick, playSwish: playSubmitSound }; // Exporting playSubmitSound as playSwish
 };
 
 
@@ -306,7 +288,7 @@ const SubmitPage = ({ playSwish }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        playSwish(); // Play the swish sound on submit
+        playSwish(); // Play the submit sound
         setStatus('submitting');
         
         const form = event.target;
