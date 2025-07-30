@@ -138,8 +138,30 @@ const BackgroundAnimation = ({ theme }) => {
 
 // --- [2] UI Components ---
 
+// SVG Icon Components
+const SunIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+);
+
+const MoonIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+);
+
+
 const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navItems = ['home', 'about', 'archive', 'gallery', 'submit'];
+
+    const handleNavClick = (page) => {
+        playClick();
+        navigateTo(page);
+        setIsMenuOpen(false); // Close menu on navigation
+    };
+
     return (
         <header className="flex flex-wrap justify-between items-center gap-x-6 gap-y-4 pb-8 border-b border-gray-300 dark:border-green-500 mb-12">
             <div 
@@ -148,14 +170,28 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
             >
                 OpenBoard
             </div>
-            <nav>
-                <ul className="flex items-center flex-wrap gap-x-4 gap-y-2">
+
+            {/* Hamburger Menu Button - visible only on small screens */}
+            <div className="md:hidden">
+                <button onClick={() => { playClick(); setIsMenuOpen(!isMenuOpen); }} className="p-2 rounded-md text-gray-600 dark:text-green-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                    </svg>
+                </button>
+            </div>
+            
+            {/* Navigation Links */}
+            <nav className={cx(
+                'w-full md:w-auto md:flex',
+                isMenuOpen ? 'block' : 'hidden'
+            )}>
+                <ul className="flex flex-col md:flex-row items-center gap-4 mt-4 md:mt-0">
                     {navItems.map((item) => (
                         <li key={item}>
                             <button
-                                onClick={() => { playClick(); navigateTo(item); }}
+                                onClick={() => handleNavClick(item)}
                                 className={cx(
-                                    'text-sm uppercase px-3 py-1 border border-transparent transition-all duration-300 whitespace-nowrap',
+                                    'text-sm uppercase px-3 py-1 border border-transparent transition-all duration-300 whitespace-nowrap w-full text-left md:w-auto',
                                     'text-gray-600 hover:text-black hover:border-gray-400',
                                     'dark:text-green-400 dark:hover:text-green-300 dark:hover:border-green-400 dark:hover:shadow-[inset_0_0_10px_rgba(51,255,51,0.3)]',
                                     currentPage === item && 'border-gray-400 dark:border-green-400 dark:text-green-200 dark:shadow-[inset_0_0_10px_rgba(51,255,51,0.3)]'
@@ -168,9 +204,9 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
                     <li>
                         <button 
                             onClick={() => { playClick(); toggleTheme(); }} 
-                            className="ml-2 px-3 py-1 border border-gray-400 dark:border-green-500 text-gray-600 dark:text-green-400 text-sm uppercase hover:bg-gray-200 dark:hover:bg-green-500/20 transition-colors whitespace-nowrap"
+                            className="ml-0 md:ml-2 p-2 rounded-full transition-colors duration-300 text-gray-600 dark:text-green-400 hover:bg-gray-200 dark:hover:bg-green-500/20"
                         >
-                           {theme === 'dark' ? '[ LITE ]' : '[ DARK ]'}
+                           {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
                         </button>
                     </li>
                 </ul>
