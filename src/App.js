@@ -4,56 +4,56 @@ import * as THREE from 'three';
 // Helper to apply classes conditionally
 const cx = (...classes) => classes.filter(Boolean).join(' ');
 
-// --- [0] Sound Component ---
-// Plays periodic beep sounds after user interaction.
-const AmbientSounds = () => {
-    const synth = useRef(null);
+// --- [0] Sound Management Hook ---
+// Manages interactive sound effects for the application.
+const useSoundEffects = () => {
+    const clickSynth = useRef(null);
+    const swishSynth = useRef(null);
+    const isAudioReady = useRef(false);
 
     useEffect(() => {
-        // This effect runs once to set up the audio context.
-        const startAudio = async () => {
-            // Ensure Tone.js is loaded from the CDN
-            if (window.Tone) {
+        const setupAudio = async () => {
+            if (window.Tone && !isAudioReady.current) {
                 await window.Tone.start();
-                console.log("Audio context started");
+                // Create a synth for the click sound
+                clickSynth.current = new window.Tone.MembraneSynth({
+                    pitchDecay: 0.01,
+                    octaves: 6,
+                    envelope: { attack: 0.001, decay: 0.2, sustain: 0 },
+                }).toDestination();
 
-                // Create a simple synth
-                synth.current = new window.Tone.MembraneSynth().toDestination();
-
-                // Create a loop that plays a random note periodically
-                const loop = new window.Tone.Loop(time => {
-                    const notes = ['C2', 'G2', 'C3', 'A3'];
-                    const randomNote = notes[Math.floor(Math.random() * notes.length)];
-                    synth.current.triggerAttackRelease(randomNote, "8n", time);
-                }, "2n"); // Loop every half-note
-
-                // Add some randomness to the loop interval
-                loop.humanize = true;
+                // Create a noise synth for the swish sound
+                swishSynth.current = new window.Tone.NoiseSynth({
+                    noise: { type: 'white' },
+                    envelope: { attack: 0.005, decay: 0.2, sustain: 0 },
+                }).toDestination();
                 
-                // Start the transport (Tone.js's master clock) and the loop
-                window.Tone.Transport.start();
-                loop.start(0);
-
-            } else {
-                console.error("Tone.js is not loaded. Please add the script tag to your index.html.");
+                isAudioReady.current = true;
+                console.log("Audio context and synths ready.");
+                document.body.removeEventListener('click', setupAudio);
             }
-            // Remove the event listener after the first click
-            document.body.removeEventListener('click', startAudio);
         };
 
-        // Add a click listener to the body to start audio on the first user interaction
-        document.body.addEventListener('click', startAudio);
+        document.body.addEventListener('click', setupAudio);
 
-        // Cleanup function to stop the transport when the component unmounts
         return () => {
-            if (window.Tone && window.Tone.Transport.state === "started") {
-                window.Tone.Transport.stop();
-            }
-            document.body.removeEventListener('click', startAudio);
+            document.body.removeEventListener('click', setupAudio);
         };
-    }, []); // Empty dependency array ensures this runs only once
+    }, []);
 
-    return null; // This component doesn't render anything visible
+    const playClick = () => {
+        if (clickSynth.current) {
+            clickSynth.current.triggerAttackRelease("C4", "8n");
+        }
+    };
+
+    const playSwish = () => {
+        if (swishSynth.current) {
+            swishSynth.current.triggerAttack();
+        }
+    };
+
+    return { playClick, playSwish };
 };
 
 
@@ -137,7 +137,7 @@ const BackgroundAnimation = ({ theme }) => {
 
 // --- [2] UI Components ---
 
-const Header = ({ currentPage, navigateTo, toggleTheme, theme }) => {
+const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
     const navItems = ['home', 'about', 'archive', 'gallery', 'submit'];
     return (
         <header className="flex flex-wrap justify-between items-center gap-x-6 gap-y-4 pb-8 border-b border-gray-300 dark:border-green-500 mb-12">
@@ -152,7 +152,7 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme }) => {
                     {navItems.map((item) => (
                         <li key={item}>
                             <button
-                                onClick={() => navigateTo(item)}
+                                onClick={() => { playClick(); navigateTo(item); }}
                                 className={cx(
                                     'text-sm uppercase px-3 py-1 border border-transparent transition-all duration-300 whitespace-nowrap',
                                     'text-gray-600 hover:text-black hover:border-gray-400',
@@ -166,7 +166,7 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme }) => {
                     ))}
                     <li>
                         <button 
-                            onClick={toggleTheme} 
+                            onClick={() => { playClick(); toggleTheme(); }} 
                             className="ml-2 px-3 py-1 border border-gray-400 dark:border-green-500 text-gray-600 dark:text-green-400 text-sm uppercase hover:bg-gray-200 dark:hover:bg-green-500/20 transition-colors whitespace-nowrap"
                         >
                            {theme === 'dark' ? '[ LITE ]' : '[ DARK ]'}
@@ -200,7 +200,7 @@ const ContentSection = ({ title, children }) => (
 
 // --- [3] Page Components ---
 
-const HomePage = ({ navigateTo }) => (
+const HomePage = ({ navigateTo, playClick }) => (
     <div className="text-center flex flex-col items-center justify-center min-h-[60vh]">
         <h1 
             className="text-5xl font-bold text-gray-800 dark:text-green-400 glitch"
@@ -213,7 +213,7 @@ const HomePage = ({ navigateTo }) => (
             An interdisciplinary pedagogical initiative. We bring together students from diverse fields to share, learn, and ignite curiosity.
         </p>
         <button
-            onClick={() => navigateTo('about')}
+            onClick={() => { playClick(); navigateTo('about'); }}
             className="px-6 py-3 border border-gray-800 dark:border-green-400 text-gray-800 dark:text-green-400 bg-gray-500/10 dark:bg-green-400/10 uppercase tracking-widest font-bold transition-all duration-300 hover:bg-gray-800 hover:text-white dark:hover:bg-green-400 dark:hover:text-black dark:hover:shadow-[0_0_20px_rgba(51,255,51,0.7)]"
         >
             Learn More &gt;
@@ -282,11 +282,12 @@ const GalleryPage = () => {
     );
 };
 
-const SubmitPage = () => {
+const SubmitPage = ({ playSwish }) => {
     const [status, setStatus] = useState('idle'); // idle, submitting, success, error
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        playSwish(); // Play the swish sound on submit
         setStatus('submitting');
         
         const form = event.target;
@@ -359,6 +360,7 @@ const SubmitPage = () => {
 export default function App() {
     const [page, setPage] = useState('home');
     const [theme, setTheme] = useState('dark'); // 'dark' or 'light'
+    const { playClick, playSwish } = useSoundEffects();
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -375,10 +377,10 @@ export default function App() {
             case 'about': return <AboutPage />;
             case 'archive': return <ArchivePage />;
             case 'gallery': return <GalleryPage />;
-            case 'submit': return <SubmitPage />;
+            case 'submit': return <SubmitPage playSwish={playSwish} />;
             case 'home':
             default:
-                return <HomePage navigateTo={setPage} />;
+                return <HomePage navigateTo={setPage} playClick={playClick} />;
         }
     };
 
@@ -433,12 +435,17 @@ export default function App() {
                     }
                 }
             `}</style>
-
-            <AmbientSounds />
+            
             <BackgroundAnimation theme={theme} />
             <div className="text-gray-800 dark:text-green-300 min-h-screen transition-colors duration-500">
                 <div className="relative z-10 container mx-auto p-8 max-w-5xl">
-                    <Header currentPage={page} navigateTo={setPage} toggleTheme={toggleTheme} theme={theme} />
+                    <Header 
+                        currentPage={page} 
+                        navigateTo={setPage} 
+                        toggleTheme={toggleTheme} 
+                        theme={theme}
+                        playClick={playClick} 
+                    />
                     <main>
                        {renderPage()}
                     </main>
