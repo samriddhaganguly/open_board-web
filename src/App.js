@@ -115,8 +115,8 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme }) => {
                                     'dark:text-green-400 dark:hover:text-green-300 dark:hover:border-green-400 dark:hover:shadow-[inset_0_0_10px_rgba(51,255,51,0.3)]',
                                     currentPage === item && 'border-gray-400 dark:border-green-400 dark:text-green-200 dark:shadow-[inset_0_0_10px_rgba(51,255,51,0.3)]'
                                 )}
-                                whileHover={{ y: -2 }}
-                                whileTap={{ y: 1 }}
+                                whileHover={{ y: -2, scale: 1.05 }}
+                                whileTap={{ y: 1, scale: 0.95 }}
                             >
                                 [ {item} ]
                             </motion.button>
@@ -130,8 +130,8 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme }) => {
                         <motion.button 
                             onClick={toggleTheme} 
                             className="ml-2 px-3 py-1 border border-gray-400 dark:border-green-500 text-gray-600 dark:text-green-400 text-sm uppercase hover:bg-gray-200 dark:hover:bg-green-500/20 transition-colors whitespace-nowrap"
-                            whileHover={{ y: -2 }}
-                            whileTap={{ y: 1 }}
+                            whileHover={{ y: -2, scale: 1.05 }}
+                            whileTap={{ y: 1, scale: 0.95 }}
                         >
                            {theme === 'dark' ? '[ LITE ]' : '[ DARK ]'}
                         </motion.button>
@@ -143,18 +143,23 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme }) => {
 };
 
 const Footer = ({ status }) => (
-    <footer className="text-center pt-8 mt-12 border-t border-gray-200 dark:border-green-700 text-sm text-gray-500 dark:text-green-500">
+    <motion.footer 
+        className="text-center pt-8 mt-12 border-t border-gray-200 dark:border-green-700 text-sm text-gray-500 dark:text-green-500"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+    >
         <p>&copy; 2024 OpenBoard. All rights reserved.</p>
         <p>Status: {status}</p>
-    </footer>
+    </motion.footer>
 );
 
 const ContentSection = ({ title, children }) => (
     <motion.div 
         className="bg-white dark:bg-black dark:bg-opacity-60 border border-gray-200 dark:border-green-700 p-8 mb-8 dark:backdrop-blur-sm"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        initial={{ opacity: 0, y: 50, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.6, 0.05, -0.01, 0.9] }}
     >
         <h2 className="text-3xl font-bold text-gray-800 dark:text-green-400 border-b-2 border-gray-300 dark:border-green-700 pb-2 mb-6" style={{ textShadow: '0 0 5px #33ff33' }}>
             // {title}
@@ -197,16 +202,27 @@ const HomePage = ({ navigateTo }) => (
     </div>
 );
 
-const AboutPage = () => (
-     <>
+const AboutPage = () => {
+    const containerVariants = {
+        hidden: { opacity: 1 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.3
+            }
+        }
+    };
+    return (
+     <motion.div variants={containerVariants} initial="hidden" animate="visible">
         <ContentSection title="Our Mission">
             <p className="text-gray-700 dark:text-green-400">OpenBoard is a peer-to-peer knowledge-sharing platform designed to break down academic silos. Our mission is to create a space where students from any field can present their passion projects and research in a way that is accessible and engaging to a non-specialist audience.</p>
         </ContentSection>
         <ContentSection title="The Vision">
             <p className="text-gray-700 dark:text-green-400">We envision a community fueled by curiosity. A place where a future historian can learn about machine learning, a budding chemist can appreciate poetic structures, and an aspiring artist can understand the elegance of a mathematical theorem. It's an opportunity to traverse the vast landscape of human knowledge, one fascinating talk at a time.</p>
         </ContentSection>
-    </>
-);
+     </motion.div>
+    );
+};
 
 const ArchivePage = () => {
     const talks = [
@@ -239,7 +255,12 @@ const ArchivePage = () => {
                 animate="visible"
             >
                 {talks.map((talk, index) => (
-                    <motion.div key={index} variants={itemVariants} className="border-l-4 border-gray-400 dark:border-green-500 pl-6 mb-8">
+                    <motion.div 
+                        key={index} 
+                        variants={itemVariants} 
+                        className="border-l-4 border-gray-400 dark:border-green-500 pl-6 mb-8 transition-shadow duration-300"
+                        whileHover={{ scale: 1.02, x: 5, boxShadow: "0px 10px 20px rgba(0,0,0,0.2)" }}
+                    >
                         <h3 className="text-xl font-bold text-gray-800 dark:text-green-400">{talk.title}</h3>
                         <p className="text-xs text-gray-500 dark:text-green-500 mb-2">{talk.speaker} | Date: {talk.date}</p>
                         <div className="flex gap-4">
@@ -316,25 +337,46 @@ const SubmitPage = () => {
             setStatus('error');
         });
     };
+    
+    const formContainerVariants = {
+        hidden: { opacity: 1 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.15
+            }
+        }
+    };
+    
+    const formItemVariants = {
+        hidden: { opacity: 0, x: -20 },
+        visible: { opacity: 1, x: 0 }
+    };
 
     return (
         <ContentSection title="Submit an Abstract">
             <p className="text-gray-500 dark:text-green-500 mb-8">Ready to contribute? Use the form below to submit your talk proposal.</p>
-            <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-                <div>
+            <motion.form 
+                className="flex flex-col gap-6" 
+                onSubmit={handleSubmit}
+                variants={formContainerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                <motion.div variants={formItemVariants}>
                     <label htmlFor="name" className="block mb-2 text-gray-700 dark:text-green-400">Name / Handle</label>
                     <input type="text" id="name" name="name" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none" />
-                </div>
-                <div>
+                </motion.div>
+                <motion.div variants={formItemVariants}>
                     <label htmlFor="email" className="block mb-2 text-gray-700 dark:text-green-400">Contact Email</label>
                     <input type="email" id="email" name="email" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none" />
-                </div>
-                <div>
+                </motion.div>
+                <motion.div variants={formItemVariants}>
                     <label htmlFor="abstract" className="block mb-2 text-gray-700 dark:text-green-400">Abstract (Max 300 words)</label>
                     <textarea id="abstract" name="abstract" rows="5" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none"></textarea>
-                </div>
+                </motion.div>
                 
-                <div className="flex items-center gap-4">
+                <motion.div variants={formItemVariants} className="flex items-center gap-4">
                     <motion.button 
                         type="submit" 
                         disabled={status === 'submitting'} 
@@ -348,8 +390,8 @@ const SubmitPage = () => {
                         {status === 'success' && <motion.p initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className="text-green-400">Success! Submission received.</motion.p>}
                         {status === 'error' && <motion.p initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className="text-red-500">Error! Please try again.</motion.p>}
                     </AnimatePresence>
-                </div>
-            </form>
+                </motion.div>
+            </motion.form>
         </ContentSection>
     );
 };
