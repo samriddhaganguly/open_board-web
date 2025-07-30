@@ -338,12 +338,22 @@ export default function App() {
     };
 
     return (
-        <div className="bg-white dark:bg-black">
+        // Use a React Fragment <> to avoid an extra div that can interfere with backgrounds
+        <>
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
                 
                 body {
                     font-family: 'Space Mono', monospace;
+                    transition: background-color 0.5s ease;
+                }
+
+                /* Set background on the html tag based on the theme class */
+                html.light {
+                    background-color: #ffffff;
+                }
+                html.dark {
+                    background-color: #000000;
                 }
 
                 .glitch {
@@ -383,6 +393,6 @@ export default function App() {
                     <Footer status={footerStatus[page]} />
                 </div>
             </div>
-        </div>
+        </>
     );
 }
