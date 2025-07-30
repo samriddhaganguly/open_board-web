@@ -197,7 +197,7 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
                                     currentPage === item && 'border-gray-400 dark:border-green-400 dark:text-green-200 dark:shadow-[inset_0_0_10px_rgba(51,255,51,0.3)]'
                                 )}
                             >
-                                [ {item} ]
+                                [ <span className="text-py-function">{item}</span>() ]
                             </button>
                         </li>
                     ))}
@@ -220,16 +220,16 @@ const Footer = ({ status }) => (
         className="text-center pt-8 mt-12 border-t border-gray-200 dark:border-green-700 text-sm text-gray-500 dark:text-green-500"
     >
         <p>&copy; 2024 OpenBoard. All rights reserved.</p>
-        <p>Status: {status}</p>
+        <p>Status: {status.replace(/\./g, '_')}</p>
     </footer>
 );
 
 const ContentSection = ({ title, children }) => (
     <div 
-        className="bg-white dark:bg-black dark:bg-opacity-60 border border-gray-200 dark:border-green-700 p-8 mb-8 dark:backdrop-blur-sm"
+        className="bg-white dark:bg-black dark:bg-opacity-60 border border-gray-200 dark:border-green-700 p-8 mb-8 dark:backdrop-blur-sm font-mono"
     >
         <h2 className="text-3xl font-bold text-gray-800 dark:text-green-400 border-b-2 border-gray-300 dark:border-green-700 pb-2 mb-6" style={{ textShadow: '0 0 5px #33ff33' }}>
-            // {title}
+            {title}
         </h2>
         {children}
     </div>
@@ -240,53 +240,60 @@ const ContentSection = ({ title, children }) => (
 const HomePage = ({ navigateTo, playClick }) => (
     <div className="text-center flex flex-col items-center justify-center min-h-[60vh]">
         <h1 
-            className="text-5xl font-bold text-gray-800 dark:text-green-400 glitch"
+            className="text-5xl font-bold text-gray-800 dark:text-green-400 glitch font-mono"
         >
-            Open Knowledge, Shared Insights.
+            <span className="text-py-keyword">print</span>(<span className="text-py-string">"Open_Knowledge, Shared_Insights"</span>)
         </h1>
         <p 
-            className="text-lg text-gray-600 dark:text-green-400 max-w-2xl mx-auto my-6"
+            className="text-lg text-gray-600 dark:text-green-400 max-w-2xl mx-auto my-6 font-mono"
         >
-            An interdisciplinary pedagogical initiative. We bring together students from diverse fields to share, learn, and ignite curiosity.
+            <span className="text-py-string">"""<br />An interdisciplinary pedagogical initiative. We bring together<br />students from diverse fields to share, learn, and ignite curiosity.<br />"""</span>
         </p>
         <button
             onClick={() => { playClick(); navigateTo('about'); }}
             className="px-6 py-3 border border-gray-800 dark:border-green-400 text-gray-800 dark:text-green-400 bg-gray-500/10 dark:bg-green-400/10 uppercase tracking-widest font-bold transition-all duration-300 hover:bg-gray-800 hover:text-white dark:hover:bg-green-400 dark:hover:text-black dark:hover:shadow-[0_0_20px_rgba(51,255,51,0.7)]"
         >
-            Learn More &gt;
+            learn_more() &gt;
         </button>
     </div>
 );
 
 const AboutPage = () => (
      <>
-        <ContentSection title="Our Mission">
-            <p className="text-gray-700 dark:text-green-400">OpenBoard is a peer-to-peer knowledge-sharing platform designed to break down academic silos. Our mission is to create a space where students from any field can present their passion projects and research in a way that is accessible and engaging to a non-specialist audience.</p>
+        <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">our_mission</span>():</>}>
+            <p className="text-gray-700 dark:text-green-400">
+                <span className="text-py-string">"""<br />OpenBoard is a peer-to-peer knowledge-sharing platform designed to break down academic silos. Our mission is to create a space where students from any field can present their passion projects and research in a way that is accessible and engaging to a non-specialist audience.<br />"""</span>
+            </p>
         </ContentSection>
-        <ContentSection title="The Vision">
-            <p className="text-gray-700 dark:text-green-400">We envision a community fueled by curiosity. A place where a future historian can learn about machine learning, a budding chemist can appreciate poetic structures, and an aspiring artist can understand the elegance of a mathematical theorem. It's an opportunity to traverse the vast landscape of human knowledge, one fascinating talk at a time.</p>
+        <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">the_vision</span>():</>}>
+            <p className="text-gray-700 dark:text-green-400">
+                <span className="text-py-string">"""<br />We envision a community fueled by curiosity. A place where a future historian can learn about machine learning, a budding chemist can appreciate poetic structures, and an aspiring artist can understand the elegance of a mathematical theorem. It's an opportunity to traverse the vast landscape of human knowledge, one fascinating talk at a time.<br />"""</span>
+            </p>
         </ContentSection>
      </>
 );
 
 const ArchivePage = () => {
     const talks = [
-        { title: 'The Quantum Basis of Photosynthesis', speaker: 'Jane Doe (Dept. of Physics)', date: '2024-07-15' },
-        { title: 'Narrative Structures in Procedural Generation', speaker: 'John Smith (Dept. of Computer Science)', date: '2024-06-20' },
-        { title: 'The Geopolitics of Submarine Internet Cables', speaker: 'Alex Ray (Dept. of International Relations)', date: '2024-05-10' },
+        { title: 'The_Quantum_Basis_of_Photosynthesis', speaker: 'Jane_Doe(Dept.Physics)', date: '2024-07-15' },
+        { title: 'Narrative_Structures_in_Procedural_Generation', speaker: 'John_Smith(Dept.CS)', date: '2024-06-20' },
+        { title: 'The_Geopolitics_of_Submarine_Internet_Cables', speaker: 'Alex_Ray(Dept.IR)', date: '2024-05-10' },
     ];
 
     return (
-        <ContentSection title="Session Archives">
-            <p className="text-gray-500 dark:text-green-500 mb-8">Accessing data logs... Below are the records of past transmissions.</p>
-            <div>
+        <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">load_archives</span>():</>}>
+            <p className="text-gray-500 dark:text-green-500 mb-8"><span className="text-py-comment"># Accessing data logs...</span></p>
+            <div className="font-mono">
                 {talks.map((talk, index) => (
                     <div key={index} className="border-l-4 border-gray-400 dark:border-green-500 pl-6 mb-8">
-                        <h3 className="text-xl font-bold text-gray-800 dark:text-green-400">{talk.title}</h3>
-                        <p className="text-xs text-gray-500 dark:text-green-500 mb-2">{talk.speaker} | Date: {talk.date}</p>
-                        <div className="flex gap-4">
-                            <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ View Summary ]</a>
-                            <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ Download Slides ]</a>
+                        <p><span className="text-py-variable">talk_{index + 1}</span> = &#123;</p>
+                        <p className="pl-4"><span className="text-py-string">'title'</span>: <span className="text-py-string">"{talk.title}"</span>,</p>
+                        <p className="pl-4"><span className="text-py-string">'speaker'</span>: <span className="text-py-string">"{talk.speaker}"</span>,</p>
+                        <p className="pl-4"><span className="text-py-string">'date'</span>: <span className="text-py-string">"{talk.date}"</span></p>
+                        <p>&#125;</p>
+                        <div className="flex gap-4 mt-2">
+                            <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ <span className="text-py-function">view_summary</span>() ]</a>
+                            <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ <span className="text-py-function">download_slides</span>() ]</a>
                         </div>
                     </div>
                 ))}
@@ -297,14 +304,14 @@ const ArchivePage = () => {
 
 const GalleryPage = () => {
     const images = [
-        'https://placehold.co/400x300/0a0a0a/33ff33?text=Session+I',
+        'https://placehold.co/400x300/0a0a0a/33ff33?text=Session_I',
         'https://placehold.co/400x300/0a0a0a/33ff33?text=Speaker',
         'https://placehold.co/400x300/0a0a0a/33ff33?text=Audience',
-        'https://placehold.co/400x300/0a0a0a/33ff33?text=Q%26A',
+        'https://placehold.co/400x300/0a0a0a/33ff33?text=Q_and_A',
     ];
     return (
-        <ContentSection title="Visual Data Stream">
-            <p className="text-gray-500 dark:text-green-500 mb-8">Image captures from previous sessions.</p>
+        <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">init_visual_stream</span>():</>}>
+            <p className="text-gray-500 dark:text-green-500 mb-8"><span className="text-py-comment"># Image captures from previous sessions.</span></p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {images.map((src, index) => (
                     <div 
@@ -357,23 +364,23 @@ const SubmitPage = ({ playSwish }) => {
     };
 
     return (
-        <ContentSection title="Submit an Abstract">
-            <p className="text-gray-500 dark:text-green-500 mb-8">Ready to contribute? Use the form below to submit your talk proposal.</p>
+        <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">submit_abstract</span>(<span className="text-py-params">data</span>):</>}>
+            <p className="text-gray-500 dark:text-green-500 mb-8"><span className="text-py-comment"># Ready to contribute? Use the form below to submit your talk proposal.</span></p>
             <form 
                 className="flex flex-col gap-6" 
                 onSubmit={handleSubmit}
             >
                 <div>
-                    <label htmlFor="name" className="block mb-2 text-gray-700 dark:text-green-400">Name / Handle</label>
-                    <input type="text" id="name" name="name" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none" />
+                    <label htmlFor="name" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Name / Handle</span></label>
+                    <input type="text" id="name" name="name" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono" />
                 </div>
                 <div>
-                    <label htmlFor="email" className="block mb-2 text-gray-700 dark:text-green-400">Contact Email</label>
-                    <input type="email" id="email" name="email" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none" />
+                    <label htmlFor="email" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Contact Email</span></label>
+                    <input type="email" id="email" name="email" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono" />
                 </div>
                 <div>
-                    <label htmlFor="abstract" className="block mb-2 text-gray-700 dark:text-green-400">Abstract (Max 300 words)</label>
-                    <textarea id="abstract" name="abstract" rows="5" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none"></textarea>
+                    <label htmlFor="abstract" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Abstract (Max 300 words)</span></label>
+                    <textarea id="abstract" name="abstract" rows="5" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono"></textarea>
                 </div>
                 
                 <div className="flex items-center gap-4">
@@ -382,10 +389,10 @@ const SubmitPage = ({ playSwish }) => {
                         disabled={status === 'submitting'} 
                         className="self-start px-6 py-3 border border-gray-800 dark:border-green-400 text-gray-800 dark:text-green-400 bg-gray-500/10 dark:bg-green-400/10 uppercase tracking-widest font-bold transition-all duration-300 hover:bg-gray-800 hover:text-white dark:hover:bg-green-400 dark:hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {status === 'submitting' ? 'Transmitting...' : 'Transmit Data'}
+                        {status === 'submitting' ? 'transmitting_data...' : 'transmit_data()'}
                     </button>
-                    {status === 'success' && <p className="text-green-400">Success! Submission received.</p>}
-                    {status === 'error' && <p className="text-red-500">Error! Please try again.</p>}
+                    {status === 'success' && <p className="text-green-400"><span className="text-py-keyword">return</span> <span className="text-py-string">"Success! Submission received."</span></p>}
+                    {status === 'error' && <p className="text-red-500"><span className="text-py-keyword">raise</span> Exception(<span className="text-py-string">"Error! Please try again."</span>)</p>}
                 </div>
             </form>
         </ContentSection>
@@ -422,11 +429,11 @@ export default function App() {
     };
 
     const footerStatus = {
-        home: 'System nominal. Awaiting input...',
-        about: 'Signal clear.',
-        archive: 'Archive integrity verified.',
-        gallery: 'Visuals rendered.',
-        submit: 'Awaiting transmission.',
+        home: 'System_nominal. Awaiting_input...',
+        about: 'Signal_clear.',
+        archive: 'Archive_integrity_verified.',
+        gallery: 'Visuals_rendered.',
+        submit: 'Awaiting_transmission.',
     };
 
     return (
@@ -471,6 +478,32 @@ export default function App() {
                         text-shadow: -0.05em 0 0 rgba(0, 255, 0, 0.75), 0.05em 0 0 rgba(255, 0, 0, 0.75);
                     }
                 }
+
+                /* Python Syntax Highlighting Colors */
+                .text-py-keyword { color: #f92672; } /* Pink for keywords like def */
+                .dark .text-py-keyword { color: #f92672; }
+                .light .text-py-keyword { color: #c678dd; }
+
+                .text-py-function { color: #e6db74; } /* Yellow for function names */
+                .dark .text-py-function { color: #e6db74; }
+                .light .text-py-function { color: #61afef; }
+                
+                .text-py-string { color: #a6e22e; } /* Green for strings */
+                .dark .text-py-string { color: #a6e22e; }
+                .light .text-py-string { color: #98c379; }
+
+                .text-py-comment { color: #75715e; } /* Gray for comments */
+                .dark .text-py-comment { color: #75715e; }
+                .light .text-py-comment { color: #5c6370; }
+
+                .text-py-params { color: #fd971f; } /* Orange for parameters */
+                .dark .text-py-params { color: #fd971f; }
+                .light .text-py-params { color: #d19a66; }
+
+                .text-py-variable { color: #66d9ef; } /* Light blue for variables */
+                .dark .text-py-variable { color: #66d9ef; }
+                .light .text-py-variable { color: #e06c75; }
+
             `}</style>
             
             <BackgroundAnimation theme={theme} />
