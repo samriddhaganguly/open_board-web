@@ -8,26 +8,43 @@ const cx = (...classes) => classes.filter(Boolean).join(' ');
 // Manages interactive sound effects for the application.
 const useSoundEffects = () => {
     const clickSynth = useRef(null);
-    const swishSynth = useRef(null);
+    const explosionSynth = useRef(null);
     const isAudioReady = useRef(false);
 
     useEffect(() => {
         const setupAudio = async () => {
             if (window.Tone && !isAudioReady.current) {
                 await window.Tone.start();
-                // Create a synth for the click sound
-                clickSynth.current = new window.Tone.MembraneSynth({
-                    pitchDecay: 0.01,
-                    octaves: 6,
-                    envelope: { attack: 0.001, decay: 0.2, sustain: 0 },
+                
+                // Futuristic Click Sound: A high-pitched, metallic synth
+                clickSynth.current = new window.Tone.MetalSynth({
+                    frequency: 400,
+                    envelope: { attack: 0.001, decay: 0.1, release: 0.01 },
+                    harmonicity: 3.1,
+                    modulationIndex: 32,
+                    resonance: 4000,
+                    octaves: 1.5
                 }).toDestination();
 
-                // Create a noise synth for the swish sound
-                swishSynth.current = new window.Tone.NoiseSynth({
-                    noise: { type: 'white' },
-                    envelope: { attack: 0.005, decay: 0.2, sustain: 0 },
-                }).toDestination();
+                // Explosive Sound: A combination of a deep kick and white noise with distortion
+                const kick = new window.Tone.MembraneSynth({
+                    pitchDecay: 0.05,
+                    octaves: 10,
+                    oscillator: { type: "sine" },
+                    envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 },
+                });
                 
+                const noise = new window.Tone.NoiseSynth({
+                    noise: { type: "white" },
+                    envelope: { attack: 0.005, decay: 0.2, sustain: 0 },
+                });
+
+                const distortion = new window.Tone.Distortion(0.4).toDestination();
+                
+                explosionSynth.current = { kick, noise };
+                explosionSynth.current.kick.connect(distortion);
+                explosionSynth.current.noise.connect(distortion);
+
                 isAudioReady.current = true;
                 console.log("Audio context and synths ready.");
                 document.body.removeEventListener('click', setupAudio);
@@ -43,17 +60,19 @@ const useSoundEffects = () => {
 
     const playClick = () => {
         if (clickSynth.current) {
-            clickSynth.current.triggerAttackRelease("C4", "8n");
+            clickSynth.current.triggerAttackRelease("C6", "32n");
         }
     };
 
-    const playSwish = () => {
-        if (swishSynth.current) {
-            swishSynth.current.triggerAttack();
+    const playExplosion = () => {
+        if (explosionSynth.current) {
+            const now = window.Tone.now();
+            explosionSynth.current.kick.triggerAttackRelease("C2", "8n", now);
+            explosionSynth.current.noise.triggerAttackRelease("16n", now + 0.01);
         }
     };
 
-    return { playClick, playSwish };
+    return { playClick, playSwish: playExplosion }; // Exporting playExplosion as playSwish for compatibility
 };
 
 
