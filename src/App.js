@@ -120,7 +120,7 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme }) => {
                             >
                                 [ {item} ]
                             </motion.button>
-                        </li>
+                        </motion.li>
                     ))}
                     <motion.li
                         initial={{ opacity: 0, y: -20 }}
