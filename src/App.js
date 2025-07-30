@@ -4,6 +4,59 @@ import * as THREE from 'three';
 // Helper to apply classes conditionally
 const cx = (...classes) => classes.filter(Boolean).join(' ');
 
+// --- [0] Sound Component ---
+// Plays periodic beep sounds after user interaction.
+const AmbientSounds = () => {
+    const synth = useRef(null);
+
+    useEffect(() => {
+        // This effect runs once to set up the audio context.
+        const startAudio = async () => {
+            // Ensure Tone.js is loaded from the CDN
+            if (window.Tone) {
+                await window.Tone.start();
+                console.log("Audio context started");
+
+                // Create a simple synth
+                synth.current = new window.Tone.MembraneSynth().toDestination();
+
+                // Create a loop that plays a random note periodically
+                const loop = new window.Tone.Loop(time => {
+                    const notes = ['C2', 'G2', 'C3', 'A3'];
+                    const randomNote = notes[Math.floor(Math.random() * notes.length)];
+                    synth.current.triggerAttackRelease(randomNote, "8n", time);
+                }, "2n"); // Loop every half-note
+
+                // Add some randomness to the loop interval
+                loop.humanize = true;
+                
+                // Start the transport (Tone.js's master clock) and the loop
+                window.Tone.Transport.start();
+                loop.start(0);
+
+            } else {
+                console.error("Tone.js is not loaded. Please add the script tag to your index.html.");
+            }
+            // Remove the event listener after the first click
+            document.body.removeEventListener('click', startAudio);
+        };
+
+        // Add a click listener to the body to start audio on the first user interaction
+        document.body.addEventListener('click', startAudio);
+
+        // Cleanup function to stop the transport when the component unmounts
+        return () => {
+            if (window.Tone && window.Tone.Transport.state === "started") {
+                window.Tone.Transport.stop();
+            }
+            document.body.removeEventListener('click', startAudio);
+        };
+    }, []); // Empty dependency array ensures this runs only once
+
+    return null; // This component doesn't render anything visible
+};
+
+
 // --- [1] Animation Component ---
 // Adapts particle color based on the current theme.
 const BackgroundAnimation = ({ theme }) => {
@@ -338,7 +391,6 @@ export default function App() {
     };
 
     return (
-        // Use a React Fragment <> to avoid an extra div that can interfere with backgrounds
         <>
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
@@ -348,7 +400,6 @@ export default function App() {
                     transition: background-color 0.5s ease;
                 }
 
-                /* Set background on the html tag based on the theme class */
                 html.light {
                     background-color: #ffffff;
                 }
@@ -383,6 +434,7 @@ export default function App() {
                 }
             `}</style>
 
+            <AmbientSounds />
             <BackgroundAnimation theme={theme} />
             <div className="text-gray-800 dark:text-green-300 min-h-screen transition-colors duration-500">
                 <div className="relative z-10 container mx-auto p-8 max-w-5xl">
