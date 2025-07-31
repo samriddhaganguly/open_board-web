@@ -231,7 +231,7 @@ const Footer = ({ status }) => (
     <footer 
         className="text-center pt-8 mt-12 border-t border-gray-200 dark:border-green-700 text-sm text-gray-500 dark:text-green-500"
     >
-        <p>&copy; 2024 OpenBoard. All rights reserved.</p>
+        <p>&copy; 2025 OpenBoard. All rights reserved.</p>
         <p>Status: {status.replace(/\./g, '_')}</p>
     </footer>
 );
@@ -287,9 +287,9 @@ const AboutPage = () => (
 
 const ArchivePage = () => {
     const talks = [
-        { title: 'The_Quantum_Basis_of_Photosynthesis', speaker: 'Jane_Doe(Dept.Physics)', date: '2024-07-15' },
-        { title: 'Narrative_Structures_in_Procedural_Generation', speaker: 'John_Smith(Dept.CS)', date: '2024-06-20' },
-        { title: 'The_Geopolitics_of_Submarine_Internet_Cables', speaker: 'Alex_Ray(Dept.IR)', date: '2024-05-10' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
     ];
 
     return (
@@ -468,8 +468,8 @@ const SubscribeForm = ({ playSwish }) => {
 
 const ContactPage = ({ playSwish }) => {
     const coordinators = [
-        { name: 'Alex_Doe', designation: 'Lead_Coordinator', gmail: 'alex.doe@example.com', linkedin: 'https://linkedin.com/in/alexdoe' },
-        { name: 'Sam_Jones', designation: 'Events_Coordinator', gmail: 'sam.jones@example.com', linkedin: 'https://linkedin.com/in/samjones' }
+        { name: 'Samriddha_Ganguly', designation: 'Physics Major 2022 Batch', gmail: 'samriddha22@iiserb.ac.in', linkedin: 'https://www.linkedin.com/in/samriddha-ganguly-3360bb16a/' },
+        { name: 'Adeetya_Choubey', designation: 'Math Major 2022 Batch', gmail: 'adeety22@iiserb.ac.in', linkedin: 'https://www.linkedin.com/in/adeetya-choubey-6b2a44254/' }
     ];
 
     return (
