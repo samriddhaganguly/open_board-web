@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Helper to apply classes conditionally
 const cx = (...classes) => classes.filter(Boolean).join(' ');
@@ -287,9 +288,9 @@ const AboutPage = () => (
 
 const ArchivePage = () => {
     const talks = [
-        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
-        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
-        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'The_Quantum_Basis_of_Photosynthesis', speaker: 'Jane_Doe(Dept.Physics)', date: '2024-07-15' },
+        { title: 'Narrative_Structures_in_Procedural_Generation', speaker: 'John_Smith(Dept.CS)', date: '2024-06-20' },
+        { title: 'The_Geopolitics_of_Submarine_Internet_Cables', speaker: 'Alex_Ray(Dept.IR)', date: '2024-05-10' },
     ];
 
     return (
