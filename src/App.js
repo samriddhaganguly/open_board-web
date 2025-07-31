@@ -287,9 +287,9 @@ const AboutPage = () => (
 
 const ArchivePage = () => {
     const talks = [
-        { title: 'The_Quantum_Basis_of_Photosynthesis', speaker: 'Jane_Doe(Dept.Physics)', date: '2024-07-15' },
-        { title: 'Narrative_Structures_in_Procedural_Generation', speaker: 'John_Smith(Dept.CS)', date: '2024-06-20' },
-        { title: 'The_Geopolitics_of_Submarine_Internet_Cables', speaker: 'Alex_Ray(Dept.IR)', date: '2024-05-10' },
+        { title: 'TBD', speaker: 'TBD', date: 'TBD' },
+        { title: 'TBD', speaker: 'TBD', date: 'TBD' },
+        { title: 'TBD', speaker: 'TBD', date: 'TBD' },
     ];
 
     return (
@@ -387,7 +387,7 @@ const GalleryPage = ({ playClick }) => {
 
 const UpcomingEventsPage = ({ playClick }) => {
     const events = [
-        { date: '2025-08-07', time: '8:30 pm', venue: 'L-8, LHC', title: 'Probabilistic Method', speaker: 'Adeetya Choubey, 4th year Math Major', abstract: 'The probabilistic method, pioneered by Paul Erdős, was originally developed to tackle problems in graph theory and combinatorics. Over the past several decades, it has evolved into a powerful and versatile tool with applications spanning analysis, algebraic geometry, computer science, and more. In this talk, I will introduce the method as envisioned by Erdős and then highlight some of its applications. As part of the presentation, I will walk through some insightful proofs that demonstrate the elegance and utility of this approach. The talk is designed to be accessible; a background in some basic probability, along with some elementary mathematical maturity to follow structured arguments, should suffice as prerequisites.' },
+        { date: '2025-08-07', time: '8:30 pm', venue: 'L-8, LHC', title: 'Probabilistic Method', speaker: 'Adeetya Choubey, 4th year Math Major', abstract: 'The probabilistic method, pioneered by Paul Erdős, was originally developed to tackle problems in graph theory and combinatorics. Over the past several decades, it has evolved into a powerful and versatile tool with applications spanning analysis, algebraic geometry, computer science, and more. In this talk, I will introduce the method as envisioned by Erdős and then highlight some of its applications. As part of the presentation, I will walk through some insightful proofs that demonstrate the elegance and utility of this approach. The talk is designed to be accessible; a background in some basic probability and combinatorics, along with some elementary mathematical maturity to follow structured arguments, should suffice as prerequisites.' },
         { date: '2025-08-14', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-08-21', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-08-22', time: '8:30 pm', venue: 'L-8, LHC', title: 'Optimization Techniques', speaker: 'Dhruv Dua, 3rd Year Physics Major', abstract: 'TBC' },
