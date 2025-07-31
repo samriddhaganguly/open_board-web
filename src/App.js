@@ -314,24 +314,71 @@ const ArchivePage = () => {
     );
 };
 
-const GalleryPage = () => {
-    const images = [
-        'https://placehold.co/400x300/0a0a0a/33ff33?text=Session_I',
-        'https://placehold.co/400x300/0a0a0a/33ff33?text=Speaker',
-        'https://placehold.co/400x300/0a0a0a/33ff33?text=Audience',
-        'https://placehold.co/400x300/0a0a0a/33ff33?text=Q_and_A',
-    ];
+const Slideshow = ({ title, images, playClick }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const timeoutRef = useRef(null);
+
+    const resetTimeout = () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+    }
+
+    useEffect(() => {
+        resetTimeout();
+        timeoutRef.current = setTimeout(
+            () => setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1)),
+            3000
+        );
+        return () => {
+            resetTimeout();
+        };
+    }, [currentIndex, images.length]);
+
+    const goToPrevious = () => {
+        playClick();
+        const isFirstSlide = currentIndex === 0;
+        const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
+        setCurrentIndex(newIndex);
+    };
+
+    const goToNext = () => {
+        playClick();
+        const isLastSlide = currentIndex === images.length - 1;
+        const newIndex = isLastSlide ? 0 : currentIndex + 1;
+        setCurrentIndex(newIndex);
+    };
+
+    return (
+        <div className="relative w-full h-64 mb-8">
+            <h3 className="text-center text-xl mb-2"><span className="text-py-variable">{title}</span></h3>
+            <div className="relative h-full w-full overflow-hidden border-2 border-gray-400 dark:border-green-500 p-1">
+                <img src={images[currentIndex]} alt={`${title} slide`} className="w-full h-full object-cover" />
+                <button onClick={goToPrevious} className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+                    &#10094;
+                </button>
+                <button onClick={goToNext} className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+                    &#10095;
+                </button>
+            </div>
+        </div>
+    );
+};
+
+const GalleryPage = ({ playClick }) => {
+    const galleries = {
+        Posters: ['/pic', '/pic', '/pic'],
+        Speakers: ['/pic', '/pic'],
+        Session_Photos: ['/pic', '/pic', '/pic', '/pic'],
+        Audience_and_Misc: ['/pic', '/pic']
+    };
+
     return (
         <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">init_visual_stream</span>():</>}>
             <p className="text-gray-500 dark:text-green-500 mb-8"><span className="text-py-comment"># Image captures from previous sessions.</span></p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {images.map((src, index) => (
-                    <div 
-                        key={index} 
-                        className="border-2 border-gray-400 dark:border-green-500 p-1 transition-transform duration-300 hover:scale-105"
-                    >
-                        <img src={src} alt={`Gallery image ${index + 1}`} className="w-full h-auto" />
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {Object.entries(galleries).map(([title, images]) => (
+                    <Slideshow key={title} title={title} images={images} playClick={playClick} />
                 ))}
             </div>
         </ContentSection>
@@ -525,7 +572,7 @@ export default function App() {
         switch (page) {
             case 'about': return <AboutPage />;
             case 'archive': return <ArchivePage />;
-            case 'gallery': return <GalleryPage />;
+            case 'gallery': return <GalleryPage playClick={playClick} />;
             case 'submit': return <SubmitPage playSwish={playSwish} />;
             case 'contact': return <ContactPage playSwish={playSwish} />;
             case 'home':
