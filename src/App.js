@@ -187,8 +187,11 @@ const DynamicLogo = ({ scale = 1, theme }) => (
             <path d="M280 30 C 270 20, 260 30, 270 40 C 260 50, 270 60, 280 50 C 290 60, 300 50, 290 40 C 300 30, 290 20, 280 30 Z" fill="none" strokeWidth="2" className="logo-element"/>
             <path d="M280 30 C 285 35, 285 45, 280 50" fill="none" strokeWidth="1" className="logo-element"/>
 
-            {/* Text */}
-            <text x="100" y="60" fontSize="30" className="logo-text">open_board</text>
+            {/* Text and Torus */}
+            <text x="100" y="60" fontSize="30" className="logo-text">open_b</text>
+            <circle cx="230" cy="50" r="10" strokeWidth="2.5" fill="none" className="logo-element"/>
+            <circle cx="230" cy="50" r="5" strokeWidth="1.5" fill="none" className="logo-element"/>
+            <text x="245" y="60" fontSize="30" className="logo-text">ard</text>
             
             {/* Border */}
             <g className="logo-border">
@@ -861,6 +864,31 @@ export default function App() {
                 .text-py-variable { color: #66d9ef; } /* Light blue for variables */
                 .dark .text-py-variable { color: #66d9ef; }
                 .light .text-py-variable { color: #e06c75; }
+
+                /* Dynamic Logo Styles */
+                .dynamic-logo .logo-element {
+                    stroke: #33ff33;
+                }
+                .dynamic-logo .logo-text {
+                    fill: #33ff33;
+                    font-family: 'Space Mono', monospace;
+                }
+                .light .dynamic-logo .logo-element {
+                    stroke: #1f2937;
+                }
+                .light .dynamic-logo .logo-text {
+                    fill: #1f2937;
+                }
+                .logo-glitch-element {
+                    fill: #33ff33;
+                    animation: logo-glitch-flicker 1s infinite alternate;
+                }
+                @keyframes logo-glitch-flicker {
+                    0% { opacity: 0; }
+                    25% { opacity: 1; }
+                    50% { opacity: 0.5; }
+                    100% { opacity: 1; }
+                }
 
             `}</style>
             
