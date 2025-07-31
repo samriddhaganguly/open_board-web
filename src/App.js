@@ -369,8 +369,8 @@ const GalleryPage = ({ playClick }) => {
     const galleries = {
         Posters: ['/pic', '/ssc', '/pic'],
         Speakers: ['/tmg', '/pic'],
-        Session_Photos: ['/JOJO', '/ssc', '/pic', '/pic'],
-        Audience_and_Misc: ['/ssc', '/pic']
+        Session_Photos: ['/tmg', '/SSC', '/pic', '/pic'],
+        Audience_and_Misc: ['/SSC', '/pic']
     };
 
     return (
@@ -386,14 +386,11 @@ const GalleryPage = ({ playClick }) => {
 };
 
 const UpcomingEventsPage = () => {
-    // --- UPDATE YOUR EVENTS HERE ---
-    // The format is YYYY-MM-DD
     const events = [
         { date: '2025-08-15', title: 'Talk: The Art of Storytelling in Code', description: 'A session on crafting compelling narratives through programming.', link: 'https://openboard-web.vercel.app/' },
         { date: '2025-08-29', title: 'Workshop: Intro to Quantum Computing', description: 'A beginner-friendly workshop on the principles of quantum mechanics in computing.', link: 'https://openboard-web.vercel.app/' },
         { date: '2025-09-12', title: 'Talk: The History of Cryptography', description: 'From ancient ciphers to modern encryption, a journey through secure communication.', link: 'https://openboard-web.vercel.app/' },
     ];
-    // -----------------------------
 
     const today = new Date();
     const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
@@ -423,14 +420,16 @@ const UpcomingEventsPage = () => {
                 {Array.from({ length: firstDayOfMonth }).map((_, i) => <div key={`empty-${i}`}></div>)}
                 {Array.from({ length: daysInMonth }).map((_, day) => {
                     const dayNumber = day + 1;
-                    const hasEvent = eventsByDate[dayNumber];
+                    const dayEvents = eventsByDate[dayNumber];
                     return (
                         <div key={dayNumber} className={cx(
-                            'p-2 border border-gray-300 dark:border-green-700 h-24',
-                            hasEvent && 'bg-green-100 dark:bg-green-900/50'
+                            'p-2 border border-gray-300 dark:border-green-700 h-28 overflow-hidden',
+                            dayEvents && 'bg-green-100 dark:bg-green-900/50'
                         )}>
-                            <div className={cx('font-bold', hasEvent ? 'text-py-keyword' : 'text-gray-500 dark:text-green-500')}>{dayNumber}</div>
-                            {hasEvent && <div className="text-xs mt-1 text-py-string truncate">{eventsByDate[dayNumber][0].title}</div>}
+                            <div className={cx('font-bold', dayEvents ? 'text-py-keyword' : 'text-gray-500 dark:text-green-500')}>{dayNumber}</div>
+                            {dayEvents && dayEvents.map((event, i) => (
+                                <a key={i} href={event.link} target="_blank" rel="noopener noreferrer" className="block text-xs mt-1 text-py-string truncate hover:underline">{event.title}</a>
+                            ))}
                         </div>
                     );
                 })}
@@ -442,7 +441,7 @@ const UpcomingEventsPage = () => {
                     events.map((event, index) => (
                         <div key={index} className="mb-4 border-l-4 border-green-500 pl-4">
                             <p className="font-bold text-py-variable">{new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</p>
-                            <p className="text-py-string">"{event.title}"</p>
+                            <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-py-string hover:underline">"{event.title}"</a>
                             <p className="text-sm text-py-comment mt-1"># {event.description}</p>
                         </div>
                     ))
