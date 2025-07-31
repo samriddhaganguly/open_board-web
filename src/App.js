@@ -367,10 +367,10 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/pic.png', '/pic.png', '/pic.png'],
-        Speakers: ['/pic.png', '/pic.png'],
-        Session_Photos: ['/pic.png', '/pic.png', '/pic.png', '/pic.png'],
-        Audience_and_Misc: ['/pic.png', '/pic.png']
+        Posters: ['/pic', '/ssc', '/pic'],
+        Speakers: ['/tmg', '/pic'],
+        Session_Photos: ['/JOJO', '/ssc', '/pic', '/pic'],
+        Audience_and_Misc: ['/ssc', '/pic']
     };
 
     return (
@@ -389,9 +389,9 @@ const UpcomingEventsPage = () => {
     // --- UPDATE YOUR EVENTS HERE ---
     // The format is YYYY-MM-DD
     const events = [
-        { date: '2025-08-15', title: 'Talk: The Art of Storytelling in Code', description: 'A session on crafting compelling narratives through programming.' },
-        { date: '2025-08-29', title: 'Workshop: Intro to Quantum Computing', description: 'A beginner-friendly workshop on the principles of quantum mechanics in computing.' },
-        { date: '2025-09-12', title: 'Talk: The History of Cryptography', description: 'From ancient ciphers to modern encryption, a journey through secure communication.' },
+        { date: '2025-08-15', title: 'Talk: The Art of Storytelling in Code', description: 'A session on crafting compelling narratives through programming.', link: 'https://openboard-web.vercel.app/' },
+        { date: '2025-08-29', title: 'Workshop: Intro to Quantum Computing', description: 'A beginner-friendly workshop on the principles of quantum mechanics in computing.', link: 'https://openboard-web.vercel.app/' },
+        { date: '2025-09-12', title: 'Talk: The History of Cryptography', description: 'From ancient ciphers to modern encryption, a journey through secure communication.', link: 'https://openboard-web.vercel.app/' },
     ];
     // -----------------------------
 
