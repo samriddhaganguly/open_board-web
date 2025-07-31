@@ -287,9 +287,9 @@ const AboutPage = () => (
 
 const ArchivePage = () => {
     const talks = [
-        { title: 'The_Quantum_Basis_of_Photosynthesis', speaker: 'Jane_Doe(Dept.Physics)', date: '2024-07-15' },
-        { title: 'Narrative_Structures_in_Procedural_Generation', speaker: 'John_Smith(Dept.CS)', date: '2024-06-20' },
-        { title: 'The_Geopolitics_of_Submarine_Internet_Cables', speaker: 'Alex_Ray(Dept.IR)', date: '2024-05-10' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
     ];
 
     return (
@@ -298,11 +298,11 @@ const ArchivePage = () => {
             <div className="font-mono">
                 {talks.map((talk, index) => (
                     <div key={index} className="border-l-4 border-gray-400 dark:border-green-500 pl-6 mb-8">
-                        <p><span className="text-py-variable">talk_{index + 1}</span> = &#123;</p>
+                        <p><span className="text-py-variable">talk_{index + 1}</span> = {'{'}</p>
                         <p className="pl-4 break-words"><span className="text-py-string">'title'</span>: <span className="text-py-string">"{talk.title}"</span>,</p>
                         <p className="pl-4 break-words"><span className="text-py-string">'speaker'</span>: <span className="text-py-string">"{talk.speaker}"</span>,</p>
                         <p className="pl-4"><span className="text-py-string">'date'</span>: <span className="text-py-string">"{talk.date}"</span></p>
-                        <p>&#125;</p>
+                        <p>{'}'}</p>
                         <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
                             <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ <span className="text-py-function">view_summary</span>() ]</a>
                             <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ <span className="text-py-function">download_slides</span>() ]</a>
@@ -367,9 +367,9 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/pic', '/ssc', '/pic'],
+        Posters: ['/pic', '/JOJO', '/SSC'],
         Speakers: ['/tmg', '/pic'],
-        Session_Photos: ['/tmg', '/SSC', '/pic', '/pic'],
+        Session_Photos: ['/JOJO', '/pic', '/tmg', '/pic'],
         Audience_and_Misc: ['/SSC', '/pic']
     };
 
@@ -594,10 +594,10 @@ const ContactPage = ({ playSwish }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {coordinators.map((coord, index) => (
                         <div key={index}>
-                            <p><span className="text-py-variable">coordinator_{index+1}</span> = &#123;</p>
+                            <p><span className="text-py-variable">coordinator_{index+1}</span> = {'{'}</p>
                             <p className="pl-4"><span className="text-py-string">'name'</span>: <span className="text-py-string">"{coord.name}"</span>,</p>
                             <p className="pl-4"><span className="text-py-string">'designation'</span>: <span className="text-py-string">"{coord.designation}"</span></p>
-                            <p>&#125;</p>
+                            <p>{'}'}</p>
                             <div className="flex gap-4 mt-4 pl-4">
                                 <a href={`mailto:${coord.gmail}`} className="text-gray-600 dark:text-green-400 hover:text-black dark:hover:text-green-200 transition-colors" title={coord.gmail}>
                                     <EmailIcon />
