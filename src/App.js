@@ -183,15 +183,13 @@ const DynamicLogo = ({ scale = 1, theme }) => (
             <path d="M65 30 L70 30 M65 35 L70 35 M65 40 L70 40 M65 45 L70 45" strokeWidth="1" className="logo-element"/>
             <path d="M80 55 L85 55 M80 60 L85 60 M80 65 L85 65 M80 70 L85 70" strokeWidth="1" className="logo-element"/>
 
-            {/* Brain Icon */}
-            <path d="M280 30 C 270 20, 260 30, 270 40 C 260 50, 270 60, 280 50 C 290 60, 300 50, 290 40 C 300 30, 290 20, 280 30 Z" fill="none" strokeWidth="2" className="logo-element"/>
-            <path d="M280 30 C 285 35, 285 45, 280 50" fill="none" strokeWidth="1" className="logo-element"/>
-
-            {/* Text and Torus */}
-            <text x="100" y="60" fontSize="30" className="logo-text">open_b</text>
-            <circle cx="230" cy="50" r="10" strokeWidth="2.5" fill="none" className="logo-element"/>
-            <circle cx="230" cy="50" r="5" strokeWidth="1.5" fill="none" className="logo-element"/>
-            <text x="245" y="60" fontSize="30" className="logo-text">ard</text>
+            {/* Atom Icon */}
+            <circle cx="320" cy="50" r="20" strokeWidth="2" fill="none" className="logo-element"/>
+            <ellipse cx="320" cy="50" rx="10" ry="22" strokeWidth="2" fill="none" className="logo-element" transform="rotate(45 320 50)"/>
+            <ellipse cx="320" cy="50" rx="10" ry="22" strokeWidth="2" fill="none" className="logo-element" transform="rotate(-45 320 50)"/>
+            
+            {/* Text */}
+            <text x="100" y="60" fontSize="30" className="logo-text">open_board</text>
             
             {/* Border */}
             <g className="logo-border">
