@@ -406,8 +406,7 @@ const UpcomingEventsPage = ({ playClick }) => {
     ];
     
     const [selectedDay, setSelectedDay] = useState(null);
-    const today = new Date();
-    const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+    const [currentDate, setCurrentDate] = useState(new Date(2025, 7, 1)); // Start with August 2025
 
     const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
     const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
@@ -422,15 +421,23 @@ const UpcomingEventsPage = ({ playClick }) => {
         }
         return acc;
     }, {});
+
+    const changeMonth = (offset) => {
+        playClick();
+        setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + offset, 1));
+        setSelectedDay(null);
+    };
     
     const selectedEvents = selectedDay ? eventsByDate[selectedDay] : null;
 
     return (
         <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">upcoming_events</span>():</>}>
-            <div className="text-center mb-6">
+            <div className="flex justify-between items-center text-center mb-6">
+                 <button onClick={() => changeMonth(-1)} className="hidden md:block p-2 rounded-full hover:bg-gray-200 dark:hover:bg-green-500/20">&#10094;</button>
                 <h3 className="text-2xl font-bold">
                     <span className="text-py-string">"{currentDate.toLocaleString('default', { month: 'long' })} {currentDate.getFullYear()}"</span>
                 </h3>
+                 <button onClick={() => changeMonth(1)} className="hidden md:block p-2 rounded-full hover:bg-gray-200 dark:hover:bg-green-500/20">&#10095;</button>
             </div>
             
             {/* Desktop Calendar Grid */}
@@ -534,53 +541,62 @@ const SubmitPage = ({ playSwish }) => {
     };
 
     return (
-        <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">submit_abstract</span>(<span className="text-py-params">data</span>):</>}>
-            <p className="text-gray-500 dark:text-green-500 mb-8"><span className="text-py-comment"># Ready to contribute? Use the form below to submit your talk proposal.</span></p>
-            <form 
-                className="flex flex-col gap-6" 
-                onSubmit={handleSubmit}
-            >
-                <div>
-                    <label htmlFor="name" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Name / Handle</span></label>
-                    <input type="text" id="name" name="name" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono" />
-                </div>
-                <div>
-                    <label htmlFor="email" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Contact Email</span></label>
-                    <input type="email" id="email" name="email" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono" />
-                </div>
-                <div>
-                    <label htmlFor="date_preference" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Date Preference</span></label>
-                    <input type="text" id="date_preference" name="date_preference" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono" />
-                </div>
-                <div>
-                    <label className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Subject Tags (Select all that apply)</span></label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {tags.map(tag => (
-                            <label key={tag} className="flex items-center space-x-2">
-                                <input type="checkbox" name={tag} className="form-checkbox bg-gray-100 dark:bg-gray-900 border-gray-300 dark:border-green-700 text-green-500 focus:ring-green-400" />
-                                <span>{tag}</span>
-                            </label>
-                        ))}
+        <>
+            <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">submission_guidelines</span>():</>}>
+                <ul className="list-disc list-inside text-gray-700 dark:text-green-400 space-y-2">
+                    <li><span className="text-py-string">"Accessible to an audience with at most 2nd-year knowledge of any subject, preferably even 1st years should be able to grasp with proper motivation."</span></li>
+                    <li><span className="text-py-string">"Talk should be at least 30-45 mins."</span></li>
+                    <li><span className="text-py-string">"Please mention any prerequisites, motivational articles, or keywords for your abstract."</span></li>
+                </ul>
+            </ContentSection>
+            <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">submit_abstract</span>(<span className="text-py-params">data</span>):</>}>
+                <p className="text-gray-500 dark:text-green-500 mb-8"><span className="text-py-comment"># Ready to contribute? Use the form below to submit your talk proposal.</span></p>
+                <form 
+                    className="flex flex-col gap-6" 
+                    onSubmit={handleSubmit}
+                >
+                    <div>
+                        <label htmlFor="name" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Name / Handle</span></label>
+                        <input type="text" id="name" name="name" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono" />
                     </div>
-                </div>
-                <div>
-                    <label htmlFor="abstract" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Abstract (Max 300 words)</span></label>
-                    <textarea id="abstract" name="abstract" rows="5" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono"></textarea>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                    <button 
-                        type="submit" 
-                        disabled={status === 'submitting'} 
-                        className="self-start px-6 py-3 border border-gray-800 dark:border-green-400 text-gray-800 dark:text-green-400 bg-gray-500/10 dark:bg-green-400/10 uppercase tracking-widest font-bold transition-all duration-300 hover:bg-gray-800 hover:text-white dark:hover:bg-green-400 dark:hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {status === 'submitting' ? 'transmitting_data...' : 'transmit_data()'}
-                    </button>
-                    {status === 'success' && <p className="text-green-400"><span className="text-py-keyword">return</span> <span className="text-py-string">"Success! Submission received."</span></p>}
-                    {status === 'error' && <p className="text-red-500"><span className="text-py-keyword">raise</span> Exception(<span className="text-py-string">"Error! Please try again."</span>)</p>}
-                </div>
-            </form>
-        </ContentSection>
+                    <div>
+                        <label htmlFor="email" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Contact Email</span></label>
+                        <input type="email" id="email" name="email" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono" />
+                    </div>
+                    <div>
+                        <label htmlFor="date_preference" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Date Preference</span></label>
+                        <input type="text" id="date_preference" name="date_preference" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono" />
+                    </div>
+                    <div>
+                        <label className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Subject Tags (Select all that apply)</span></label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            {tags.map(tag => (
+                                <label key={tag} className="flex items-center space-x-2">
+                                    <input type="checkbox" name={tag} className="form-checkbox bg-gray-100 dark:bg-gray-900 border-gray-300 dark:border-green-700 text-green-500 focus:ring-green-400" />
+                                    <span>{tag}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <label htmlFor="abstract" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Abstract (Max 300 words)</span></label>
+                        <textarea id="abstract" name="abstract" rows="5" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono"></textarea>
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                        <button 
+                            type="submit" 
+                            disabled={status === 'submitting'} 
+                            className="self-start px-6 py-3 border border-gray-800 dark:border-green-400 text-gray-800 dark:text-green-400 bg-gray-500/10 dark:bg-green-400/10 uppercase tracking-widest font-bold transition-all duration-300 hover:bg-gray-800 hover:text-white dark:hover:bg-green-400 dark:hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {status === 'submitting' ? 'transmitting_data...' : 'transmit_data()'}
+                        </button>
+                        {status === 'success' && <p className="text-green-400"><span className="text-py-keyword">return</span> <span className="text-py-string">"Success! Submission received."</span></p>}
+                        {status === 'error' && <p className="text-red-500"><span className="text-py-keyword">raise</span> Exception(<span className="text-py-string">"Error! Please try again."</span>)</p>}
+                    </div>
+                </form>
+            </ContentSection>
+        </>
     );
 };
 
