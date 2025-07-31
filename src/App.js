@@ -406,6 +406,7 @@ const UpcomingEventsPage = ({ playClick }) => {
     ];
     
     const [selectedDay, setSelectedDay] = useState(null);
+    const [expandedMobileEvent, setExpandedMobileEvent] = useState(null);
     const [currentDate, setCurrentDate] = useState(new Date(2025, 7, 1)); // Start with August 2025
 
     const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
@@ -466,10 +467,17 @@ const UpcomingEventsPage = ({ playClick }) => {
             <div className="md:hidden">
                 {events.length > 0 ? (
                     events.map((event, index) => (
-                        <div key={index} className="mb-4 border-l-4 border-green-500 pl-4">
+                        <div key={index} className="mb-4 border-l-4 border-green-500 pl-4 cursor-pointer" onClick={() => setExpandedMobileEvent(expandedMobileEvent === index ? null : index)}>
                             <p className="font-bold text-py-variable">{new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} at {event.time}</p>
                             <p className="text-py-string">"{event.title}"</p>
-                            <p className="text-sm text-py-comment mt-1"># {event.description}</p>
+                            {expandedMobileEvent === index && (
+                                <div className="mt-2 text-sm">
+                                    <p><span className="text-py-keyword">speaker</span>: <span className="text-py-string">"{event.speaker}"</span></p>
+                                    <p><span className="text-py-keyword">venue</span>: <span className="text-py-string">"{event.venue}"</span></p>
+                                    <p className="mt-2"><span className="text-py-comment"># Abstract:</span></p>
+                                    <p className="text-gray-700 dark:text-green-400 whitespace-pre-wrap">{event.abstract}</p>
+                                </div>
+                            )}
                         </div>
                     ))
                 ) : (
@@ -477,7 +485,7 @@ const UpcomingEventsPage = ({ playClick }) => {
                 )}
             </div>
 
-            {/* Event Details Section */}
+            {/* Event Details Section for Desktop */}
             {selectedEvents && (
                 <div className="mt-8 border-t-2 border-green-700 pt-4">
                     <h3 className="text-xl font-bold mb-4"><span className="text-py-variable">event_details</span> for <span className="text-py-string">{currentDate.toLocaleString('default', { month: 'long' })} {selectedDay}</span>:</h3>
@@ -500,7 +508,20 @@ const UpcomingEventsPage = ({ playClick }) => {
 
 const SubmitPage = ({ playSwish }) => {
     const [status, setStatus] = useState('idle'); // idle, submitting, success, error
+    const [selectedTags, setSelectedTags] = useState(new Set());
     const tags = ['Physics', 'Mathematics', 'Biology', 'Economics', 'Earth Sciences', 'Environmental Sciences', 'Social Sciences', 'EECS', 'Applied Sciences and Engineering'];
+
+    const handleTagClick = (tag) => {
+        setSelectedTags(prev => {
+            const newTags = new Set(prev);
+            if (newTags.has(tag)) {
+                newTags.delete(tag);
+            } else {
+                newTags.add(tag);
+            }
+            return newTags;
+        });
+    };
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -509,14 +530,13 @@ const SubmitPage = ({ playSwish }) => {
         
         const form = event.target;
         const formData = new FormData(form);
-        const selectedTags = tags.filter(tag => formData.get(tag));
-
+        
         const data = {
             name: formData.get('name'),
             email: formData.get('email'),
             abstract: formData.get('abstract'),
             date_preference: formData.get('date_preference'),
-            tags: selectedTags.join(', ')
+            tags: Array.from(selectedTags).join(', ')
         };
 
         const scriptURL = "https://script.google.com/macros/s/AKfycbyiUl916nvX0Xp4wFy0XZOBUllTJ49r1z1U-cxJ98UhEDbxt5o5gWIz9ZtrP5o44S2a/exec";
@@ -533,6 +553,7 @@ const SubmitPage = ({ playSwish }) => {
              console.log('Success!', response);
              setStatus('success');
              form.reset();
+             setSelectedTags(new Set());
         })
         .catch(error => {
             console.error('Error!', error.message);
@@ -569,12 +590,21 @@ const SubmitPage = ({ playSwish }) => {
                     </div>
                     <div>
                         <label className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Subject Tags (Select all that apply)</span></label>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <div className="flex flex-wrap gap-2">
                             {tags.map(tag => (
-                                <label key={tag} className="flex items-center space-x-2">
-                                    <input type="checkbox" name={tag} className="form-checkbox bg-gray-100 dark:bg-gray-900 border-gray-300 dark:border-green-700 text-green-500 focus:ring-green-400" />
-                                    <span>{tag}</span>
-                                </label>
+                                <button
+                                    type="button"
+                                    key={tag}
+                                    onClick={() => handleTagClick(tag)}
+                                    className={cx(
+                                        'px-3 py-1 border rounded-full transition-colors duration-200',
+                                        selectedTags.has(tag)
+                                            ? 'bg-green-500 text-black border-green-500'
+                                            : 'bg-transparent border-gray-400 dark:border-green-700 text-gray-600 dark:text-green-400'
+                                    )}
+                                >
+                                    {tag}
+                                </button>
                             ))}
                         </div>
                     </div>
