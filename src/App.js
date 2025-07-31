@@ -275,12 +275,12 @@ const AboutPage = () => (
      <>
         <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">our_mission</span>():</>}>
             <p className="text-gray-700 dark:text-green-400">
-                <span className="text-py-string">"""<br />OpenBoard is a peer-to-peer knowledge-sharing platform designed to break down academic silos. Our mission is to create a space where students from any field can present their passion projects and research in a way that is accessible and engaging to a non-specialist audience.<br />"""</span>
+                <span className="text-py-string">"""<br />OpenBoard is a student seminar initiative that gives students from any field an opportunity to present topics they find interesting and important. The aim is to explain these topics in a clear, pedagogical way so that even those without a background in the subject can learn something useful and engage in meaningful discussion.<br />"""</span>
             </p>
         </ContentSection>
         <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">the_vision</span>():</>}>
             <p className="text-gray-700 dark:text-green-400">
-                <span className="text-py-string">"""<br />We envision a community fueled by curiosity. A place where a future historian can learn about machine learning, a budding chemist can appreciate poetic structures, and an aspiring artist can understand the elegance of a mathematical theorem. It's an opportunity to traverse the vast landscape of human knowledge, one fascinating talk at a time.<br />"""</span>
+                <span className="text-py-string">"""<br />OpenBoard envisions a campus culture where sharing knowledge across disciplines becomes a common practice. We aim to build an environment where students feel encouraged to communicate their ideas clearly, explore subjects outside their own field, and engage in discussions that broaden perspectives and spark curiosity beyond traditional classroom boundaries.<br />"""</span>
             </p>
         </ContentSection>
      </>
@@ -288,9 +288,9 @@ const AboutPage = () => (
 
 const ArchivePage = () => {
     const talks = [
-        { title: 'The_Quantum_Basis_of_Photosynthesis', speaker: 'Jane_Doe(Dept.Physics)', date: '2024-07-15' },
-        { title: 'Narrative_Structures_in_Procedural_Generation', speaker: 'John_Smith(Dept.CS)', date: '2024-06-20' },
-        { title: 'The_Geopolitics_of_Submarine_Internet_Cables', speaker: 'Alex_Ray(Dept.IR)', date: '2024-05-10' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
     ];
 
     return (
