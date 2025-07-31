@@ -287,9 +287,9 @@ const AboutPage = () => (
 
 const ArchivePage = () => {
     const talks = [
-        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
-        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
-        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'The_Quantum_Basis_of_Photosynthesis', speaker: 'Jane_Doe(Dept.Physics)', date: '2024-07-15' },
+        { title: 'Narrative_Structures_in_Procedural_Generation', speaker: 'John_Smith(Dept.CS)', date: '2024-06-20' },
+        { title: 'The_Geopolitics_of_Submarine_Internet_Cables', speaker: 'Alex_Ray(Dept.IR)', date: '2024-05-10' },
     ];
 
     return (
@@ -350,9 +350,9 @@ const Slideshow = ({ title, images, playClick }) => {
     };
 
     return (
-        <div className="relative w-full h-64 mb-8">
+        <div className="w-full mb-8">
             <h3 className="text-center text-xl mb-2"><span className="text-py-variable">{title}</span></h3>
-            <div className="relative h-full w-full overflow-hidden border-2 border-gray-400 dark:border-green-500 p-1">
+            <div className="relative w-full aspect-square overflow-hidden border-2 border-gray-400 dark:border-green-500 p-1">
                 <img src={images[currentIndex]} alt={`${title} slide`} className="w-full h-full object-cover" />
                 <button onClick={goToPrevious} className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
                     &#10094;
