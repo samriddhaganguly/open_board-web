@@ -163,6 +163,45 @@ const LinkedInIcon = () => (
     </svg>
 );
 
+const DynamicLogo = ({ scale = 1, theme }) => (
+    <svg viewBox="0 0 400 100" width={400 * scale} height={100 * scale} className="dynamic-logo">
+        <defs>
+            <filter id="neon-glow">
+                <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+        <g className="logo-glow" style={{ filter: theme === 'dark' ? 'url(#neon-glow)' : 'none' }}>
+            {/* Book Icon */}
+            <path d="M60 25 L60 75 L50 75 L50 25 Z" fill="none" strokeWidth="2" className="logo-element"/>
+            <path d="M60 25 L90 25 L90 75 L60 75" fill="none" strokeWidth="2" className="logo-element"/>
+            <path d="M60 50 L90 50" fill="none" strokeWidth="1" className="logo-element"/>
+            <path d="M75 25 L75 75" fill="none" strokeWidth="1" className="logo-element"/>
+            <path d="M65 30 L70 30 M65 35 L70 35 M65 40 L70 40 M65 45 L70 45" strokeWidth="1" className="logo-element"/>
+            <path d="M80 55 L85 55 M80 60 L85 60 M80 65 L85 65 M80 70 L85 70" strokeWidth="1" className="logo-element"/>
+
+            {/* Brain Icon */}
+            <path d="M280 30 C 270 20, 260 30, 270 40 C 260 50, 270 60, 280 50 C 290 60, 300 50, 290 40 C 300 30, 290 20, 280 30 Z" fill="none" strokeWidth="2" className="logo-element"/>
+            <path d="M280 30 C 285 35, 285 45, 280 50" fill="none" strokeWidth="1" className="logo-element"/>
+
+            {/* Text */}
+            <text x="100" y="60" fontSize="30" className="logo-text">open_board</text>
+            
+            {/* Border */}
+            <g className="logo-border">
+                <path d="M40 20 L360 20 L360 80 L40 80 Z" fill="none" strokeWidth="4" className="logo-element"/>
+                {/* Glitch elements */}
+                <rect x="150" y="16" width="20" height="4" className="logo-glitch-element"/>
+                <rect x="360" y="40" width="4" height="10" className="logo-glitch-element"/>
+                <rect x="40" y="70" width="4" height="10" className="logo-glitch-element"/>
+                <rect x="200" y="80" width="30" height="4" className="logo-glitch-element"/>
+            </g>
+        </g>
+    </svg>
+);
 
 const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -176,12 +215,7 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
 
     return (
         <header className="flex flex-wrap justify-between items-center gap-x-6 gap-y-4 pb-8 border-b border-gray-300 dark:border-green-500 mb-12">
-            <div 
-                className="text-3xl font-bold text-gray-800 dark:text-green-400" 
-                style={{ textShadow: theme === 'dark' ? '0 0 5px #33ff33, 0 0 10px #33ff33' : 'none' }}
-            >
-                open_board
-            </div>
+            <DynamicLogo scale={0.5} theme={theme} />
 
             {/* Hamburger Menu Button - visible only on small screens */}
             <div className="md:hidden">
@@ -251,11 +285,9 @@ const ContentSection = ({ title, children }) => (
 
 const HomePage = ({ navigateTo, playClick }) => (
     <div className="text-center flex flex-col items-center justify-center min-h-[60vh]">
-        <h1 
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 dark:text-green-400 glitch font-mono break-words"
-        >
-            <span className="text-py-keyword">print</span>(<span className="text-py-string">"Open_Knowledge, Shared_Insights"</span>)
-        </h1>
+        <div className="mb-8 p-4 glitch-border-container">
+            <DynamicLogo theme="dark" />
+        </div>
         <p 
             className="text-lg text-gray-600 dark:text-green-400 max-w-2xl mx-auto my-6 font-mono"
         >
@@ -367,8 +399,8 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/talk1', '/talk3', '/talk4'],
-        Session_Snaps: ['/pic', '/tmg', '/SSC'],
+        Posters: ['/talk1.png', '/talk1.png', '/talk1.png'],
+        Session_Snaps: ['/pic.png', '/pic.png', '/pic.png'],
     };
 
     return (
