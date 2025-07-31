@@ -180,7 +180,7 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
                 className="text-3xl font-bold text-gray-800 dark:text-green-400" 
                 style={{ textShadow: theme === 'dark' ? '0 0 5px #33ff33, 0 0 10px #33ff33' : 'none' }}
             >
-                OpenBoard
+                open_board
             </div>
 
             {/* Hamburger Menu Button - visible only on small screens */}
@@ -231,7 +231,7 @@ const Footer = ({ status }) => (
     <footer 
         className="text-center pt-8 mt-12 border-t border-gray-200 dark:border-green-700 text-sm text-gray-500 dark:text-green-500"
     >
-        <p>&copy; 2025 OpenBoard. All rights reserved.</p>
+        <p>&copy; 2025 open_board. All rights reserved.</p>
         <p>Status: {status.replace(/\./g, '_')}</p>
     </footer>
 );
@@ -274,7 +274,7 @@ const AboutPage = () => (
      <>
         <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">our_mission</span>():</>}>
             <p className="text-gray-700 dark:text-green-400">
-                <span className="text-py-string">"""<br />OpenBoard is a peer-to-peer knowledge-sharing platform designed to break down academic silos. Our mission is to create a space where students from any field can present their passion projects and research in a way that is accessible and engaging to a non-specialist audience.<br />"""</span>
+                <span className="text-py-string">"""<br />open_board is a peer-to-peer knowledge-sharing platform designed to break down academic silos. Our mission is to create a space where students from any field can present their passion projects and research in a way that is accessible and engaging to a non-specialist audience.<br />"""</span>
             </p>
         </ContentSection>
         <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">the_vision</span>():</>}>
@@ -367,10 +367,10 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/pic', '/JOJO', '/SSC'],
-        Speakers: ['/tmg', '/pic'],
-        Session_Photos: ['/JOJO', '/pic', '/tmg', '/pic'],
-        Audience_and_Misc: ['/SSC', '/pic']
+        Posters: ['/pic.png', '/pic.png', '/pic.png'],
+        Speakers: ['/pic.png', '/pic.png'],
+        Session_Photos: ['/pic.png', '/pic.png', '/pic.png', '/pic.png'],
+        Audience_and_Misc: ['/pic.png', '/pic.png']
     };
 
     return (
@@ -387,11 +387,25 @@ const GalleryPage = ({ playClick }) => {
 
 const UpcomingEventsPage = ({ playClick }) => {
     const events = [
-        { date: '2025-08-15', title: 'Talk: The Art of Storytelling in Code', description: 'A session on crafting compelling narratives through programming.', link: 'https://openboard-web.vercel.app/' },
-        { date: '2025-08-29', title: 'Workshop: Intro to Quantum Computing', description: 'A beginner-friendly workshop on the principles of quantum mechanics in computing.', link: 'https://openboard-web.vercel.app/' },
-        { date: '2025-09-12', title: 'Talk: The History of Cryptography', description: 'From ancient ciphers to modern encryption, a journey through secure communication.', link: 'https://openboard-web.vercel.app/' },
+        { date: '2025-08-07', time: '8:30 pm', venue: 'L-8, LHC', title: 'Probabilistic Method', speaker: 'Adeetya Choubey, 4th year Math Major', abstract: 'The probabilistic method, pioneered by Paul Erdős, was originally developed to tackle problems in graph theory and combinatorics. Over the past several decades, it has evolved into a powerful and versatile tool with applications spanning analysis, algebraic geometry, computer science, and more. In this talk, I will introduce the method as envisioned by Erdős and then highlight some of its applications. As part of the presentation, I will walk through some insightful proofs that demonstrate the elegance and utility of this approach. The talk is designed to be accessible; a background in some basic probability, along with some elementary mathematical maturity to follow structured arguments, should suffice as prerequisites.' },
+        { date: '2025-08-14', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-08-21', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-08-22', time: '8:30 pm', venue: 'L-8, LHC', title: 'Optimization Techniques', speaker: 'Dhruv Dua, 3rd Year Physics Major', abstract: 'TBC' },
+        { date: '2025-08-29', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-09-04', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-09-05', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-09-12', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-10-09', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-10-16', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-10-17', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-10-23', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-10-30', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-10-31', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-11-13', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-11-14', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
     ];
-
+    
+    const [selectedDay, setSelectedDay] = useState(null);
     const today = new Date();
     const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
@@ -400,11 +414,16 @@ const UpcomingEventsPage = ({ playClick }) => {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     const eventsByDate = events.reduce((acc, event) => {
-        const day = new Date(event.date).getDate();
-        if (!acc[day]) acc[day] = [];
-        acc[day].push(event);
+        const date = new Date(event.date);
+        if (date.getMonth() === currentDate.getMonth() && date.getFullYear() === currentDate.getFullYear()) {
+            const day = date.getDate();
+            if (!acc[day]) acc[day] = [];
+            acc[day].push(event);
+        }
         return acc;
     }, {});
+    
+    const selectedEvents = selectedDay ? eventsByDate[selectedDay] : null;
 
     return (
         <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">upcoming_events</span>():</>}>
@@ -422,15 +441,16 @@ const UpcomingEventsPage = ({ playClick }) => {
                     const dayNumber = day + 1;
                     const dayEvents = eventsByDate[dayNumber];
                     return (
-                        <div key={dayNumber} className={cx(
-                            'p-2 border border-gray-300 dark:border-green-700 h-28 overflow-hidden',
-                            dayEvents && 'bg-green-100 dark:bg-green-900/50'
+                        <button key={dayNumber} onClick={() => { if(dayEvents) { playClick(); setSelectedDay(dayNumber); } }} className={cx(
+                            'p-2 border border-gray-300 dark:border-green-700 h-28 overflow-hidden text-left',
+                            dayEvents && 'bg-green-100 dark:bg-green-900/50 cursor-pointer hover:ring-2 ring-green-400',
+                            selectedDay === dayNumber && 'ring-2 ring-offset-2 ring-green-500'
                         )}>
                             <div className={cx('font-bold', dayEvents ? 'text-py-keyword' : 'text-gray-500 dark:text-green-500')}>{dayNumber}</div>
                             {dayEvents && dayEvents.map((event, i) => (
-                                <a key={i} href={event.link} target="_blank" rel="noopener noreferrer" className="block text-xs mt-1 text-py-string truncate hover:underline">{event.title}</a>
+                                <div key={i} className="block text-xs mt-1 text-py-string truncate">{event.title}</div>
                             ))}
-                        </div>
+                        </button>
                     );
                 })}
             </div>
@@ -440,8 +460,8 @@ const UpcomingEventsPage = ({ playClick }) => {
                 {events.length > 0 ? (
                     events.map((event, index) => (
                         <div key={index} className="mb-4 border-l-4 border-green-500 pl-4">
-                            <p className="font-bold text-py-variable">{new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</p>
-                            <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-py-string hover:underline">"{event.title}"</a>
+                            <p className="font-bold text-py-variable">{new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} at {event.time}</p>
+                            <p className="text-py-string">"{event.title}"</p>
                             <p className="text-sm text-py-comment mt-1"># {event.description}</p>
                         </div>
                     ))
@@ -449,6 +469,23 @@ const UpcomingEventsPage = ({ playClick }) => {
                     <p className="text-py-comment"># No upcoming events scheduled. Check back soon.</p>
                 )}
             </div>
+
+            {/* Event Details Section */}
+            {selectedEvents && (
+                <div className="mt-8 border-t-2 border-green-700 pt-4">
+                    <h3 className="text-xl font-bold mb-4"><span className="text-py-variable">event_details</span> for <span className="text-py-string">{currentDate.toLocaleString('default', { month: 'long' })} {selectedDay}</span>:</h3>
+                    {selectedEvents.map((event, i) => (
+                        <div key={i} className="mb-4">
+                            <p><span className="text-py-keyword">title</span> = <span className="text-py-string">"{event.title}"</span></p>
+                            <p><span className="text-py-keyword">speaker</span> = <span className="text-py-string">"{event.speaker}"</span></p>
+                            <p><span className="text-py-keyword">time</span> = <span className="text-py-string">"{event.time}"</span></p>
+                            <p><span className="text-py-keyword">venue</span> = <span className="text-py-string">"{event.venue}"</span></p>
+                            <p className="mt-2"><span className="text-py-comment"># Abstract:</span></p>
+                            <p className="text-gray-700 dark:text-green-400 whitespace-pre-wrap">{event.abstract}</p>
+                        </div>
+                    ))}
+                </div>
+            )}
         </ContentSection>
     );
 };
@@ -456,6 +493,7 @@ const UpcomingEventsPage = ({ playClick }) => {
 
 const SubmitPage = ({ playSwish }) => {
     const [status, setStatus] = useState('idle'); // idle, submitting, success, error
+    const tags = ['Physics', 'Mathematics', 'Biology', 'Economics', 'Earth Sciences', 'Environmental Sciences', 'Social Sciences', 'EECS', 'Applied Sciences and Engineering'];
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -464,10 +502,14 @@ const SubmitPage = ({ playSwish }) => {
         
         const form = event.target;
         const formData = new FormData(form);
+        const selectedTags = tags.filter(tag => formData.get(tag));
+
         const data = {
             name: formData.get('name'),
             email: formData.get('email'),
             abstract: formData.get('abstract'),
+            date_preference: formData.get('date_preference'),
+            tags: selectedTags.join(', ')
         };
 
         const scriptURL = "https://script.google.com/macros/s/AKfycbyiUl916nvX0Xp4wFy0XZOBUllTJ49r1z1U-cxJ98UhEDbxt5o5gWIz9ZtrP5o44S2a/exec";
@@ -505,6 +547,21 @@ const SubmitPage = ({ playSwish }) => {
                 <div>
                     <label htmlFor="email" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Contact Email</span></label>
                     <input type="email" id="email" name="email" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono" />
+                </div>
+                <div>
+                    <label htmlFor="date_preference" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Date Preference</span></label>
+                    <input type="text" id="date_preference" name="date_preference" required className="w-full p-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-green-700 text-gray-800 dark:text-green-300 focus:ring-2 focus:ring-green-400 focus:outline-none font-mono" />
+                </div>
+                <div>
+                    <label className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Subject Tags (Select all that apply)</span></label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {tags.map(tag => (
+                            <label key={tag} className="flex items-center space-x-2">
+                                <input type="checkbox" name={tag} className="form-checkbox bg-gray-100 dark:bg-gray-900 border-gray-300 dark:border-green-700 text-green-500 focus:ring-green-400" />
+                                <span>{tag}</span>
+                            </label>
+                        ))}
+                    </div>
                 </div>
                 <div>
                     <label htmlFor="abstract" className="block mb-2 text-gray-700 dark:text-green-400"><span className="text-py-comment"># Abstract (Max 300 words)</span></label>
