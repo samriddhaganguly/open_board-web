@@ -166,7 +166,7 @@ const LinkedInIcon = () => (
 
 const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const navItems = ['home', 'about', 'archive', 'gallery', 'submit', 'contact'];
+    const navItems = ['home', 'about', 'archive', 'gallery', 'events', 'submit', 'contact'];
 
     const handleNavClick = (page) => {
         playClick();
@@ -287,9 +287,9 @@ const AboutPage = () => (
 
 const ArchivePage = () => {
     const talks = [
-        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
-        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
-        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'The_Quantum_Basis_of_Photosynthesis', speaker: 'Jane_Doe(Dept.Physics)', date: '2024-07-15' },
+        { title: 'Narrative_Structures_in_Procedural_Generation', speaker: 'John_Smith(Dept.CS)', date: '2024-06-20' },
+        { title: 'The_Geopolitics_of_Submarine_Internet_Cables', speaker: 'Alex_Ray(Dept.IR)', date: '2024-05-10' },
     ];
 
     return (
@@ -367,10 +367,10 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/pic', '/JOJO', '/SSC'],
-        Speakers: ['/tmg', '/pic'],
-        Session_Photos: ['/JOJO', '/pic', '/tmg', '/pic'],
-        Audience_and_Misc: ['/SSC', '/pic']
+        Posters: ['/pic.png', '/pic.png', '/pic.png'],
+        Speakers: ['/pic.png', '/pic.png'],
+        Session_Photos: ['/pic.png', '/pic.png', '/pic.png', '/pic.png'],
+        Audience_and_Misc: ['/pic.png', '/pic.png']
     };
 
     return (
@@ -384,6 +384,76 @@ const GalleryPage = ({ playClick }) => {
         </ContentSection>
     );
 };
+
+const UpcomingEventsPage = () => {
+    // --- UPDATE YOUR EVENTS HERE ---
+    // The format is YYYY-MM-DD
+    const events = [
+        { date: '2025-08-15', title: 'Talk: The Art of Storytelling in Code', description: 'A session on crafting compelling narratives through programming.' },
+        { date: '2025-08-29', title: 'Workshop: Intro to Quantum Computing', description: 'A beginner-friendly workshop on the principles of quantum mechanics in computing.' },
+        { date: '2025-09-12', title: 'Talk: The History of Cryptography', description: 'From ancient ciphers to modern encryption, a journey through secure communication.' },
+    ];
+    // -----------------------------
+
+    const today = new Date();
+    const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+
+    const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    const eventsByDate = events.reduce((acc, event) => {
+        const day = new Date(event.date).getDate();
+        if (!acc[day]) acc[day] = [];
+        acc[day].push(event);
+        return acc;
+    }, {});
+
+    return (
+        <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">upcoming_events</span>():</>}>
+            <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold">
+                    <span className="text-py-string">"{currentDate.toLocaleString('default', { month: 'long' })} {currentDate.getFullYear()}"</span>
+                </h3>
+            </div>
+            
+            {/* Desktop Calendar Grid */}
+            <div className="hidden md:grid grid-cols-7 gap-2">
+                {days.map(day => <div key={day} className="text-center font-bold text-py-variable">{day}</div>)}
+                {Array.from({ length: firstDayOfMonth }).map((_, i) => <div key={`empty-${i}`}></div>)}
+                {Array.from({ length: daysInMonth }).map((_, day) => {
+                    const dayNumber = day + 1;
+                    const hasEvent = eventsByDate[dayNumber];
+                    return (
+                        <div key={dayNumber} className={cx(
+                            'p-2 border border-gray-300 dark:border-green-700 h-24',
+                            hasEvent && 'bg-green-100 dark:bg-green-900/50'
+                        )}>
+                            <div className={cx('font-bold', hasEvent ? 'text-py-keyword' : 'text-gray-500 dark:text-green-500')}>{dayNumber}</div>
+                            {hasEvent && <div className="text-xs mt-1 text-py-string truncate">{eventsByDate[dayNumber][0].title}</div>}
+                        </div>
+                    );
+                })}
+            </div>
+            
+            {/* Mobile Event List */}
+            <div className="md:hidden">
+                {events.length > 0 ? (
+                    events.map((event, index) => (
+                        <div key={index} className="mb-4 border-l-4 border-green-500 pl-4">
+                            <p className="font-bold text-py-variable">{new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</p>
+                            <p className="text-py-string">"{event.title}"</p>
+                            <p className="text-sm text-py-comment mt-1"># {event.description}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-py-comment"># No upcoming events scheduled. Check back soon.</p>
+                )}
+            </div>
+        </ContentSection>
+    );
+};
+
 
 const SubmitPage = ({ playSwish }) => {
     const [status, setStatus] = useState('idle'); // idle, submitting, success, error
@@ -573,6 +643,7 @@ export default function App() {
             case 'about': return <AboutPage />;
             case 'archive': return <ArchivePage />;
             case 'gallery': return <GalleryPage playClick={playClick} />;
+            case 'events': return <UpcomingEventsPage />;
             case 'submit': return <SubmitPage playSwish={playSwish} />;
             case 'contact': return <ContactPage playSwish={playSwish} />;
             case 'home':
@@ -586,6 +657,7 @@ export default function App() {
         about: 'Signal_clear.',
         archive: 'Archive_integrity_verified.',
         gallery: 'Visuals_rendered.',
+        events: 'Scanning_for_upcoming_events...',
         submit: 'Awaiting_transmission.',
         contact: 'Connection_established.',
     };
