@@ -287,9 +287,9 @@ const AboutPage = () => (
 
 const ArchivePage = () => {
     const talks = [
-        { title: 'TBD', speaker: 'TBD', date: 'TBD' },
-        { title: 'TBD', speaker: 'TBD', date: 'TBD' },
-        { title: 'TBD', speaker: 'TBD', date: 'TBD' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
+        { title: 'Coming Soon...', speaker: 'Coming Soon...', date: 'TBA' },
     ];
 
     return (
@@ -367,10 +367,8 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/tmg', '/pic', '/SSC'],
-        Speakers: ['/pic', '/tmg'],
-        Session_Photos: ['/SSC', '/pic', '/tmg', '/pic'],
-        Audience_and_Misc: ['/pic', '/tmg']
+        Posters: ['/talk1.png', '/talk1.png', '/talk1.png'],
+        Session_Snaps: ['/pic.png', '/pic.png', '/pic.png'],
     };
 
     return (
@@ -387,7 +385,7 @@ const GalleryPage = ({ playClick }) => {
 
 const UpcomingEventsPage = ({ playClick }) => {
     const events = [
-        { date: '2025-08-07', time: '8:30 pm', venue: 'L-8, LHC', title: 'Probabilistic Method', speaker: 'Adeetya Choubey, 4th year Math Major', abstract: 'The probabilistic method, pioneered by Paul Erdős, was originally developed to tackle problems in graph theory and combinatorics. Over the past several decades, it has evolved into a powerful and versatile tool with applications spanning analysis, algebraic geometry, computer science, and more. In this talk, I will introduce the method as envisioned by Erdős and then highlight some of its applications. As part of the presentation, I will walk through some insightful proofs that demonstrate the elegance and utility of this approach. The talk is designed to be accessible; a background in some basic probability and combinatorics, along with some elementary mathematical maturity to follow structured arguments, should suffice as prerequisites.' },
+        { date: '2025-08-07', time: '8:30 pm', venue: 'L-8, LHC', title: 'Probabilistic Method', speaker: 'Adeetya Choubey, 4th year Math Major', abstract: 'The probabilistic method, pioneered by Paul Erdős, was originally developed to tackle problems in graph theory and combinatorics. Over the past several decades, it has evolved into a powerful and versatile tool with applications spanning analysis, algebraic geometry, computer science, and more. In this talk, I will introduce the method as envisioned by Erdős and then highlight some of its applications. As part of the presentation, I will walk through some insightful proofs that demonstrate the elegance and utility of this approach. The talk is designed to be accessible; a background in some basic probability, along with some elementary mathematical maturity to follow structured arguments, should suffice as prerequisites.' },
         { date: '2025-08-14', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-08-21', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-08-22', time: '8:30 pm', venue: 'L-8, LHC', title: 'Optimization Techniques', speaker: 'Dhruv Dua, 3rd Year Physics Major', abstract: 'TBC' },
