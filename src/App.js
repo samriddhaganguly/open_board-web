@@ -367,10 +367,10 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/pic', '/pic', '/pic'],
-        Speakers: ['/pic', '/pic'],
-        Session_Photos: ['/pic', '/pic', '/pic', '/pic'],
-        Audience_and_Misc: ['/pic', '/pic']
+        Posters: ['/pic', '/JOJO', '/SSC'],
+        Speakers: ['/tmg', '/pic'],
+        Session_Photos: ['/JOJO', '/pic', '/tmg', '/pic'],
+        Audience_and_Misc: ['/SSC', '/pic']
     };
 
     return (
