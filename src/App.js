@@ -175,13 +175,10 @@ const DynamicLogo = ({ scale = 1, theme }) => (
             </filter>
         </defs>
         <g className="logo-glow" style={{ filter: theme === 'dark' ? 'url(#neon-glow)' : 'none' }}>
-            {/* Book Icon */}
-            <path d="M60 25 L60 75 L50 75 L50 25 Z" fill="none" strokeWidth="2" className="logo-element"/>
-            <path d="M60 25 L90 25 L90 75 L60 75" fill="none" strokeWidth="2" className="logo-element"/>
-            <path d="M60 50 L90 50" fill="none" strokeWidth="1" className="logo-element"/>
-            <path d="M75 25 L75 75" fill="none" strokeWidth="1" className="logo-element"/>
-            <path d="M65 30 L70 30 M65 35 L70 35 M65 40 L70 40 M65 45 L70 45" strokeWidth="1" className="logo-element"/>
-            <path d="M80 55 L85 55 M80 60 L85 60 M80 65 L85 65 M80 70 L85 70" strokeWidth="1" className="logo-element"/>
+            {/* Open Book Icon */}
+            <path d="M50 75 C 60 65, 70 65, 80 75" fill="none" strokeWidth="2" className="logo-element"/>
+            <path d="M50 25 L50 75 L80 75 L80 25 L50 25 Z" fill="none" strokeWidth="2" className="logo-element"/>
+            <path d="M80 25 L110 25 L110 75 L80 75" fill="none" strokeWidth="2" className="logo-element"/>
 
             {/* Atom Icon */}
             <circle cx="320" cy="50" r="20" strokeWidth="2" fill="none" className="logo-element"/>
@@ -189,16 +186,32 @@ const DynamicLogo = ({ scale = 1, theme }) => (
             <ellipse cx="320" cy="50" rx="10" ry="22" strokeWidth="2" fill="none" className="logo-element" transform="rotate(-45 320 50)"/>
             
             {/* Text */}
-            <text x="100" y="60" fontSize="30" className="logo-text">open_board</text>
+            <text x="120" y="60" fontSize="30" className="logo-text">open_b</text>
+            <circle cx="250" cy="50" r="10" strokeWidth="2.5" fill="none" className="logo-element"/>
+            <circle cx="250" cy="50" r="5" strokeWidth="1.5" fill="none" className="logo-element"/>
+            <text x="265" y="60" fontSize="30" className="logo-text">ard</text>
             
-            {/* Border */}
+            {/* Glitch Border */}
             <g className="logo-border">
-                <path d="M40 20 L360 20 L360 80 L40 80 Z" fill="none" strokeWidth="4" className="logo-element"/>
-                {/* Glitch elements */}
+                {/* Top */}
+                <rect x="40" y="16" width="10" height="4" className="logo-glitch-element"/>
+                <rect x="80" y="16" width="30" height="4" className="logo-glitch-element"/>
                 <rect x="150" y="16" width="20" height="4" className="logo-glitch-element"/>
-                <rect x="360" y="40" width="4" height="10" className="logo-glitch-element"/>
-                <rect x="40" y="70" width="4" height="10" className="logo-glitch-element"/>
-                <rect x="200" y="80" width="30" height="4" className="logo-glitch-element"/>
+                <rect x="220" y="16" width="40" height="4" className="logo-glitch-element"/>
+                <rect x="300" y="16" width="60" height="4" className="logo-glitch-element"/>
+                {/* Bottom */}
+                <rect x="40" y="80" width="50" height="4" className="logo-glitch-element"/>
+                <rect x="120" y="80" width="20" height="4" className="logo-glitch-element"/>
+                <rect x="180" y="80" width="60" height="4" className="logo-glitch-element"/>
+                <rect x="280" y="80" width="80" height="4" className="logo-glitch-element"/>
+                {/* Left */}
+                <rect x="36" y="20" width="4" height="10" className="logo-glitch-element"/>
+                <rect x="36" y="40" width="4" height="20" className="logo-glitch-element"/>
+                <rect x="36" y="70" width="4" height="10" className="logo-glitch-element"/>
+                {/* Right */}
+                <rect x="360" y="20" width="4" height="20" className="logo-glitch-element"/>
+                <rect x="360" y="50" width="4" height="10" className="logo-glitch-element"/>
+                <rect x="360" y="70" width="4" height="10" className="logo-glitch-element"/>
             </g>
         </g>
     </svg>
