@@ -163,59 +163,6 @@ const LinkedInIcon = () => (
     </svg>
 );
 
-const DynamicLogo = ({ scale = 1, theme }) => (
-    <svg viewBox="0 0 400 100" width={400 * scale} height={100 * scale} className="dynamic-logo">
-        <defs>
-            <filter id="neon-glow">
-                <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
-                <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-            </filter>
-        </defs>
-        <g className="logo-glow" style={{ filter: theme === 'dark' ? 'url(#neon-glow)' : 'none' }}>
-            {/* Open Book Icon */}
-            <path d="M50 75 C 60 65, 70 65, 80 75" fill="none" strokeWidth="2" className="logo-element"/>
-            <path d="M50 25 L50 75 L80 75 L80 25 L50 25 Z" fill="none" strokeWidth="2" className="logo-element"/>
-            <path d="M80 25 L110 25 L110 75 L80 75" fill="none" strokeWidth="2" className="logo-element"/>
-
-            {/* Atom Icon */}
-            <circle cx="320" cy="50" r="20" strokeWidth="2" fill="none" className="logo-element"/>
-            <ellipse cx="320" cy="50" rx="10" ry="22" strokeWidth="2" fill="none" className="logo-element" transform="rotate(45 320 50)"/>
-            <ellipse cx="320" cy="50" rx="10" ry="22" strokeWidth="2" fill="none" className="logo-element" transform="rotate(-45 320 50)"/>
-            
-            {/* Text */}
-            <text x="120" y="60" fontSize="30" className="logo-text">open_b</text>
-            <circle cx="250" cy="50" r="10" strokeWidth="2.5" fill="none" className="logo-element"/>
-            <circle cx="250" cy="50" r="5" strokeWidth="1.5" fill="none" className="logo-element"/>
-            <text x="265" y="60" fontSize="30" className="logo-text">ard</text>
-            
-            {/* Glitch Border */}
-            <g className="logo-border">
-                {/* Top */}
-                <rect x="40" y="16" width="10" height="4" className="logo-glitch-element"/>
-                <rect x="80" y="16" width="30" height="4" className="logo-glitch-element"/>
-                <rect x="150" y="16" width="20" height="4" className="logo-glitch-element"/>
-                <rect x="220" y="16" width="40" height="4" className="logo-glitch-element"/>
-                <rect x="300" y="16" width="60" height="4" className="logo-glitch-element"/>
-                {/* Bottom */}
-                <rect x="40" y="80" width="50" height="4" className="logo-glitch-element"/>
-                <rect x="120" y="80" width="20" height="4" className="logo-glitch-element"/>
-                <rect x="180" y="80" width="60" height="4" className="logo-glitch-element"/>
-                <rect x="280" y="80" width="80" height="4" className="logo-glitch-element"/>
-                {/* Left */}
-                <rect x="36" y="20" width="4" height="10" className="logo-glitch-element"/>
-                <rect x="36" y="40" width="4" height="20" className="logo-glitch-element"/>
-                <rect x="36" y="70" width="4" height="10" className="logo-glitch-element"/>
-                {/* Right */}
-                <rect x="360" y="20" width="4" height="20" className="logo-glitch-element"/>
-                <rect x="360" y="50" width="4" height="10" className="logo-glitch-element"/>
-                <rect x="360" y="70" width="4" height="10" className="logo-glitch-element"/>
-            </g>
-        </g>
-    </svg>
-);
 
 const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -229,7 +176,12 @@ const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
 
     return (
         <header className="flex flex-wrap justify-between items-center gap-x-6 gap-y-4 pb-8 border-b border-gray-300 dark:border-green-500 mb-12">
-            <DynamicLogo scale={0.5} theme={theme} />
+            <div 
+                className="text-3xl font-bold text-gray-800 dark:text-green-400" 
+                style={{ textShadow: theme === 'dark' ? '0 0 5px #33ff33, 0 0 10px #33ff33' : 'none' }}
+            >
+                open_board
+            </div>
 
             {/* Hamburger Menu Button - visible only on small screens */}
             <div className="md:hidden">
@@ -299,9 +251,11 @@ const ContentSection = ({ title, children }) => (
 
 const HomePage = ({ navigateTo, playClick }) => (
     <div className="text-center flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="mb-8 p-4 glitch-border-container">
-            <DynamicLogo theme="dark" />
-        </div>
+        <h1 
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 dark:text-green-400 glitch font-mono break-words"
+        >
+            <span className="text-py-keyword">print</span>(<span className="text-py-string">"Open_Knowledge, Shared_Insights"</span>)
+        </h1>
         <p 
             className="text-lg text-gray-600 dark:text-green-400 max-w-2xl mx-auto my-6 font-mono"
         >
@@ -413,8 +367,8 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/talk1.png', '/talk1.png', '/talk1.png'],
-        Session_Snaps: ['/pic.png', '/pic.png', '/pic.png'],
+        Posters: ['/talk1', '/talk3', '/talk4'],
+        Session_Snaps: ['/pic', '/tmg', '/SSC'],
     };
 
     return (
@@ -875,31 +829,6 @@ export default function App() {
                 .text-py-variable { color: #66d9ef; } /* Light blue for variables */
                 .dark .text-py-variable { color: #66d9ef; }
                 .light .text-py-variable { color: #e06c75; }
-
-                /* Dynamic Logo Styles */
-                .dynamic-logo .logo-element {
-                    stroke: #33ff33;
-                }
-                .dynamic-logo .logo-text {
-                    fill: #33ff33;
-                    font-family: 'Space Mono', monospace;
-                }
-                .light .dynamic-logo .logo-element {
-                    stroke: #1f2937;
-                }
-                .light .dynamic-logo .logo-text {
-                    fill: #1f2937;
-                }
-                .logo-glitch-element {
-                    fill: #33ff33;
-                    animation: logo-glitch-flicker 1s infinite alternate;
-                }
-                @keyframes logo-glitch-flicker {
-                    0% { opacity: 0; }
-                    25% { opacity: 1; }
-                    50% { opacity: 0.5; }
-                    100% { opacity: 1; }
-                }
 
             `}</style>
             
