@@ -367,8 +367,8 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/talk1', '/talk3', '/talk4'],
-        Session_Snaps: ['/pic', '/tmg', '/SSC'],
+        Posters: ['/talk1','/raman.png', '/dhruv.png', '/talk4', ],
+        Session_Snaps: ['/photo1.jpeg', '/photo2.jpeg', '/photo3.jpeg', 'pic' ],
     };
 
     return (
