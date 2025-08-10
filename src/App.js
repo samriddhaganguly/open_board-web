@@ -367,7 +367,7 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/talk1','/raman.png', '/dhruv.png', '/talk4', ],
+        Posters: ['/talk1','/raman.png', '/dhruv.png', '/aryan.png', ],
         Session_Snaps: ['/photo1.jpeg', '/photo2.jpeg', '/photo3.jpeg', 'pic' ],
     };
 
@@ -386,15 +386,15 @@ const GalleryPage = ({ playClick }) => {
 const UpcomingEventsPage = ({ playClick }) => {
     const events = [
         { date: '2025-08-07', time: '8:30 pm', venue: 'L-8, LHC', title: 'Probabilistic Method', speaker: 'Adeetya Choubey, 4th year Math Major', abstract: 'The probabilistic method, pioneered by Paul Erdős, was originally developed to tackle problems in graph theory and combinatorics. Over the past several decades, it has evolved into a powerful and versatile tool with applications spanning analysis, algebraic geometry, computer science, and more. In this talk, I will introduce the method as envisioned by Erdős and then highlight some of its applications. As part of the presentation, I will walk through some insightful proofs that demonstrate the elegance and utility of this approach. The talk is designed to be accessible; a background in some basic probability, along with some elementary mathematical maturity to follow structured arguments, should suffice as prerequisites.' },
-        { date: '2025-08-14', time: '8:30 pm', venue: 'L-8, LHC', title: 'Butterflies, Chaos and Fractals', speaker: 'Sidharth Raman', abstract: 'Does the Flap of a Butterfly’s Wings in Brazil Set off a Tornado in Texas? Dynamical systems can exhibit chaotic, seemingly random behavior. This talk is about how the butterfly effect links chaos and the beautiful geometric objects, fractals.' },
-        { date: '2025-08-21', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
-        { date: '2025-08-22', time: '8:30 pm', venue: 'L-8, LHC', title: 'Optimization Techniques', speaker: 'Dhruv Dua, 3rd Year Physics Major', abstract: 'TBC' },
-        { date: '2025-08-29', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
-        { date: '2025-09-04', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-08-14', time: '8:30 pm', venue: 'L-8, LHC', title: 'Butterflies, Chaos and Fractals', speaker: 'Sidharth Raman. 4th year Economics Major', abstract: 'Does the Flap of a Butterfly’s Wings in Brazil Set off a Tornado in Texas? Dynamical systems can exhibit chaotic, seemingly random behavior. This talk is about how the butterfly effect links chaos and the beautiful geometric objects, fractals.' },
+        { date: '2025-08-21', time: '8:30 pm', venue: 'L-8, LHC', title: 'Stochastic simulation of chemical and non chemical systems using Gillespies algorithm', speaker: 'Aryan Gupta, 4th year Biology Major', abstract: 'To be announced.' },
+        { date: '2025-08-22', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-08-29', time: '8:30 pm', venue: 'L-8, LHC', title: 'Coming Soon..', speaker: 'Vanshika Tripathi, 4th year Biology Major', abstract: 'To be announced.' },
+        { date: '2025-09-04', time: '8:30 pm', venue: 'L-8, LHC', title: 'Coming Soon..', speaker: 'Manas Nandan, 4th year Economics Major', abstract: 'To be announced.' },
         { date: '2025-09-05', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-09-12', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
-        { date: '2025-10-09', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
-        { date: '2025-10-16', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-10-09', time: '8:30 pm', venue: 'L-8, LHC', title: 'Physics is Cool', speaker: 'Samriddha Ganguly, 4th year Physics major', abstract: 'TBD' },
+        { date: '2025-10-16', time: '8:30 pm', venue: 'L-8, LHC', title: 'Optimization Techniques', speaker: 'Dhruv Dua, 3rd year Physics Major', abstract: 'To be announced.' },
         { date: '2025-10-17', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-10-23', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-10-30', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
