@@ -367,7 +367,7 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/talk1','/raman.png', '/aryan.png', '/harsh.png', '/dev.png'],
+        Posters: ['/talk1','/raman.png', '/aryan.png', '/harsh.png', '/dev.png', '/deo.png'],
         Session_Snaps: ['/photo1.jpeg', '/photo2.jpeg', '/photo3.jpeg', 'pic','/ram1.jpeg', '/ram2.jpeg', '/ram3.jpeg' ],
     };
 
@@ -392,7 +392,7 @@ const UpcomingEventsPage = ({ playClick }) => {
         { date: '2025-08-29', time: '8:30 pm', venue: 'L-8, LHC', title: 'Coming Soon..', speaker: 'Vanshika Tripathi, 4th year Biology Major', abstract: 'To be announced.' },
         { date: '2025-09-04', time: '8:30 pm', venue: 'L-8, LHC', title: 'Coming Soon..', speaker: 'Manas Nandan, 4th year Economics Major', abstract: 'To be announced.' },
         { date: '2025-09-05', time: '8:30 pm', venue: 'L-8, LHC', title: 'A Hitchhikers Guide to Hyperbolic Geometry', speaker: 'Dev Krishna, 4th year Math Major', abstract: 'Euclids 5th postulate states that for a line in the plane and a point not on the line, there exists a unique line passing through that point and parallel to the line. We ask a question: Can there be more than one line passing through that point, and is parallel to the initial line? The answer is yes, but the caveat is that it would no longer be Euclidean Geometry at all. So would it be legitimate geometry at all? The answer is Yes. This is what we call Hyperbolic Geometry. We will start with the discussion on the two main models of describing the hyperbolic plane. Then we discuss the notion of lines in this plane. After this, we will try to construct simple polygons using our new notion of "lines". At the end, we will be trying to formalize the notions of trigonometry in the new geometry. ' },
-        { date: '2025-09-12', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-09-12', time: '8:30 pm', venue: 'L-8, LHC', title: '"Watt are the Chances?: Electrical Networks and Random Walks', speaker: 'Deo Ishaan Prashant, 4th Year Math Major', abstract: 'Electrical networks and random walks are two seemingly unrelated concepts, but the mathematics behind them reveals deep connections. One can, in fact, be used to model the other. In this talk, we will view random walks through the lens of electrical networks, leading to some surprising conclusions — about drunk people, drunk birds, and even drunk higher-dimensional beings.' },
         { date: '2025-10-09', time: '8:30 pm', venue: 'L-8, LHC', title: 'Physics is Cool', speaker: 'Samriddha Ganguly, 4th year Physics major', abstract: 'TBD' },
         { date: '2025-10-16', time: '8:30 pm', venue: 'L-8, LHC', title: 'Optimization Techniques', speaker: 'Dhruv Dua, 3rd year Physics Major', abstract: 'To be announced.' },
         { date: '2025-10-17', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
