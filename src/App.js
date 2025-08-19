@@ -163,6 +163,17 @@ const LinkedInIcon = () => (
     </svg>
 );
 
+const WhatsAppIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.487 5.235 3.487 8.413 0 6.557-5.338 11.892-11.894 11.892-1.99 0-3.903-.52-5.687-1.475L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.447-4.435-9.884-9.888-9.884-5.448 0-9.886 4.434-9.889 9.885.002 2.17.662 4.245 1.957 5.96.02.029.029.064.017.098l-1.181 4.324 4.463-1.164c.032-.008.067-.008.099.008z"/>
+    </svg>
+);
+
+const GmailIcon = () => (
+     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M24 4.5v15c0 .825-.675 1.5-1.5 1.5H1.5C.675 21 0 20.325 0 19.5v-15C0 3.675.675 3 1.5 3h21C23.325 3 24 3.675 24 4.5zm-2.19-1.5H2.19C1.725 3 1.5 3.225 1.5 3.69v.96l10.5 6.562L22.5 4.65v-.96c0-.465-.225-.69-.69-.69zm-1.31 2.812L12 12.825 3.5 6.812V19.5h17V6.812z"/>
+    </svg>
+);
 
 const Header = ({ currentPage, navigateTo, toggleTheme, theme, playClick }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -691,6 +702,35 @@ const ContactPage = ({ playSwish }) => {
 
     return (
         <>
+            {/* THIS IS THE NEW SECTION TO ADD */}
+            <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">open_board_socials</span>():</>}>
+                <p className="text-gray-700 dark:text-green-400 mb-4">
+                    <span className="text-py-string">"""Follow us for the latest updates and discussions."""</span>
+                </p>
+                <div className="flex flex-wrap gap-x-6 gap-y-4 items-center">
+                    {/* WhatsApp Link */}
+                    <a
+                        href="https://whatsapp.com/channel/0029Vb63g00D8SDxWIIeLU2r"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 text-gray-600 dark:text-green-400 hover:text-black dark:hover:text-green-200 transition-colors"
+                        title="Join our WhatsApp Channel"
+                    >
+                        <WhatsAppIcon />
+                        <span className="font-mono hidden sm:inline">[ WhatsApp Channel ]</span>
+                    </a>
+
+                    {/* Gmail Link */}
+                    <a
+                        href="mailto:openboardinitiative@gmail.com"
+                        className="flex items-center gap-3 text-gray-600 dark:text-green-400 hover:text-black dark:hover:text-green-200 transition-colors"
+                        title="Email us"
+                    >
+                        <GmailIcon />
+                        <span className="font-mono hidden sm:inline">[ openboardinitiative@gmail.com ]</span>
+                    </a>
+                </div>
+            </ContentSection>
             <ContentSection title={<><span className="text-py-keyword">class</span> <span className="text-py-function">Coordinators</span>:</>}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {coordinators.map((coord, index) => (
@@ -711,6 +751,7 @@ const ContactPage = ({ playSwish }) => {
                     ))}
                 </div>
             </ContentSection>
+            
             <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">get_updates</span>(<span className="text-py-params">email</span>):</>}>
                 <p className="text-gray-700 dark:text-green-400 mb-4">
                     <span className="text-py-string">"""Subscribe to receive information about our talks."""</span>
