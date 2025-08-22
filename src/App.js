@@ -378,7 +378,7 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/talk1','/raman.png', '/aryan.png', '/harsh.png', '/dev.png', '/deo.png', '/manas.png', '/dhruv.png'],
+        Posters: ['/talk1','/raman.png', '/aryan.png', '/harsh.png', '/dev.png', '/deo.png', '/manas.png', '/dhruv.png', '/ab.png'],
         Session_Snaps: ['/photo1.jpeg', '/photo2.jpeg', '/photo3.jpeg', 'pic','/ram1.jpeg', '/ram2.jpeg', '/ram3.jpeg','/aryan1.jpeg','/aryan2.jpeg','/aryan3.jpeg' ],
     };
 
@@ -406,11 +406,11 @@ const UpcomingEventsPage = ({ playClick }) => {
         { date: '2025-09-12', time: '8:30 pm', venue: 'L-8, LHC', title: '"Watt are the Chances?: Electrical Networks and Random Walks', speaker: 'Deo Ishaan Prashant, 4th Year Math Major', abstract: 'Electrical networks and random walks are two seemingly unrelated concepts, but the mathematics behind them reveals deep connections. One can, in fact, be used to model the other. In this talk, we will view random walks through the lens of electrical networks, leading to some surprising conclusions — about drunk people, drunk birds, and even drunk higher-dimensional beings.' },
         { date: '2025-10-09', time: '8:30 pm', venue: 'L-8, LHC', title: 'Physics is Cool', speaker: 'Samriddha Ganguly, 4th year Physics major', abstract: 'TBD' },
         { date: '2025-10-16', time: '8:30 pm', venue: 'L-8, LHC', title: 'An ODEyssey into Neural Differential Equations', speaker: 'Dhruv Dua, 3rd year Physics Major', abstract: 'In this talk, we will introduce Neural Differential Equations (NDEs), a recent approach that combines ideas from deep learning and differential equations. Instead of thinking of a neural network as a sequence of layers, an NDE treats it as a continuous dynamical system where the change of the hidden state is described by a differential equation. We will cover the basic definitions, motivation, and mathematical structure of NDEs, along with how they are trained. To illustrate their usefulness, we will look at examples from physics and finance. The goal of the talk is to give students across both natural and engineering sciences a clear and accessible first understanding of this exciting area.' },
-        { date: '2025-10-17', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
-        { date: '2025-10-23', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
-        { date: '2025-10-30', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
-        { date: '2025-10-31', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
-        { date: '2025-11-13', time: '8:30 pm', venue: 'L-8, LHC', title: 'TBA Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-10-17', time: '8:30 pm', venue: 'L-8, LHC', title: 'Occupied!', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-10-23', time: '8:30 pm', venue: 'L-8, LHC', title: 'Bifurcations and How to Find them', speaker: 'Abeer Singh, 2nd Year PMD Pre-major', abstract: 'How bifurcations is everywhere in complex and deterministic systems. In a nutshell, why does a airplane wing vibrate during high intensity wind? Why do you have unusual non linear oscillatory behaviour in heart rate? Why this? Why that?' },
+        { date: '2025-10-30', time: '8:30 pm', venue: 'L-8, LHC', title: 'Open Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-10-31', time: '8:30 pm', venue: 'L-8, LHC', title: 'Open Slot', speaker: 'TBA', abstract: 'To be announced.' },
+        { date: '2025-11-13', time: '8:30 pm', venue: 'L-8, LHC', title: 'Open Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-11-14', time: '8:30 pm', venue: 'L-8, LHC', title: 'Biology in Life', speaker: 'Pratham Shah', abstract: 'To be announced.' },
     ];
     
