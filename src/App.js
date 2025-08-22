@@ -379,7 +379,7 @@ const Slideshow = ({ title, images, playClick }) => {
 const GalleryPage = ({ playClick }) => {
     const galleries = {
         Posters: ['/talk1','/raman.png', '/aryan.png', '/harsh.png', '/dev.png', '/deo.png', '/manas.png', '/dhruv.png'],
-        Session_Snaps: ['/photo1.jpeg', '/photo2.jpeg', '/photo3.jpeg', 'pic','/ram1.jpeg', '/ram2.jpeg', '/ram3.jpeg' ],
+        Session_Snaps: ['/photo1.jpeg', '/photo2.jpeg', '/photo3.jpeg', 'pic','/ram1.jpeg', '/ram2.jpeg', '/ram3.jpeg','/aryan1.jpeg','/aryan2.jpeg','/aryan3.jpeg' ],
     };
 
     return (
