@@ -407,7 +407,7 @@ const Slideshow = ({ title, images, playClick }) => {
 
 const GalleryPage = ({ playClick }) => {
     const galleries = {
-        Posters: ['/talk1','/raman.png', '/aryan.png', '/harsh.png','/manaso.png', '/devp.png','/raj.jpeg', '/deo.png',  '/sam.png','/raghav.png','/vvml.png','/adixit.png', '/ab.png', '/diwan.png'],
+        Posters: ['/talk1','/raman.png', '/aryan.png', '/harsh.png','/manaso.png', '/devp.png','/raj.jpeg', '/deo.png',  '/sam.png','/raghav.png','/vvml.png','/adixit.png', '/ab.png', '/diwan.png','/yash.png'],
         Session_Snaps: ['/photo1.jpeg', '/photo2.jpeg', '/photo3.jpeg', 'pic','/ram1.jpeg', '/ram2.jpeg', '/ram3.jpeg','/aryan1.jpeg','/aryan2.jpeg','/aryan3.jpeg', '/hrh1.jpeg', '/hrh2.jpeg','/hrh3.jpeg', '/mn1.jpeg', '/mn2.jpeg', '/mn3.jpeg', '/rj1.jpeg', '/rj2.jpeg', '/ish1.jpeg', '/ish2.jpeg', '/ish3.jpeg', '/sam1.jpeg', '/sam2.jpeg', '/sam3.jpeg'],
     };
 
