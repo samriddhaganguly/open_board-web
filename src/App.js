@@ -336,10 +336,6 @@ const ArchivePage = () => {
                         <p className="pl-4"><span className="text-py-string">'date'</span>: <span className="text-py-string">"{talk.date}"</span></p>
                         <p>{'}'}</p>
 
-                        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
-                            <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">
-                                [ <span className="text-py-function">view_summary</span>() ]
-                            </a>
 
                             {talk.slides && (
                                 <a 
