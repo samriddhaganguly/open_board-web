@@ -321,7 +321,6 @@ const ArchivePage = () => {
         { title: 'The Mathematics of Opinions: How Ideas Spread (Or Get Stuck)', speaker: 'Aneesh Diwanji', date: '2024-10-30', slides: slidesPlaceholder },
     ];
 
-
     return (
         <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">load_archives</span>():</>}>
             <p className="text-gray-500 dark:text-green-500 mb-8">
@@ -336,7 +335,7 @@ const ArchivePage = () => {
                         <p className="pl-4"><span className="text-py-string">'date'</span>: <span className="text-py-string">"{talk.date}"</span></p>
                         <p>{'}'}</p>
 
-
+                        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
                             {talk.slides && (
                                 <a 
                                     href={talk.slides} 
