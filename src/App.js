@@ -297,15 +297,35 @@ const AboutPage = () => (
 );
 
 const ArchivePage = () => {
+    const slidesPlaceholder = '/Everything__Entangled__All_At_Once.pdf';
+
     const talks = [
-        { title: 'The Probabilistic Method', speaker: 'Adeetya Choubey', date: '2024-08-07' },
-        { title: 'TBA', speaker: 'TBA', date: '2024-06-20' },
-        { title: 'TBA', speaker: 'TBA', date: '2024-05-10' },
+        // AUGUST
+        { title: 'The Probabilistic Method', speaker: 'Adeetya Choubey', date: '2024-08-07', slides: slidesPlaceholder },
+        { title: 'Butterflies, Chaos and Fractals', speaker: 'Sidharth Raman', date: '2024-08-14', slides: slidesPlaceholder },
+        { title: 'Stochastic simulation of chemical systems', speaker: 'Aryan Gupta', date: '2024-08-21', slides: slidesPlaceholder },
+        { title: 'How I met your limit function', speaker: 'Harsh Tandon', date: '2024-08-22', slides: slidesPlaceholder },
+
+        // SEPTEMBER
+        { title: 'Strategic Lies and the Art of Truth Extraction', speaker: 'Manas Nandan', date: '2024-09-04', slides: /slides.pdf },
+        { title: "A Hitchhiker's Guide to Hyperbolic Geometry", speaker: 'Dev Krishna', date: '2024-09-06', slides: slidesPlaceholder },
+        { title: 'Interpolation Techniques', speaker: 'Raj Soni', date: '2024-09-09', slides: slidesPlaceholder },
+        { title: '"Watt are the Chances?": Electrical Networks and Random Walks', speaker: 'Deo Ishaan Prashant', date: '2024-09-12', slides: slidesPlaceholder },
+
+        // OCTOBER
+        { title: 'Everything Entangled All at Once', speaker: 'Samriddha Ganguly', date: '2024-10-09', slides: slidesPlaceholder },
+        { title: 'Rethinking Cosmic Symmetries: Thurston Spacetimes', speaker: 'Raghav Kumawat', date: '2024-10-16', slides: /Cosmology.pptx },
+        { title: 'Mathe(ML)atics, from proofs to predictions', speaker: 'Vedanshi Vaghela', date: '2024-10-17', slides: slidesPlaceholder },
+        { title: 'Climate Models: Formulation And Applications in Predicting Precipitation Over India', speaker: 'Aryaman Dixit', date: '2024-10-18', slides: slidesPlaceholder },
+        { title: 'Bifurcations and How to Find them', speaker: 'Abeer Singh', date: '2024-10-23', slides: slidesPlaceholder },
+        { title: 'The Mathematics of Opinions: How Ideas Spread (Or Get Stuck)', speaker: 'Aneesh Diwanji', date: '2024-10-30', slides: slidesPlaceholder },
     ];
 
     return (
         <ContentSection title={<><span className="text-py-keyword">def</span> <span className="text-py-function">load_archives</span>():</>}>
-            <p className="text-gray-500 dark:text-green-500 mb-8"><span className="text-py-comment"># Accessing data logs...</span></p>
+            <p className="text-gray-500 dark:text-green-500 mb-8">
+                <span className="text-py-comment"># Accessing data logs...</span>
+            </p>
             <div className="font-mono">
                 {talks.map((talk, index) => (
                     <div key={index} className="border-l-4 border-gray-400 dark:border-green-500 pl-6 mb-8">
@@ -314,9 +334,21 @@ const ArchivePage = () => {
                         <p className="pl-4 break-words"><span className="text-py-string">'speaker'</span>: <span className="text-py-string">"{talk.speaker}"</span>,</p>
                         <p className="pl-4"><span className="text-py-string">'date'</span>: <span className="text-py-string">"{talk.date}"</span></p>
                         <p>{'}'}</p>
+
                         <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
-                            <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ <span className="text-py-function">view_summary</span>() ]</a>
-                            <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">[ <span className="text-py-function">download_slides</span>() ]</a>
+                            <a href="#" className="font-bold text-gray-700 dark:text-green-300 hover:underline">
+                                [ <span className="text-py-function">view_summary</span>() ]
+                            </a>
+
+                            {talk.slides && (
+                                <a 
+                                    href={talk.slides} 
+                                    download 
+                                    className="font-bold text-gray-700 dark:text-green-300 hover:underline"
+                                >
+                                    [ <span className="text-py-function">download_slides</span>() ]
+                                </a>
+                            )}
                         </div>
                     </div>
                 ))}
@@ -324,6 +356,7 @@ const ArchivePage = () => {
         </ContentSection>
     );
 };
+
 
 const Slideshow = ({ title, images, playClick }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
