@@ -440,7 +440,18 @@ const UpcomingEventsPage = ({ playClick }) => {
         { date: '2025-10-23', time: '8:30 pm', venue: 'L-8, LHC', title: 'Bifurcations and How to Find them', speaker: 'Abeer Singh, 2nd Year PMD Pre-major', abstract: 'How bifurcations is everywhere in complex and deterministic systems. In a nutshell, why does a airplane wing vibrate during high intensity wind? Why do you have unusual non linear oscillatory behaviour in heart rate? Why this? Why that?' },
         { date: '2025-10-24', time: '8:30 pm', venue: 'L-8, LHC', title: 'Open Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-10-30', time: '8:30 pm', venue: 'L-8, LHC', title: 'The Mathematics of Opinions: How Ideas Spread (Or Get Stuck)', speaker: 'Aneesh Diwanji, 4th Year Math Major', abstract: 'Why do some opinions take hold while others disappear? In this talk, we use Markov chains to explore how individuals influence one another within networks. Through simple probabilistic rules, we’ll see how collective patterns such as consensus, polarization, and echo chambers emerge. Blending mathematics, simulations, and real-world parallels, this talk uncovers the hidden dynamics that drive opinion formation. ' },
-        { date: '2025-10-31', time: '8:30 pm', venue: 'L-8, LHC', title: 'Occupied', speaker: 'Yash Sharma', abstract: 'To be announced.' },
+        { date: '2025-10-31', time: '8:30 pm', venue: 'L-8, LHC', title: 'From Fields to Codes: The Algebra Behind Error Correction', speaker: 'Yash Sharma, 3rd Year Math Major', abstract: 'In this talk, I am going to explain how communication over noisy channels — from deep space signals to everyday internet messages — inevitably encounters errors, and how mathematics helps us overcome them. I will show how error-correcting codes provide a systematic way to detect and correct these errors, ensuring reliable transmission. We will
+ see that at the heart of these codes lies a beautiful algebraic structure involving finite
+ fields, vector spaces, rings, and polynomials. I will begin with linear codes and their
+ vector space foundations, then move on to cyclic and Reed–Solomon codes, illustrating
+ how fields and polynomials form the backbone of modern error correction. By the end
+ of the talk, I hope to show how ideas from abstract algebra naturally lead to practical
+ coding techniques, connecting pure mathematics with real-world information theory.
+ More Precisely: In this talk, I am going to explain how algebra shapes the design of error-correcting codes
+ that make communication reliable, from deep-space signals to internet data. Starting with
+ linear codes and moving to cyclic and Reed–Solomon codes, I will show how finite fields,
+ vector spaces, and polynomials form the foundation of modern coding theory connecting
+ pure mathematics with real-world applications.' },
         { date: '2025-11-06', time: '8:30 pm', venue: 'L-8, LHC', title: 'Open Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-11-07', time: '8:30 pm', venue: 'L-8, LHC', title: 'Open Slot', speaker: 'TBA', abstract: 'To be announced.' },
         { date: '2025-11-13', time: '8:30 pm', venue: 'L-8, LHC', title: 'Open Slot', speaker: 'TBA', abstract: 'To be announced.' },
