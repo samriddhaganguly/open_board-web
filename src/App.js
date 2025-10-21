@@ -315,7 +315,7 @@ const ArchivePage = () => {
         // OCTOBER
         { title: 'Everything Entangled All at Once', speaker: 'Samriddha Ganguly', date: '2025-10-09', slides: slidesPlaceholder },
         { title: 'Rethinking Cosmic Symmetries: Thurston Spacetimes', speaker: 'Raghav Kumawat', date: '2025-10-16', slides: '/Cosmology.pptx' },
-        { title: 'Mathe(ML)atics, from proofs to predictions', speaker: 'Vedanshi Vaghela', date: '2025-10-17', slides: slidesPlaceholder },
+        { title: 'Mathe(ML)atics, from proofs to predictions', speaker: 'Vedanshi Vaghela', date: '2025-10-17', slides: '/vv.pdf' },
         { title: 'Climate Models: Formulation And Applications in Predicting Precipitation Over India', speaker: 'Aryaman Dixit', date: '2025-10-24', slides: slidesPlaceholder },
         { title: 'Bifurcations and How to Find them', speaker: 'Abeer Singh', date: '2025-10-23', slides: slidesPlaceholder },
         { title: 'The Mathematics of Opinions: How Ideas Spread (Or Get Stuck)', speaker: 'Aneesh Diwanji', date: '2025-10-30', slides: slidesPlaceholder },
