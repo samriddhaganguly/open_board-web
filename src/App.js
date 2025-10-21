@@ -301,24 +301,24 @@ const ArchivePage = () => {
 
     const talks = [
         // AUGUST
-        { title: 'The Probabilistic Method', speaker: 'Adeetya Choubey', date: '2024-08-07', slides: slidesPlaceholder },
-        { title: 'Butterflies, Chaos and Fractals', speaker: 'Sidharth Raman', date: '2024-08-14', slides: slidesPlaceholder },
-        { title: 'Stochastic simulation of chemical systems', speaker: 'Aryan Gupta', date: '2024-08-21', slides: '/beamer.pdf' },
-        { title: 'How I met your limit function', speaker: 'Harsh Tandon', date: '2024-08-22', slides: slidesPlaceholder },
+        { title: 'The Probabilistic Method', speaker: 'Adeetya Choubey', date: '2025-08-07', slides: slidesPlaceholder },
+        { title: 'Butterflies, Chaos and Fractals', speaker: 'Sidharth Raman', date: '2025-08-14', slides: slidesPlaceholder },
+        { title: 'Stochastic simulation of chemical systems', speaker: 'Aryan Gupta', date: '2025-08-21', slides: '/beamer.pdf' },
+        { title: 'How I met your limit function', speaker: 'Harsh Tandon', date: '2025-08-22', slides: slidesPlaceholder },
 
         // SEPTEMBER
-        { title: 'Strategic Lies and the Art of Truth Extraction', speaker: 'Manas Nandan', date: '2024-09-04', slides: '/slides.pdf' },
-        { title: "A Hitchhiker's Guide to Hyperbolic Geometry", speaker: 'Dev Krishna', date: '2024-09-06', slides: slidesPlaceholder },
-        { title: 'Interpolation Techniques', speaker: 'Raj Soni', date: '2024-09-09', slides: slidesPlaceholder },
-        { title: '"Watt are the Chances?": Electrical Networks and Random Walks', speaker: 'Deo Ishaan Prashant', date: '2024-09-12', slides: '/walks.pdf' },
+        { title: 'Strategic Lies and the Art of Truth Extraction', speaker: 'Manas Nandan', date: '2025-09-04', slides: '/slides.pdf' },
+        { title: "A Hitchhiker's Guide to Hyperbolic Geometry", speaker: 'Dev Krishna', date: '2025-09-06', slides: slidesPlaceholder },
+        { title: 'Interpolation Techniques', speaker: 'Raj Soni', date: '2025-09-09', slides: slidesPlaceholder },
+        { title: '"Watt are the Chances?": Electrical Networks and Random Walks', speaker: 'Deo Ishaan Prashant', date: '2025-09-12', slides: '/walks.pdf' },
 
         // OCTOBER
-        { title: 'Everything Entangled All at Once', speaker: 'Samriddha Ganguly', date: '2024-10-09', slides: slidesPlaceholder },
-        { title: 'Rethinking Cosmic Symmetries: Thurston Spacetimes', speaker: 'Raghav Kumawat', date: '2024-10-16', slides: '/Cosmology.pptx' },
-        { title: 'Mathe(ML)atics, from proofs to predictions', speaker: 'Vedanshi Vaghela', date: '2024-10-17', slides: slidesPlaceholder },
-        { title: 'Climate Models: Formulation And Applications in Predicting Precipitation Over India', speaker: 'Aryaman Dixit', date: '2024-10-18', slides: slidesPlaceholder },
-        { title: 'Bifurcations and How to Find them', speaker: 'Abeer Singh', date: '2024-10-23', slides: slidesPlaceholder },
-        { title: 'The Mathematics of Opinions: How Ideas Spread (Or Get Stuck)', speaker: 'Aneesh Diwanji', date: '2024-10-30', slides: slidesPlaceholder },
+        { title: 'Everything Entangled All at Once', speaker: 'Samriddha Ganguly', date: '2025-10-09', slides: slidesPlaceholder },
+        { title: 'Rethinking Cosmic Symmetries: Thurston Spacetimes', speaker: 'Raghav Kumawat', date: '2025-10-16', slides: '/Cosmology.pptx' },
+        { title: 'Mathe(ML)atics, from proofs to predictions', speaker: 'Vedanshi Vaghela', date: '2025-10-17', slides: slidesPlaceholder },
+        { title: 'Climate Models: Formulation And Applications in Predicting Precipitation Over India', speaker: 'Aryaman Dixit', date: '2025-10-24', slides: slidesPlaceholder },
+        { title: 'Bifurcations and How to Find them', speaker: 'Abeer Singh', date: '2025-10-23', slides: slidesPlaceholder },
+        { title: 'The Mathematics of Opinions: How Ideas Spread (Or Get Stuck)', speaker: 'Aneesh Diwanji', date: '2025-10-30', slides: slidesPlaceholder },
     ];
 
     return (
