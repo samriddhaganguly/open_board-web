@@ -309,7 +309,7 @@ const ArchivePage = () => {
         // SEPTEMBER
         { title: 'Strategic Lies and the Art of Truth Extraction', speaker: 'Manas Nandan', date: '2025-09-04', slides: '/slides.pdf' },
         { title: "A Hitchhiker's Guide to Hyperbolic Geometry", speaker: 'Dev Krishna', date: '2025-09-06', slides: slidesPlaceholder },
-        { title: 'Interpolation Techniques', speaker: 'Raj Soni', date: '2025-09-09', slides: slidesPlaceholder },
+        { title: 'Interpolation Techniques', speaker: 'Raj Soni', date: '2025-09-09', slides: '/Presentation_interpolation.pdf' },
         { title: '"Watt are the Chances?": Electrical Networks and Random Walks', speaker: 'Deo Ishaan Prashant', date: '2025-09-12', slides: '/walks.pdf' },
 
         // OCTOBER
