@@ -303,7 +303,7 @@ const ArchivePage = () => {
         // AUGUST
         { title: 'The Probabilistic Method', speaker: 'Adeetya Choubey', date: '2024-08-07', slides: slidesPlaceholder },
         { title: 'Butterflies, Chaos and Fractals', speaker: 'Sidharth Raman', date: '2024-08-14', slides: slidesPlaceholder },
-        { title: 'Stochastic simulation of chemical systems', speaker: 'Aryan Gupta', date: '2024-08-21', slides: slidesPlaceholder },
+        { title: 'Stochastic simulation of chemical systems', speaker: 'Aryan Gupta', date: '2024-08-21', slides: '/beamer.pdf' },
         { title: 'How I met your limit function', speaker: 'Harsh Tandon', date: '2024-08-22', slides: slidesPlaceholder },
 
         // SEPTEMBER
