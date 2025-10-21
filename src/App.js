@@ -304,7 +304,7 @@ const ArchivePage = () => {
         { title: 'The Probabilistic Method', speaker: 'Adeetya Choubey', date: '2025-08-07', slides: slidesPlaceholder },
         { title: 'Butterflies, Chaos and Fractals', speaker: 'Sidharth Raman', date: '2025-08-14', slides: slidesPlaceholder },
         { title: 'Stochastic simulation of chemical systems', speaker: 'Aryan Gupta', date: '2025-08-21', slides: '/beamer.pdf' },
-        { title: 'How I met your limit function', speaker: 'Harsh Tandon', date: '2025-08-22', slides: slidesPlaceholder },
+        { title: 'How I met your limit function', speaker: 'Harsh Tandon', date: '2025-08-22', slides: '/yg.pdf' },
 
         // SEPTEMBER
         { title: 'Strategic Lies and the Art of Truth Extraction', speaker: 'Manas Nandan', date: '2025-09-04', slides: '/slides.pdf' },
