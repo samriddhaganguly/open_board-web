@@ -297,7 +297,7 @@ const AboutPage = () => (
 );
 
 const ArchivePage = () => {
-    const slidesPlaceholder = '/Everything__Entangled__All_At_Once.pdf';
+    const slidesPlaceholder = '/Open_board.pdf';
 
     const talks = [
         // AUGUST
