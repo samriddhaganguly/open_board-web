@@ -5,22 +5,6 @@ import * as THREE from 'three';
 const cx = (...classes) => classes.filter(Boolean).join(' ');
 
 // =========================================================
-// 0. EMAIL DRAFT HELPERS (mailto + Gmail compose links)
-// =========================================================
-const OB_EMAIL = 'openboardinitiative@gmail.com';
-
-// mailto: bodies expect CRLF line breaks
-const toCRLF = (text) => text.replace(/\r?\n/g, '\r\n');
-
-const buildMailtoUrl = (subject, body) =>
-  `mailto:${OB_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(toCRLF(body))}`;
-
-const buildGmailUrl = (subject, body) =>
-  `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(OB_EMAIL)}&su=${encodeURIComponent(
-    subject
-  )}&body=${encodeURIComponent(body)}`;
-
-// =========================================================
 // 1. NATIVE WEB AUDIO SYNTHESIZER ENGINE (Zero-dependency, Instant Sound)
 // =========================================================
 const useSoundEffects = (isMuted) => {
@@ -383,21 +367,9 @@ const MASCOT_SPECIES = {
     accent: '#00ff9d',
     ears: 'bird',
     quips: [
-      'Coo! Fill the form and I will draft your mail to openboardinitiative@gmail.com!',
+      'Coo! Fill the form to draft your proposal to openboardinitiative@gmail.com!',
       'Every submission gets a unique #OB-2026 serial tag!',
-      'Share your passion project with IISERB!',
-    ],
-  },
-  suggest: {
-    name: 'Feynman’s Idea Hamster',
-    role: 'Suggestion Collector',
-    color: '#22d3ee',
-    accent: '#f43f5e',
-    ears: 'bunny',
-    quips: [
-      'Squeak! Got a topic, speaker or feature idea?',
-      'Fill the form and your email draft writes itself!',
-      'Every suggestion gets an #OBS-2026 tag!',
+      'Review your formatted email draft and hit send!',
     ],
   },
   contact: {
@@ -407,8 +379,8 @@ const MASCOT_SPECIES = {
     accent: '#00ff9d',
     ears: 'fox',
     quips: [
-      'Ping us anytime at openboardinitiative@gmail.com!',
-      'State machine ready for your message!',
+      'Fill out the suggestion form to draft a clean email to openboardinitiative@gmail.com!',
+      'State machine ready for your feedback or suggestion!',
       'Room L-8, Lecture Hall Complex!',
     ],
   },
@@ -1022,169 +994,11 @@ const GALLERY_ITEMS = [
 ];
 
 // =========================================================
-// 6B. EMAIL DRAFT READY SCREEN (shared by proposals & suggestions)
-//     The form data has already been turned into a pre-filled
-//     email draft. The person reviews it and presses send.
-// =========================================================
-const MailDraftReady = ({ isDark, tagLabel, heading, intro, mail, onReset, resetLabel, playClick }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    playClick();
-    const text = `To: ${OB_EMAIL}\nSubject: ${mail.subject}\n\n${mail.body}`;
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2200);
-    } catch (e) {
-      window.prompt('Copy the email text below:', text);
-    }
-  };
-
-  return (
-    <div
-      className={cx(
-        'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl space-y-5 shadow-2xl',
-        isDark ? 'bg-[#161b22]/90 border-[#00ff9d]/50' : 'bg-white border-emerald-300'
-      )}
-    >
-      <div className="text-center space-y-3">
-        <div className="w-14 h-14 rounded-full bg-[#00ff9d]/20 text-[#00ff9d] flex items-center justify-center text-2xl mx-auto border border-[#00ff9d]/40">
-          ✉
-        </div>
-        <div className="inline-block px-3 py-1 rounded-full bg-[#00ff9d]/15 border border-[#00ff9d]/40 text-xs font-mono text-[#00ff9d] font-bold">
-          {tagLabel}
-        </div>
-        <h3 className={cx('text-xl font-bold font-mono', isDark ? 'text-white' : 'text-zinc-900')}>{heading}</h3>
-        <p
-          className={cx(
-            'text-xs font-sans max-w-md mx-auto leading-relaxed',
-            isDark ? 'text-zinc-300' : 'text-zinc-700'
-          )}
-        >
-          {intro}
-        </p>
-      </div>
-
-      {/* Draft Preview */}
-      <div
-        className={cx(
-          'rounded-xl border text-xs font-mono overflow-hidden',
-          isDark ? 'bg-[#0d1117] border-[#30363d]' : 'bg-zinc-50 border-zinc-300'
-        )}
-      >
-        <div className={cx('px-4 py-2 border-b space-y-1', isDark ? 'border-[#30363d]' : 'border-zinc-300')}>
-          <div>
-            <span className="text-zinc-500">To: </span>
-            <span className="text-[#00ff9d]">{OB_EMAIL}</span>
-          </div>
-          <div>
-            <span className="text-zinc-500">Subject: </span>
-            <span className={isDark ? 'text-zinc-100' : 'text-zinc-900'}>{mail.subject}</span>
-          </div>
-        </div>
-        <pre
-          className={cx(
-            'px-4 py-3 whitespace-pre-wrap break-words max-h-64 overflow-y-auto leading-relaxed font-mono text-[11px]',
-            isDark ? 'text-zinc-300' : 'text-zinc-700'
-          )}
-        >
-          {mail.body}
-        </pre>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        <a
-          href={buildMailtoUrl(mail.subject, mail.body)}
-          onClick={playClick}
-          className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[#00ff9d] text-black hover:bg-[#34d399] transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,255,157,0.3)]"
-        >
-          <span>✉ OPEN EMAIL DRAFT</span>
-        </a>
-        <a
-          href={buildGmailUrl(mail.subject, mail.body)}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={playClick}
-          className="px-4 py-2 rounded-xl text-xs font-mono font-bold border border-[#00ff9d] text-[#00ff9d] hover:bg-[#00ff9d]/10 transition-all flex items-center gap-1.5"
-        >
-          <span>OPEN IN GMAIL ↗</span>
-        </a>
-        <button
-          onClick={handleCopy}
-          className={cx(
-            'px-4 py-2 rounded-xl text-xs font-mono transition-all',
-            isDark ? 'bg-[#21262d] text-zinc-300 hover:text-white' : 'bg-zinc-100 text-zinc-700 hover:text-black'
-          )}
-        >
-          {copied ? '✓ COPIED' : '📋 COPY EMAIL TEXT'}
-        </button>
-      </div>
-
-      <p className="text-[11px] font-mono text-center text-zinc-500 leading-relaxed">
-        Nothing has been sent yet. Review the draft in your email app and press send. If no mail app opened, use
-        &quot;Open in Gmail&quot; or copy the text.
-      </p>
-
-      <div className="text-center">
-        <button
-          onClick={() => {
-            playClick();
-            onReset();
-          }}
-          className={cx(
-            'px-4 py-2 rounded-xl text-xs font-mono',
-            isDark ? 'bg-[#21262d] text-zinc-300 hover:text-white' : 'bg-zinc-100 text-zinc-700 hover:text-black'
-          )}
-        >
-          {resetLabel}
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// =========================================================
 // 7. MAIN APPLICATION COMPONENT
 // =========================================================
-const EMPTY_PROPOSAL = {
-  name: '',
-  email: '',
-  title: '',
-  department: 'Physics',
-  abstract: '',
-  prerequisites: 'Basic undergraduate calculus & linear algebra',
-  preferredDate: '',
-  tags: 'Interdisciplinary, Theory',
-};
-
-const EMPTY_SUGGESTION = {
-  name: '',
-  email: '',
-  type: 'Topic request',
-  title: '',
-  details: '',
-  link: '',
-};
-
-const SUGGESTION_TYPES = [
-  'Topic request',
-  'Speaker recommendation',
-  'Session format / logistics',
-  'Website improvement',
-  'Collaboration / outreach',
-  'Other',
-];
-
-const inputClass = (isDark) =>
-  cx(
-    'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-    isDark
-      ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-      : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-  );
-
 export default function App() {
+  const OPENBOARD_EMAIL = 'openboardinitiative@gmail.com';
+
   // Theme state
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -1228,17 +1042,50 @@ export default function App() {
   const [activeModalTalk, setActiveModalTalk] = useState(null);
   const [activeLightboxImg, setActiveLightboxImg] = useState(null);
 
-  // Proposal Submission Form state
-  const [formState, setFormState] = useState(EMPTY_PROPOSAL);
-  const [formStatus, setFormStatus] = useState('idle'); // 'idle' | 'success' (draft ready for review)
+  // ---------------------------------------------------------
+  // 7A. TALK PROPOSAL SUBMISSION FORM STATE
+  // ---------------------------------------------------------
+  const [formState, setFormState] = useState({
+    name: '',
+    email: '',
+    batchOrAffiliation: '',
+    title: '',
+    department: 'Physics',
+    abstract: '',
+    prerequisites: 'Basic undergraduate calculus & linear algebra',
+    preferredDate: '',
+    tags: 'Interdisciplinary, Theory',
+  });
+  const [formStatus, setFormStatus] = useState('idle'); // 'idle' | 'drafted'
   const [lastSerialNumber, setLastSerialNumber] = useState('');
-  const [proposalMail, setProposalMail] = useState(null); // { subject, body }
+  const [proposalDraft, setProposalDraft] = useState({
+    subject: '',
+    body: '',
+    mailtoUrl: '',
+    gmailUrl: '',
+  });
+  const [copiedProposal, setCopiedProposal] = useState(false);
 
-  // Suggestion Form state
-  const [suggestState, setSuggestState] = useState(EMPTY_SUGGESTION);
-  const [suggestStatus, setSuggestStatus] = useState('idle'); // 'idle' | 'success' (draft ready for review)
-  const [lastSuggestSerial, setLastSuggestSerial] = useState('');
-  const [suggestMail, setSuggestMail] = useState(null); // { subject, body }
+  // ---------------------------------------------------------
+  // 7B. SUGGESTIONS & FEEDBACK FORM STATE
+  // ---------------------------------------------------------
+  const [suggestionState, setSuggestionState] = useState({
+    name: '',
+    email: '',
+    affiliation: '',
+    category: 'Topic / Speaker Suggestion',
+    topic: '',
+    details: '',
+  });
+  const [suggestionStatus, setSuggestionStatus] = useState('idle'); // 'idle' | 'drafted'
+  const [lastSuggestionSerial, setLastSuggestionSerial] = useState('');
+  const [suggestionDraft, setSuggestionDraft] = useState({
+    subject: '',
+    body: '',
+    mailtoUrl: '',
+    gmailUrl: '',
+  });
+  const [copiedSuggestion, setCopiedSuggestion] = useState(false);
 
   // Mobile menu open state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -1304,14 +1151,14 @@ export default function App() {
     });
   }, [searchQuery, selectedCategory, showOnlyBookmarked, bookmarkedIds]);
 
-  // Generate Sequential + Unique Serial Number (#OB-2026-XXXX for talks, #OBS-... for suggestions)
+  // Generate Sequential + Unique Serial Number (#OB-2026-XXXX)
   const generateSerialNumber = (prefix = 'OB') => {
     let seq = 101;
-    const counterKey = prefix === 'OB' ? 'openboard_seq_counter' : `openboard_seq_counter_${prefix.toLowerCase()}`;
     try {
-      const current = parseInt(localStorage.getItem(counterKey) || '100', 10);
+      const storageKey = prefix === 'OB-SUG' ? 'openboard_sug_counter' : 'openboard_seq_counter';
+      const current = parseInt(localStorage.getItem(storageKey) || '100', 10);
       seq = current + 1;
-      localStorage.setItem(counterKey, String(seq));
+      localStorage.setItem(storageKey, String(seq));
     } catch (e) {}
     const now = new Date();
     const mmdd = `${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
@@ -1319,148 +1166,163 @@ export default function App() {
     return `${prefix}-${now.getFullYear()}-${mmdd}-${seq}-${rand}`;
   };
 
-  const nowIST = () => new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-
-  // Opens the visitor's mail app with the draft already filled in (nothing is sent automatically)
-  const openMailDraft = (subject, body) => {
-    window.location.href = buildMailtoUrl(subject, body);
+  // Helper to construct mailto and Gmail compose URLs
+  const createEmailLinks = (to, subject, body) => {
+    const encodedSubj = encodeURIComponent(subject);
+    const encodedBody = encodeURIComponent(body);
+    return {
+      mailtoUrl: `mailto:${to}?subject=${encodedSubj}&body=${encodedBody}`,
+      gmailUrl: `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodedSubj}&body=${encodedBody}`,
+    };
   };
 
-  // Talk proposal: form -> pre-filled email draft to the OpenBoard inbox for review & send
+  // ---------------------------------------------------------
+  // HANDLER 1: TALK PROPOSAL FORM -> DRAFTS PROPER EMAIL TO OPENBOARD GMAIL
+  // ---------------------------------------------------------
   const handleSubmitProposal = (e) => {
     e.preventDefault();
-    const f = {
-      ...formState,
-      name: formState.name.trim(),
-      email: formState.email.trim(),
-      title: formState.title.trim(),
-      abstract: formState.abstract.trim(),
-      prerequisites: formState.prerequisites.trim(),
-      tags: formState.tags.trim(),
-    };
-    if (!f.name || !f.email || !f.title || !f.abstract) {
-      alert('Please fill out all required fields.');
+    if (
+      !formState.name.trim() ||
+      !formState.email.trim() ||
+      !formState.title.trim() ||
+      !formState.abstract.trim()
+    ) {
+      alert('Please fill out all required fields (Speaker Name, Email, Talk Title, and Abstract) before drafting your submission.');
       return;
     }
 
-    playClick();
+    playSuccess();
 
     const serialNumber = generateSerialNumber('OB');
     setLastSerialNumber(serialNumber);
+    const submittedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-    const subject = `[Submission #${serialNumber}] OpenBoard Talk Proposal: ${f.title}`;
+    const subject = `[Submission #${serialNumber}] OpenBoard Talk Proposal: ${formState.title.trim()}`;
     const body = [
-      'OPENBOARD TALK PROPOSAL',
-      '=======================',
-      `Tag: Submission`,
-      `Serial Number: #${serialNumber}`,
-      `Prepared On (IST): ${nowIST()}`,
-      '',
-      'SPEAKER DETAILS',
-      '---------------',
-      `Name: ${f.name}`,
-      `Email: ${f.email}`,
-      `Academic Discipline: ${f.department}`,
-      '',
-      'TALK DETAILS',
-      '------------',
-      `Title: ${f.title}`,
-      `Preferred Session Date: ${f.preferredDate || 'Flexible'}`,
-      `Audience Prerequisites: ${f.prerequisites || 'None (Accessible to all)'}`,
-      `Topic Tags: ${f.tags || 'N/A'}`,
-      '',
-      'ABSTRACT & PEDAGOGICAL HOOK',
-      '---------------------------',
-      f.abstract,
-      '',
-      '---',
-      'Prepared via the open_board website proposal form.',
+      `Dear OpenBoard Coordinators,`,
+      ``,
+      `I would like to submit a talk proposal for an upcoming OpenBoard session at IISER Bhopal. Please find the complete details of my proposed talk below:`,
+      ``,
+      `==================================================`,
+      `OPENBOARD TALK PROPOSAL SUBMISSION`,
+      `==================================================`,
+      `• Submission Tag     : [Submission]`,
+      `• Serial Number      : #${serialNumber}`,
+      `• Timestamp (IST)    : ${submittedAt}`,
+      ``,
+      `--- SPEAKER DETAILS ---`,
+      `• Speaker Name       : ${formState.name.trim()}`,
+      `• Speaker Email      : ${formState.email.trim()}`,
+      `• Batch / Affiliation: ${formState.batchOrAffiliation.trim() || 'IISER Bhopal Student'}`,
+      `• Academic Discipline: ${formState.department}`,
+      ``,
+      `--- TALK DETAILS ---`,
+      `• Talk Title         : ${formState.title.trim()}`,
+      `• Preferred Date     : ${formState.preferredDate || 'Flexible / Next Available Slot'}`,
+      `• Prerequisites      : ${formState.prerequisites.trim() || 'None (Accessible to all disciplines)'}`,
+      `• Topic Tags         : ${formState.tags.trim() || 'Interdisciplinary'}`,
+      ``,
+      `--- ABSTRACT & PEDAGOGICAL HOOK ---`,
+      `${formState.abstract.trim()}`,
+      `==================================================`,
+      ``,
+      `Looking forward to discussing this further!`,
+      ``,
+      `Best regards,`,
+      `${formState.name.trim()}`,
+      `${formState.email.trim()}`,
     ].join('\n');
 
-    setProposalMail({ subject, body });
-    setFormStatus('success');
-    playSuccess();
-    openMailDraft(subject, body);
+    const { mailtoUrl, gmailUrl } = createEmailLinks(OPENBOARD_EMAIL, subject, body);
+
+    setProposalDraft({
+      subject,
+      body,
+      mailtoUrl,
+      gmailUrl,
+    });
+    setFormStatus('drafted');
+
+    // Open the user's default mail client with the complete pre-filled draft ready to review & send
+    window.location.href = mailtoUrl;
   };
 
-  const resetProposal = () => {
-    setFormStatus('idle');
-    setProposalMail(null);
-    setFormState(EMPTY_PROPOSAL);
-  };
-
-  // Suggestion: form -> pre-filled email draft to the OpenBoard inbox for review & send
+  // ---------------------------------------------------------
+  // HANDLER 2: SUGGESTION FORM -> DRAFTS PROPER EMAIL TO OPENBOARD GMAIL
+  // ---------------------------------------------------------
   const handleSubmitSuggestion = (e) => {
     e.preventDefault();
-    const f = {
-      ...suggestState,
-      name: suggestState.name.trim(),
-      email: suggestState.email.trim(),
-      title: suggestState.title.trim(),
-      details: suggestState.details.trim(),
-      link: suggestState.link.trim(),
-    };
-    if (!f.name || !f.email || !f.title || !f.details) {
-      alert('Please fill out all required fields.');
+    if (
+      !suggestionState.name.trim() ||
+      !suggestionState.email.trim() ||
+      !suggestionState.topic.trim() ||
+      !suggestionState.details.trim()
+    ) {
+      alert('Please fill out all required fields (Your Name, Email, Subject/Topic, and Suggestion Details) before drafting your email.');
       return;
     }
 
-    playClick();
+    playSuccess();
 
-    const serialNumber = generateSerialNumber('OBS');
-    setLastSuggestSerial(serialNumber);
+    const suggestionSerial = generateSerialNumber('OB-SUG');
+    setLastSuggestionSerial(suggestionSerial);
+    const submittedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-    const subject = `[Suggestion #${serialNumber}] OpenBoard ${f.type}: ${f.title}`;
+    const subject = `[Suggestion #${suggestionSerial}] OpenBoard (${suggestionState.category}): ${suggestionState.topic.trim()}`;
     const body = [
-      'OPENBOARD SUGGESTION',
-      '====================',
-      `Tag: Suggestion`,
-      `Serial Number: #${serialNumber}`,
-      `Prepared On (IST): ${nowIST()}`,
-      '',
-      'FROM',
-      '----',
-      `Name: ${f.name}`,
-      `Email: ${f.email}`,
-      '',
-      'SUGGESTION',
-      '----------',
-      `Category: ${f.type}`,
-      `Headline: ${f.title}`,
-      `Reference Link: ${f.link || 'N/A'}`,
-      '',
-      'DETAILS',
-      '-------',
-      f.details,
-      '',
-      '---',
-      'Prepared via the open_board website suggestion form.',
+      `Dear OpenBoard Coordinators,`,
+      ``,
+      `I am writing to share a suggestion / feedback for the OpenBoard initiative at IISER Bhopal. Here are the complete details:`,
+      ``,
+      `==================================================`,
+      `OPENBOARD SUGGESTION & FEEDBACK DISPATCH`,
+      `==================================================`,
+      `• Dispatch Tag       : [Suggestion]`,
+      `• Reference ID       : #${suggestionSerial}`,
+      `• Category           : ${suggestionState.category}`,
+      `• Timestamp (IST)    : ${submittedAt}`,
+      ``,
+      `--- SENDER DETAILS ---`,
+      `• Name               : ${suggestionState.name.trim()}`,
+      `• Email              : ${suggestionState.email.trim()}`,
+      `• Batch / Affiliation: ${suggestionState.affiliation.trim() || 'IISER Bhopal Community'}`,
+      ``,
+      `--- SUGGESTION / TOPIC SUMMARY ---`,
+      `• Topic / Subject    : ${suggestionState.topic.trim()}`,
+      ``,
+      `--- DETAILED MESSAGE & SUGGESTION ---`,
+      `${suggestionState.details.trim()}`,
+      `==================================================`,
+      ``,
+      `Best regards,`,
+      `${suggestionState.name.trim()}`,
+      `${suggestionState.email.trim()}`,
     ].join('\n');
 
-    setSuggestMail({ subject, body });
-    setSuggestStatus('success');
-    playSuccess();
-    openMailDraft(subject, body);
+    const { mailtoUrl, gmailUrl } = createEmailLinks(OPENBOARD_EMAIL, subject, body);
+
+    setSuggestionDraft({
+      subject,
+      body,
+      mailtoUrl,
+      gmailUrl,
+    });
+    setSuggestionStatus('drafted');
+
+    // Open the user's default mail client with the complete pre-filled suggestion draft ready to review & send
+    window.location.href = mailtoUrl;
   };
 
-  const resetSuggestion = () => {
-    setSuggestStatus('idle');
-    setSuggestMail(null);
-    setSuggestState(EMPTY_SUGGESTION);
+  const handleCopyText = (text, setCopiedFlag) => {
+    playClick();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedFlag(true);
+      setTimeout(() => setCopiedFlag(false), 2500);
+    }
   };
 
   const isDark = theme === 'dark';
-
-  const NAV_TABS = [
-    { id: 'home', label: '00 // HOME' },
-    { id: 'about', label: '01 // ABOUT' },
-    { id: 'archive', label: '02 // ARCHIVE' },
-    { id: 'gallery', label: '03 // GALLERY' },
-    { id: 'events', label: '04 // EVENTS' },
-    { id: 'submit', label: '05 // PROPOSE' },
-    { id: 'suggest', label: '06 // SUGGEST' },
-    { id: 'contact', label: '07 // CONTACT' },
-  ];
 
   return (
     <div
@@ -1552,7 +1414,15 @@ export default function App() {
 
           {/* Desktop Navigation Tabs */}
           <nav className="hidden lg:flex items-center gap-1 text-xs">
-            {NAV_TABS.map((tab) => {
+            {[
+              { id: 'home', label: '00 // HOME' },
+              { id: 'about', label: '01 // ABOUT' },
+              { id: 'archive', label: '02 // ARCHIVE' },
+              { id: 'gallery', label: '03 // GALLERY' },
+              { id: 'events', label: '04 // EVENTS' },
+              { id: 'submit', label: '05 // PROPOSE' },
+              { id: 'contact', label: '06 // CONTACT' },
+            ].map((tab) => {
               const isActive = activeTab === tab.id;
               return (
                 <button
@@ -1648,7 +1518,15 @@ export default function App() {
               isDark ? 'bg-[#161b22]/95 border-[#30363d]' : 'bg-white/95 border-zinc-200'
             )}
           >
-            {NAV_TABS.map((tab) => (
+            {[
+              { id: 'home', label: '00 // HOME' },
+              { id: 'about', label: '01 // ABOUT' },
+              { id: 'archive', label: '02 // ARCHIVE' },
+              { id: 'gallery', label: '03 // GALLERY' },
+              { id: 'events', label: '04 // EVENTS' },
+              { id: 'submit', label: '05 // PROPOSE TALK' },
+              { id: 'contact', label: '06 // CONTACT & SUGGESTIONS' },
+            ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleNavClick(tab.id)}
@@ -1659,7 +1537,7 @@ export default function App() {
                     : 'text-zinc-400 hover:text-zinc-100 hover:bg-[#21262d]'
                 )}
               >
-                {tab.id === 'submit' ? '05 // PROPOSE TALK' : tab.label}
+                {tab.label}
               </button>
             ))}
           </div>
@@ -1986,7 +1864,7 @@ export default function App() {
         )}
 
         {/* ----------------------------------------------------- */}
-        {/* VIEW 1: ABOUT — MISSION, LEADERSHIP & VISION         */}
+        {/* VIEW 1: ABOUT — MISSION, LEADERSHIP & VISION          */}
         {/* ----------------------------------------------------- */}
         {activeTab === 'about' && (
           <div className="space-y-16">
@@ -2486,34 +2364,143 @@ export default function App() {
         )}
 
         {/* ----------------------------------------------------- */}
-        {/* VIEW 5: PROPOSE — FORM -> PRE-FILLED EMAIL DRAFT      */}
+        {/* VIEW 5: PROPOSE — FORM -> DRAFT EMAIL TO OPENBOARD    */}
         {/* ----------------------------------------------------- */}
         {activeTab === 'submit' && (
-          <div className="max-w-2xl mx-auto space-y-8">
+          <div className="max-w-3xl mx-auto space-y-8">
             <div className="text-left">
               <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">
                 05 // CALL FOR SPEAKERS
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Propose Your Talk</h2>
-              <p className={cx('text-xs sm:text-sm mt-1', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
-                Fill in the form below and we will prepare a ready-to-send email to{' '}
-                <span className="text-[#00ff9d]">{OB_EMAIL}</span> with a unique{' '}
-                <span className="text-[#00ff9d]">#OB-2026</span> serial number, a proper subject line, and all your
-                details in the body. Just review the draft and press send.
+              <p className={cx('text-xs sm:text-sm mt-1 leading-relaxed', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
+                Fill out the proposal form below first. Upon clicking draft, a complete email with your unique{' '}
+                <span className="text-[#00ff9d] font-bold">#OB-2026</span> submission tag, talk title in the subject,
+                and structured details in the body is automatically drafted to{' '}
+                <span className="text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span> so you can review and hit send.
               </p>
             </div>
 
-            {formStatus === 'success' && proposalMail ? (
-              <MailDraftReady
-                isDark={isDark}
-                playClick={playClick}
-                tagLabel={`TAG: SUBMISSION • SERIAL #${lastSerialNumber}`}
-                heading="EMAIL DRAFT READY FOR REVIEW"
-                intro={`Thank you, ${formState.name}! Your talk proposal "${formState.title}" has been formatted into an email to ${OB_EMAIL}. Review it in your mail app and press send to complete your submission.`}
-                mail={proposalMail}
-                onReset={resetProposal}
-                resetLabel="Submit Another Proposal"
-              />
+            {formStatus === 'drafted' ? (
+              <div
+                className={cx(
+                  'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl space-y-6 shadow-2xl',
+                  isDark ? 'bg-[#161b22]/90 border-[#00ff9d]/50' : 'bg-white border-emerald-400'
+                )}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#30363d] pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-[#00ff9d]/20 text-[#00ff9d] flex items-center justify-center text-xl border border-[#00ff9d]/40">
+                      ✉
+                    </div>
+                    <div>
+                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-[#00ff9d]/15 border border-[#00ff9d]/40 text-[10px] font-mono text-[#00ff9d] font-bold">
+                        TAG: SUBMISSION • SERIAL #{lastSerialNumber}
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-bold font-mono mt-0.5">
+                        EMAIL DRAFT READY FOR REVIEW &amp; SEND
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                <p className={cx('text-xs font-sans leading-relaxed', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                  Your talk proposal for <strong>"{formState.title}"</strong> has been formatted into a complete email
+                  draft addressed to <span className="font-mono text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span>. If
+                  your email app did not open automatically, choose your preferred option below to review and send it:
+                </p>
+
+                {/* Primary Launch Buttons: Default Mail Client + Gmail Web Compose + Copy */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={proposalDraft.mailtoUrl}
+                    onClick={playClick}
+                    className="px-5 py-2.5 rounded-xl text-xs font-mono font-bold bg-[#00ff9d] text-black hover:bg-[#34d399] shadow-[0_0_20px_rgba(0,255,157,0.35)] transition-all flex items-center gap-2"
+                  >
+                    <span>✉ OPEN IN DEFAULT MAIL APP &amp; SEND</span>
+                  </a>
+
+                  <a
+                    href={proposalDraft.gmailUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playClick}
+                    className="px-5 py-2.5 rounded-xl text-xs font-mono font-bold border border-[#00ff9d] text-[#00ff9d] hover:bg-[#00ff9d]/15 transition-all flex items-center gap-2"
+                  >
+                    <span>🌐 OPEN IN GMAIL WEB COMPOSE ↗</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleCopyText(`Subject: ${proposalDraft.subject}\n\n${proposalDraft.body}`, setCopiedProposal)
+                    }
+                    className="px-4 py-2.5 rounded-xl text-xs font-mono border border-[#30363d] text-zinc-300 hover:border-zinc-400 hover:text-white transition-all"
+                  >
+                    {copiedProposal ? '✓ COPIED FULL DRAFT' : '📋 COPY DRAFT TEXT'}
+                  </button>
+                </div>
+
+                {/* Live Preview of the Drafted Email */}
+                <div
+                  className={cx(
+                    'rounded-xl border p-4 space-y-3 font-mono text-xs',
+                    isDark ? 'bg-[#0d1117] border-[#30363d]' : 'bg-zinc-50 border-zinc-300'
+                  )}
+                >
+                  <div className="text-[10px] uppercase tracking-wider text-[#00ff9d] font-bold">
+                    DRAFTED EMAIL PREVIEW (VERIFY BEFORE SENDING)
+                  </div>
+                  <div className="space-y-1 border-b border-[#30363d] pb-2.5 text-[11px]">
+                    <div>
+                      <span className="text-zinc-500">To: </span>
+                      <span className="text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">Subject: </span>
+                      <span className="font-bold text-amber-300">{proposalDraft.subject}</span>
+                    </div>
+                  </div>
+                  <pre className="whitespace-pre-wrap text-[11px] leading-relaxed text-zinc-300 max-h-64 overflow-y-auto font-mono">
+                    {proposalDraft.body}
+                  </pre>
+                </div>
+
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-[#30363d]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playClick();
+                      setFormStatus('idle');
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-mono border border-[#30363d] text-zinc-300 hover:text-white hover:border-[#00ff9d]"
+                  >
+                    ← Edit Proposal Details
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playClick();
+                      setFormStatus('idle');
+                      setFormState({
+                        name: '',
+                        email: '',
+                        batchOrAffiliation: '',
+                        title: '',
+                        department: 'Physics',
+                        abstract: '',
+                        prerequisites: 'Basic undergraduate calculus & linear algebra',
+                        preferredDate: '',
+                        tags: 'Interdisciplinary, Theory',
+                      });
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-mono bg-[#21262d] text-zinc-300 hover:text-white"
+                  >
+                    Start Fresh Proposal
+                  </button>
+                </div>
+              </div>
             ) : (
               <form
                 onSubmit={handleSubmitProposal}
@@ -2522,12 +2509,12 @@ export default function App() {
                   isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white/95 border-[#d0d7de]'
                 )}
               >
-                <div className="flex items-center justify-between border-b border-[#30363d] pb-3 text-[11px] text-zinc-400">
-                  <span>&gt; target_inbox = "{OB_EMAIL}"</span>
-                  <span className="text-[#00ff9d] font-bold">[TAG: SUBMISSION]</span>
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#30363d] pb-3 text-[11px] text-zinc-400">
+                  <span>&gt; recipient = "{OPENBOARD_EMAIL}"</span>
+                  <span className="text-[#00ff9d] font-bold">[STEP 1: FILL FORM → STEP 2: REVIEW &amp; SEND MAIL]</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
                   <div>
                     <label className="block text-zinc-400 mb-1">Speaker Name *</label>
                     <input
@@ -2536,7 +2523,12 @@ export default function App() {
                       placeholder="e.g. Emmy Noether"
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                      className={inputClass(isDark)}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
                     />
                   </div>
 
@@ -2548,7 +2540,28 @@ export default function App() {
                       placeholder="username22@iiserb.ac.in"
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                      className={inputClass(isDark)}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-zinc-400 mb-1">Batch / Affiliation</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 2022 Batch, IISERB"
+                      value={formState.batchOrAffiliation}
+                      onChange={(e) => setFormState({ ...formState, batchOrAffiliation: e.target.value })}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
                     />
                   </div>
                 </div>
@@ -2562,16 +2575,26 @@ export default function App() {
                       placeholder="e.g. Symmetries & Conservation Laws"
                       value={formState.title}
                       onChange={(e) => setFormState({ ...formState, title: e.target.value })}
-                      className={inputClass(isDark)}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">Academic Discipline</label>
+                    <label className="block text-zinc-400 mb-1">Academic Discipline *</label>
                     <select
                       value={formState.department}
                       onChange={(e) => setFormState({ ...formState, department: e.target.value })}
-                      className={inputClass(isDark)}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
                     >
                       <option value="Physics">Physics</option>
                       <option value="Mathematics">Mathematics</option>
@@ -2585,14 +2608,19 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-zinc-400 mb-1">Abstract & Pedagogical Hook *</label>
+                  <label className="block text-zinc-400 mb-1">Abstract &amp; Pedagogical Hook *</label>
                   <textarea
                     required
                     rows={4}
                     placeholder="Provide a 2-4 sentence summary of your presentation. What fundamental question are you answering for non-specialists?"
                     value={formState.abstract}
                     onChange={(e) => setFormState({ ...formState, abstract: e.target.value })}
-                    className={cx(inputClass(isDark), 'font-sans')}
+                    className={cx(
+                      'w-full px-3.5 py-2.5 rounded-lg border outline-none font-sans text-xs',
+                      isDark
+                        ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                        : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                    )}
                   />
                 </div>
 
@@ -2603,18 +2631,28 @@ export default function App() {
                     placeholder="e.g. None! Just curiosity (or 1st-year linear algebra)"
                     value={formState.prerequisites}
                     onChange={(e) => setFormState({ ...formState, prerequisites: e.target.value })}
-                    className={inputClass(isDark)}
+                    className={cx(
+                      'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                      isDark
+                        ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                        : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                    )}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-zinc-400 mb-1">Preferred Date</label>
+                    <label className="block text-zinc-400 mb-1">Preferred Session Date</label>
                     <input
                       type="date"
                       value={formState.preferredDate}
                       onChange={(e) => setFormState({ ...formState, preferredDate: e.target.value })}
-                      className={inputClass(isDark)}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
                     />
                   </div>
 
@@ -2625,176 +2663,61 @@ export default function App() {
                       placeholder="e.g. Noether Theorem, Group Theory"
                       value={formState.tags}
                       onChange={(e) => setFormState({ ...formState, tags: e.target.value })}
-                      className={inputClass(isDark)}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
                     />
                   </div>
                 </div>
 
+                {/* Live Subject Line Preview Bar */}
+                <div
+                  className={cx(
+                    'p-3 rounded-lg border text-[11px] font-mono',
+                    isDark ? 'bg-[#0d1117]/90 border-[#30363d] text-zinc-400' : 'bg-zinc-100 border-zinc-300 text-zinc-600'
+                  )}
+                >
+                  <span className="text-[#00ff9d] font-bold">Draft Subject Preview: </span>
+                  <span>
+                    [Submission #OB-2026-XXXX] OpenBoard Talk Proposal:{' '}
+                    {formState.title.trim() ? formState.title.trim() : '<Your Talk Title>'}
+                  </span>
+                </div>
+
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl font-mono text-xs font-bold tracking-wider bg-[#00ff9d] text-black shadow-[0_0_20px_rgba(0,255,157,0.35)] hover:shadow-[0_0_30px_rgba(0,255,157,0.55)] transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl font-mono text-xs font-bold tracking-wider bg-[#00ff9d] text-black shadow-[0_0_20px_rgba(0,255,157,0.35)] hover:shadow-[0_0_30px_rgba(0,255,157,0.55)] transition-all flex items-center justify-center gap-2"
                 >
-                  <span>&gt; PREPARE EMAIL DRAFT FOR REVIEW</span>
+                  <span>&gt; DRAFT SUBMISSION EMAIL TO OPENBOARDINITIATIVE@GMAIL.COM (REVIEW &amp; SEND)</span>
                 </button>
-
-                <p className="text-[11px] text-zinc-500 text-center leading-relaxed">
-                  This opens your email app with everything pre-filled. Nothing is sent until you press send.
-                </p>
               </form>
             )}
           </div>
         )}
 
         {/* ----------------------------------------------------- */}
-        {/* VIEW 6: SUGGEST — FORM -> PRE-FILLED EMAIL DRAFT      */}
-        {/* ----------------------------------------------------- */}
-        {activeTab === 'suggest' && (
-          <div className="max-w-2xl mx-auto space-y-8">
-            <div className="text-left">
-              <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">
-                06 // COMMUNITY FEEDBACK
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Make A Suggestion</h2>
-              <p className={cx('text-xs sm:text-sm mt-1', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
-                Want a topic covered, a speaker invited, or something improved? Fill in the form and we will prepare a
-                ready-to-send email to <span className="text-[#00ff9d]">{OB_EMAIL}</span> with a unique{' '}
-                <span className="text-[#00ff9d]">#OBS-2026</span> serial number, a proper subject line, and all your
-                details in the body. Just review the draft and press send.
-              </p>
-            </div>
-
-            {suggestStatus === 'success' && suggestMail ? (
-              <MailDraftReady
-                isDark={isDark}
-                playClick={playClick}
-                tagLabel={`TAG: SUGGESTION • SERIAL #${lastSuggestSerial}`}
-                heading="EMAIL DRAFT READY FOR REVIEW"
-                intro={`Thank you, ${suggestState.name}! Your suggestion "${suggestState.title}" has been formatted into an email to ${OB_EMAIL}. Review it in your mail app and press send to complete it.`}
-                mail={suggestMail}
-                onReset={resetSuggestion}
-                resetLabel="Make Another Suggestion"
-              />
-            ) : (
-              <form
-                onSubmit={handleSubmitSuggestion}
-                className={cx(
-                  'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl shadow-2xl space-y-4 font-mono text-xs',
-                  isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white/95 border-[#d0d7de]'
-                )}
-              >
-                <div className="flex items-center justify-between border-b border-[#30363d] pb-3 text-[11px] text-zinc-400">
-                  <span>&gt; target_inbox = "{OB_EMAIL}"</span>
-                  <span className="text-[#f43f5e] font-bold">[TAG: SUGGESTION]</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                  <div>
-                    <label className="block text-zinc-400 mb-1">Your Name *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Emmy Noether"
-                      value={suggestState.name}
-                      onChange={(e) => setSuggestState({ ...suggestState, name: e.target.value })}
-                      className={inputClass(isDark)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-zinc-400 mb-1">Your Email *</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="username22@iiserb.ac.in"
-                      value={suggestState.email}
-                      onChange={(e) => setSuggestState({ ...suggestState, email: e.target.value })}
-                      className={inputClass(isDark)}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-zinc-400 mb-1">Suggestion Category</label>
-                    <select
-                      value={suggestState.type}
-                      onChange={(e) => setSuggestState({ ...suggestState, type: e.target.value })}
-                      className={inputClass(isDark)}
-                    >
-                      {SUGGESTION_TYPES.map((t) => (
-                        <option key={t} value={t}>
-                          {t}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-zinc-400 mb-1">Headline *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. A session on Category Theory"
-                      value={suggestState.title}
-                      onChange={(e) => setSuggestState({ ...suggestState, title: e.target.value })}
-                      className={inputClass(isDark)}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-zinc-400 mb-1">Details *</label>
-                  <textarea
-                    required
-                    rows={5}
-                    placeholder="Describe your suggestion. What would you like to see, and why would it help the community?"
-                    value={suggestState.details}
-                    onChange={(e) => setSuggestState({ ...suggestState, details: e.target.value })}
-                    className={cx(inputClass(isDark), 'font-sans')}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-zinc-400 mb-1">Reference Link (optional)</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. a paper, video, or page related to your idea"
-                    value={suggestState.link}
-                    onChange={(e) => setSuggestState({ ...suggestState, link: e.target.value })}
-                    className={inputClass(isDark)}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3 rounded-xl font-mono text-xs font-bold tracking-wider bg-[#00ff9d] text-black shadow-[0_0_20px_rgba(0,255,157,0.35)] hover:shadow-[0_0_30px_rgba(0,255,157,0.55)] transition-all flex items-center justify-center gap-2"
-                >
-                  <span>&gt; PREPARE EMAIL DRAFT FOR REVIEW</span>
-                </button>
-
-                <p className="text-[11px] text-zinc-500 text-center leading-relaxed">
-                  This opens your email app with everything pre-filled. Nothing is sent until you press send.
-                </p>
-              </form>
-            )}
-          </div>
-        )}
-
-        {/* ----------------------------------------------------- */}
-        {/* VIEW 7: CONTACT — COORDINATOR CHANNELS               */}
+        {/* VIEW 6: CONTACT & SUGGESTIONS — FORM -> DRAFT EMAIL   */}
         {/* ----------------------------------------------------- */}
         {activeTab === 'contact' && (
           <div className="max-w-3xl mx-auto space-y-8">
             <div className="text-left">
               <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">
-                07 // COMMUNICATIONS
+                06 // COMMUNICATIONS &amp; FEEDBACK
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Get In Touch</h2>
-              <p className={cx('text-xs sm:text-sm mt-1', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
-                Reach out to our official initiative inbox or directly to the student coordinators.
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">
+                Suggestions &amp; Coordinator Channels
+              </h2>
+              <p className={cx('text-xs sm:text-sm mt-1 leading-relaxed', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
+                Have a suggestion for a topic, speaker, collaboration, or improvement? Fill out the form below to
+                generate a properly structured email draft to{' '}
+                <span className="text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span> ready for you to review and send.
               </p>
             </div>
 
+            {/* Direct Info Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div
                 className={cx(
@@ -2821,8 +2744,8 @@ export default function App() {
                 <div className="text-xs font-mono space-y-1.5 text-zinc-300">
                   <div>
                     Official Inbox:{' '}
-                    <a href="mailto:openboardinitiative@gmail.com" className="text-[#00ff9d] font-bold hover:underline">
-                      openboardinitiative@gmail.com
+                    <a href={`mailto:${OPENBOARD_EMAIL}`} className="text-[#00ff9d] font-bold hover:underline">
+                      {OPENBOARD_EMAIL}
                     </a>
                   </div>
                   <div>
@@ -2840,6 +2763,274 @@ export default function App() {
                 </div>
               </div>
             </div>
+
+            {/* SUGGESTIONS & FEEDBACK FORM -> DRAFTS PROPER EMAIL */}
+            {suggestionStatus === 'drafted' ? (
+              <div
+                className={cx(
+                  'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl space-y-6 shadow-2xl',
+                  isDark ? 'bg-[#161b22]/90 border-[#f43f5e]/50' : 'bg-white border-rose-300'
+                )}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#30363d] pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-[#f43f5e]/20 text-[#f43f5e] flex items-center justify-center text-xl border border-[#f43f5e]/40">
+                      ✉
+                    </div>
+                    <div>
+                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-[#f43f5e]/15 border border-[#f43f5e]/40 text-[10px] font-mono text-[#f43f5e] font-bold">
+                        TAG: SUGGESTION • REF #{lastSuggestionSerial}
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-bold font-mono mt-0.5">
+                        SUGGESTION DRAFT READY FOR REVIEW &amp; SEND
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                <p className={cx('text-xs font-sans leading-relaxed', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                  Your suggestion regarding <strong>"{suggestionState.topic}"</strong> has been formatted into an email
+                  draft to <span className="font-mono text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span>. Please review
+                  and send it via your preferred email client below:
+                </p>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={suggestionDraft.mailtoUrl}
+                    onClick={playClick}
+                    className="px-5 py-2.5 rounded-xl text-xs font-mono font-bold bg-[#00ff9d] text-black hover:bg-[#34d399] shadow-[0_0_20px_rgba(0,255,157,0.35)] transition-all flex items-center gap-2"
+                  >
+                    <span>✉ OPEN IN DEFAULT MAIL APP &amp; SEND</span>
+                  </a>
+
+                  <a
+                    href={suggestionDraft.gmailUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playClick}
+                    className="px-5 py-2.5 rounded-xl text-xs font-mono font-bold border border-[#00ff9d] text-[#00ff9d] hover:bg-[#00ff9d]/15 transition-all flex items-center gap-2"
+                  >
+                    <span>🌐 OPEN IN GMAIL WEB COMPOSE ↗</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleCopyText(
+                        `Subject: ${suggestionDraft.subject}\n\n${suggestionDraft.body}`,
+                        setCopiedSuggestion
+                      )
+                    }
+                    className="px-4 py-2.5 rounded-xl text-xs font-mono border border-[#30363d] text-zinc-300 hover:border-zinc-400 hover:text-white transition-all"
+                  >
+                    {copiedSuggestion ? '✓ COPIED FULL DRAFT' : '📋 COPY DRAFT TEXT'}
+                  </button>
+                </div>
+
+                {/* Live Preview of the Drafted Suggestion Email */}
+                <div
+                  className={cx(
+                    'rounded-xl border p-4 space-y-3 font-mono text-xs',
+                    isDark ? 'bg-[#0d1117] border-[#30363d]' : 'bg-zinc-50 border-zinc-300'
+                  )}
+                >
+                  <div className="text-[10px] uppercase tracking-wider text-[#f43f5e] font-bold">
+                    DRAFTED SUGGESTION EMAIL PREVIEW (VERIFY BEFORE SENDING)
+                  </div>
+                  <div className="space-y-1 border-b border-[#30363d] pb-2.5 text-[11px]">
+                    <div>
+                      <span className="text-zinc-500">To: </span>
+                      <span className="text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">Subject: </span>
+                      <span className="font-bold text-amber-300">{suggestionDraft.subject}</span>
+                    </div>
+                  </div>
+                  <pre className="whitespace-pre-wrap text-[11px] leading-relaxed text-zinc-300 max-h-64 overflow-y-auto font-mono">
+                    {suggestionDraft.body}
+                  </pre>
+                </div>
+
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-[#30363d]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playClick();
+                      setSuggestionStatus('idle');
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-mono border border-[#30363d] text-zinc-300 hover:text-white hover:border-[#00ff9d]"
+                  >
+                    ← Edit Suggestion Details
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playClick();
+                      setSuggestionStatus('idle');
+                      setSuggestionState({
+                        name: '',
+                        email: '',
+                        affiliation: '',
+                        category: 'Topic / Speaker Suggestion',
+                        topic: '',
+                        details: '',
+                      });
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-mono bg-[#21262d] text-zinc-300 hover:text-white"
+                  >
+                    Draft Another Suggestion
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmitSuggestion}
+                className={cx(
+                  'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl shadow-2xl space-y-4 font-mono text-xs',
+                  isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white/95 border-[#d0d7de]'
+                )}
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#30363d] pb-3 text-[11px] text-zinc-400">
+                  <span>&gt; submit_suggestion_to = "{OPENBOARD_EMAIL}"</span>
+                  <span className="text-[#f43f5e] font-bold">[TAG: SUGGESTION / FEEDBACK]</span>
+                </div>
+
+                <h3 className="text-base sm:text-lg font-bold tracking-tight pt-1">
+                  Submit a Suggestion, Topic Request, or Feedback
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-zinc-400 mb-1">Your Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Alan Turing"
+                      value={suggestionState.name}
+                      onChange={(e) => setSuggestionState({ ...suggestionState, name: e.target.value })}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-zinc-400 mb-1">Your Email *</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="student@iiserb.ac.in"
+                      value={suggestionState.email}
+                      onChange={(e) => setSuggestionState({ ...suggestionState, email: e.target.value })}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-zinc-400 mb-1">Batch / Department</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Physics 2023 Batch"
+                      value={suggestionState.affiliation}
+                      onChange={(e) => setSuggestionState({ ...suggestionState, affiliation: e.target.value })}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-zinc-400 mb-1">Suggestion Category *</label>
+                    <select
+                      value={suggestionState.category}
+                      onChange={(e) => setSuggestionState({ ...suggestionState, category: e.target.value })}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
+                    >
+                      <option value="Topic / Speaker Suggestion">Topic / Speaker Suggestion</option>
+                      <option value="Session Format & Pedagogy">Session Format &amp; Pedagogy</option>
+                      <option value="Website / Archive Feedback">Website / Archive Feedback</option>
+                      <option value="Collaboration / Club Partnership">Collaboration / Club Partnership</option>
+                      <option value="General Query / Other">General Query / Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-zinc-400 mb-1">Subject / Topic Title *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Request for a session on Category Theory"
+                      value={suggestionState.topic}
+                      onChange={(e) => setSuggestionState({ ...suggestionState, topic: e.target.value })}
+                      className={cx(
+                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
+                        isDark
+                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-zinc-400 mb-1">Detailed Suggestion / Message *</label>
+                  <textarea
+                    required
+                    rows={4}
+                    placeholder="Describe your suggestion, recommended speaker, or feedback in detail so we can review it..."
+                    value={suggestionState.details}
+                    onChange={(e) => setSuggestionState({ ...suggestionState, details: e.target.value })}
+                    className={cx(
+                      'w-full px-3.5 py-2.5 rounded-lg border outline-none font-sans text-xs',
+                      isDark
+                        ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                        : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                    )}
+                  />
+                </div>
+
+                {/* Live Subject Line Preview Bar */}
+                <div
+                  className={cx(
+                    'p-3 rounded-lg border text-[11px] font-mono',
+                    isDark ? 'bg-[#0d1117]/90 border-[#30363d] text-zinc-400' : 'bg-zinc-100 border-zinc-300 text-zinc-600'
+                  )}
+                >
+                  <span className="text-[#f43f5e] font-bold">Draft Subject Preview: </span>
+                  <span>
+                    [Suggestion #OB-SUG-2026-XXXX] OpenBoard ({suggestionState.category}):{' '}
+                    {suggestionState.topic.trim() ? suggestionState.topic.trim() : '<Your Topic / Subject>'}
+                  </span>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 rounded-xl font-mono text-xs font-bold tracking-wider bg-[#f43f5e] text-white shadow-[0_0_20px_rgba(244,63,94,0.35)] hover:shadow-[0_0_30px_rgba(244,63,94,0.55)] transition-all flex items-center justify-center gap-2"
+                >
+                  <span>&gt; DRAFT SUGGESTION EMAIL TO OPENBOARDINITIATIVE@GMAIL.COM (REVIEW &amp; SEND)</span>
+                </button>
+              </form>
+            )}
           </div>
         )}
       </main>
@@ -2882,7 +3073,7 @@ export default function App() {
 
             <div>
               <h4 className="text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5 font-bold">
-                Abstract & Core Theorems
+                Abstract &amp; Core Theorems
               </h4>
               <p
                 className={cx(
@@ -2989,7 +3180,7 @@ export default function App() {
             <span>•</span>
             <span>IISER Bhopal Pedagogical Initiative</span>
             <span>•</span>
-            <span className="text-[#00ff9d]">openboardinitiative@gmail.com</span>
+            <span className="text-[#00ff9d]">{OPENBOARD_EMAIL}</span>
           </div>
 
           <div className="flex items-center gap-4">
@@ -3005,7 +3196,7 @@ export default function App() {
             <button onClick={() => handleNavClick('submit')} className="hover:text-[#00ff9d]">
               Propose Talk
             </button>
-            <button onClick={() => handleNavClick('suggest')} className="hover:text-[#00ff9d]">
+            <button onClick={() => handleNavClick('contact')} className="hover:text-[#00ff9d]">
               Suggest
             </button>
             <a
