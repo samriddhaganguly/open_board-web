@@ -99,7 +99,7 @@ const BackgroundAnimation = ({ theme }) => {
   const threeMountRef = useRef(null);
   const mouseRef = useRef({ x: -9999, y: -9999, normX: 0, normY: 0 });
 
-  // 2A. Interactive 2D Pixel Grid Canvas (Glowing Cyber Voxels & Cursor Trail)
+  // 2A. Interactive 2D Pixel Grid Canvas (Glowing Cyber Voxels & Daylight Blueprint)
   useEffect(() => {
     const canvas = pixelCanvasRef.current;
     if (!canvas) return;
@@ -147,21 +147,21 @@ const BackgroundAnimation = ({ theme }) => {
           const dy = gy - mouseRef.current.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 170) {
-            const intensity = (1 - dist / 170) * (isDark ? 0.65 : 0.4);
+          if (dist < 175) {
+            const intensity = (1 - dist / 175) * (isDark ? 0.7 : 0.48);
             ctx.fillStyle = isDark
               ? `rgba(0, 255, 157, ${intensity.toFixed(3)})`
-              : `rgba(5, 150, 105, ${intensity.toFixed(3)})`;
+              : `rgba(4, 120, 87, ${intensity.toFixed(3)})`;
             const s = dist < 75 ? 5 : 3;
             ctx.fillRect(gx - s / 2, gy - s / 2, s, s);
           } else if ((gx + gy) % 72 === 0) {
-            ctx.fillStyle = isDark ? 'rgba(48, 54, 61, 0.35)' : 'rgba(148, 163, 184, 0.28)';
+            ctx.fillStyle = isDark ? 'rgba(30, 41, 59, 0.55)' : 'rgba(148, 163, 184, 0.35)';
             ctx.fillRect(gx, gy, 2, 2);
           }
         }
       }
 
-      // Draw floating neon pixel blocks
+      // Draw floating pixel blocks
       pixelNodes.forEach((p) => {
         p.x += p.vx;
         p.y += p.vy;
@@ -170,7 +170,6 @@ const BackgroundAnimation = ({ theme }) => {
         if (p.y < 0) p.y = canvas.height;
         if (p.y > canvas.height) p.y = 0;
 
-        // Gentle repulsion/attraction to mouse
         const dx = mouseRef.current.x - p.x;
         const dy = mouseRef.current.y - p.y;
         const d = Math.sqrt(dx * dx + dy * dy);
@@ -179,15 +178,14 @@ const BackgroundAnimation = ({ theme }) => {
           p.y -= (dy / d) * 0.8;
         }
 
-        const alpha = (Math.sin(tick + p.phase) * 0.35 + 0.55) * (isDark ? 0.85 : 0.55);
+        const alpha = (Math.sin(tick + p.phase) * 0.35 + 0.55) * (isDark ? 0.85 : 0.65);
         if (p.colorType === 'pink') {
-          ctx.fillStyle = `rgba(244, 63, 94, ${alpha})`;
+          ctx.fillStyle = isDark ? `rgba(255, 51, 102, ${alpha})` : `rgba(225, 29, 72, ${alpha})`;
         } else if (p.colorType === 'cyan') {
-          ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`;
+          ctx.fillStyle = isDark ? `rgba(0, 229, 255, ${alpha})` : `rgba(2, 132, 199, ${alpha})`;
         } else {
-          ctx.fillStyle = isDark ? `rgba(0, 255, 157, ${alpha})` : `rgba(16, 185, 129, ${alpha})`;
+          ctx.fillStyle = isDark ? `rgba(0, 255, 157, ${alpha})` : `rgba(4, 120, 87, ${alpha})`;
         }
-        // Snap to 2px crisp pixel coordinates
         const snapX = Math.round(p.x / 2) * 2;
         const snapY = Math.round(p.y / 2) * 2;
         ctx.fillRect(snapX, snapY, p.size, p.size);
@@ -231,10 +229,10 @@ const BackgroundAnimation = ({ theme }) => {
 
     const isDark = theme === 'dark';
     const material = new THREE.PointsMaterial({
-      size: 0.025,
-      color: isDark ? 0x00ff9d : 0x0f766e,
+      size: 0.026,
+      color: isDark ? 0x00ff9d : 0x047857,
       transparent: true,
-      opacity: isDark ? 0.65 : 0.35,
+      opacity: isDark ? 0.68 : 0.42,
       depthWrite: false,
     });
 
@@ -244,9 +242,9 @@ const BackgroundAnimation = ({ theme }) => {
     const icosaGeo = new THREE.IcosahedronGeometry(2.2, 1);
     const wireGeo = new THREE.WireframeGeometry(icosaGeo);
     const lineMat = new THREE.LineBasicMaterial({
-      color: isDark ? 0x00ff9d : 0x059669,
+      color: isDark ? 0x00ff9d : 0x047857,
       transparent: true,
-      opacity: isDark ? 0.13 : 0.07,
+      opacity: isDark ? 0.14 : 0.11,
     });
     const wireframe = new THREE.LineSegments(wireGeo, lineMat);
     scene.add(wireframe);
@@ -296,27 +294,29 @@ const BackgroundAnimation = ({ theme }) => {
 };
 
 // =========================================================
-// 3. INTERACTIVE PIXEL ANIMAL COMPANION (Follows Mouse, Walks & Reacts)
+// 3. PIXEL ANIMAL CURSOR (DIRECTLY REPLACES SYSTEM MOUSE CURSOR)
 // =========================================================
 const MASCOT_SPECIES = {
   home: {
     name: 'Schrödinger’s Pixel Cat',
     role: 'Quantum Guardian',
-    color: '#00ff9d',
-    accent: '#f43f5e',
+    darkColor: '#00ff9d',
+    lightColor: '#047857',
+    accent: '#ff3366',
     ears: 'cat',
     quips: [
       'Meow! Both |Alive⟩ & |Curious⟩!',
       'Click any talk to inspect slides!',
-      'Try moving your cursor around me!',
+      'Press [SPACE] anytime to pet me!',
       '>>> ob.ignite_curiosity() == True',
     ],
   },
   about: {
     name: 'Euler’s Night Owl',
     role: 'Keeper of Theorems',
-    color: '#38bdf8',
-    accent: '#eab308',
+    darkColor: '#00e5ff',
+    lightColor: '#0369a1',
+    accent: '#f59e0b',
     ears: 'owl',
     quips: [
       'Hoot! Breaking academic silos since 2025!',
@@ -327,7 +327,8 @@ const MASCOT_SPECIES = {
   archive: {
     name: 'Maxwell’s Cyber Fox',
     role: 'Entropy Sorter',
-    color: '#f43f5e',
+    darkColor: '#ff3366',
+    lightColor: '#be123c',
     accent: '#00ff9d',
     ears: 'fox',
     quips: [
@@ -339,7 +340,8 @@ const MASCOT_SPECIES = {
   gallery: {
     name: 'Fibonacci Bunny',
     role: 'Visual Archivist',
-    color: '#a855f7',
+    darkColor: '#c084fc',
+    lightColor: '#7e22ce',
     accent: '#00ff9d',
     ears: 'bunny',
     quips: [
@@ -351,8 +353,9 @@ const MASCOT_SPECIES = {
   events: {
     name: 'Lorenz’s Chaos Frog',
     role: 'Strange Attractor',
-    color: '#10b981',
-    accent: '#fde047',
+    darkColor: '#10b981',
+    lightColor: '#047857',
+    accent: '#facc15',
     ears: 'frog',
     quips: [
       'Ribbit! Small hops → huge breakthroughs!',
@@ -363,7 +366,8 @@ const MASCOT_SPECIES = {
   submit: {
     name: 'Darwin’s Carrier Pigeon',
     role: 'Proposal Dispatcher',
-    color: '#eab308',
+    darkColor: '#facc15',
+    lightColor: '#b45309',
     accent: '#00ff9d',
     ears: 'bird',
     quips: [
@@ -375,7 +379,8 @@ const MASCOT_SPECIES = {
   contact: {
     name: 'Turing’s Red Panda',
     role: 'Protocol Operator',
-    color: '#f97316',
+    darkColor: '#fb923c',
+    lightColor: '#c2410c',
     accent: '#00ff9d',
     ears: 'fox',
     quips: [
@@ -386,76 +391,75 @@ const MASCOT_SPECIES = {
   },
 };
 
-const PixelCompanion = ({ activeTab, onPetSound }) => {
+const PixelCompanion = ({ activeTab, theme, onPetSound, petSignal }) => {
+  const isDark = theme === 'dark';
   const species = MASCOT_SPECIES[activeTab] || MASCOT_SPECIES.home;
-  const [pos, setPos] = useState({ x: 140, y: 180 });
-  const targetRef = useRef({ x: 140, y: 180 });
-  const posRef = useRef({ x: 140, y: 180 });
+  const primaryColor = isDark ? species.darkColor : species.lightColor;
+
+  const [pos, setPos] = useState({ x: -100, y: -100 });
+  const prevXRef = useRef(0);
+  const moveTimeoutRef = useRef(null);
+
   const [facingLeft, setFacingLeft] = useState(false);
-  const [isWalking, setIsWalking] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
+  const [isClicking, setIsClicking] = useState(false);
   const [stepFrame, setStepFrame] = useState(0);
   const [isBlinking, setIsBlinking] = useState(false);
   const [speechIndex, setSpeechIndex] = useState(0);
   const [showBubble, setShowBubble] = useState(true);
   const [hearts, setHearts] = useState([]);
 
-  // Track mouse movement so the pixel animal gently walks/floats near the cursor
+  // Directly replace the mouse pointer with 0-latency exact tracking
   useEffect(() => {
+    let moveCount = 0;
+
     const handleMouseMove = (e) => {
-      // Offset slightly from cursor so it never blocks clicks
-      const offsetX = e.clientX > window.innerWidth - 160 ? e.clientX - 95 : e.clientX + 55;
-      const offsetY = Math.max(85, Math.min(window.innerHeight - 95, e.clientY + 35));
-      targetRef.current = { x: offsetX, y: offsetY };
-    };
+      const dx = e.clientX - prevXRef.current;
+      if (Math.abs(dx) > 1.5) {
+        setFacingLeft(dx < 0);
+      }
+      prevXRef.current = e.clientX;
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+      setPos({ x: e.clientX, y: e.clientY });
+      setIsMoving(true);
 
-  // Smooth physics loop for walking & floating along the page
-  useEffect(() => {
-    let animId;
-    let frameCounter = 0;
-
-    const updatePhysics = () => {
-      frameCounter++;
-      const dx = targetRef.current.x - posRef.current.x;
-      const dy = targetRef.current.y - posRef.current.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist > 8) {
-        posRef.current.x += dx * 0.045;
-        posRef.current.y += dy * 0.045;
-        if (Math.abs(dx) > 2) {
-          setFacingLeft(dx < 0);
-        }
-        setIsWalking(true);
-        if (frameCounter % 8 === 0) {
-          setStepFrame((s) => (s + 1) % 2);
-        }
-      } else {
-        setIsWalking(false);
+      moveCount++;
+      if (moveCount % 5 === 0) {
+        setStepFrame((s) => (s + 1) % 2);
       }
 
-      setPos({
-        x: Math.round(posRef.current.x),
-        y: Math.round(posRef.current.y + Math.sin(frameCounter * 0.07) * 4),
-      });
-
-      animId = requestAnimationFrame(updatePhysics);
+      if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
+      moveTimeoutRef.current = setTimeout(() => {
+        setIsMoving(false);
+      }, 90);
     };
 
-    animId = requestAnimationFrame(updatePhysics);
-    return () => cancelAnimationFrame(animId);
+    const handleMouseDown = () => {
+      setIsClicking(true);
+    };
+
+    const handleMouseUp = () => {
+      setIsClicking(false);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
+    };
   }, []);
 
-  // Periodic blinking & quip rotation
+  // Periodic blinking
   useEffect(() => {
     const blinkInterval = setInterval(() => {
       setIsBlinking(true);
-      setTimeout(() => setIsBlinking(false), 180);
-    }, 3400);
-
+      setTimeout(() => setIsBlinking(false), 160);
+    }, 3200);
     return () => clearInterval(blinkInterval);
   }, []);
 
@@ -463,97 +467,140 @@ const PixelCompanion = ({ activeTab, onPetSound }) => {
   useEffect(() => {
     setSpeechIndex(0);
     setShowBubble(true);
-    const timer = setTimeout(() => setShowBubble(false), 6500);
+    const timer = setTimeout(() => setShowBubble(false), 5200);
     return () => clearTimeout(timer);
   }, [activeTab]);
 
-  const handlePetMascot = () => {
+  // Trigger pet interaction from navbar badge or Spacebar shortcut
+  const triggerPetEffect = useCallback(() => {
     if (onPetSound) onPetSound();
     setSpeechIndex((prev) => (prev + 1) % species.quips.length);
     setShowBubble(true);
-    const id = Date.now();
+    const id = Date.now() + Math.random();
     setHearts((prev) => [...prev, id]);
     setTimeout(() => {
       setHearts((prev) => prev.filter((h) => h !== id));
-    }, 1000);
-  };
+    }, 950);
+  }, [onPetSound, species.quips.length]);
+
+  useEffect(() => {
+    if (petSignal > 0) {
+      triggerPetEffect();
+    }
+  }, [petSignal, triggerPetEffect]);
+
+  // Allow pressing Spacebar (when not typing in an input/textarea) to pet the cursor companion
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      if (e.code === 'Space' && !e.repeat) {
+        triggerPetEffect();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [triggerPetEffect]);
+
+  // Keep speech bubble inside viewport near screen edges
+  const bubbleNearRightEdge = typeof window !== 'undefined' && pos.x > window.innerWidth - 250;
+  const bubbleNearTopEdge = pos.y < 110;
 
   return (
     <div
       style={{
         transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,
       }}
-      className="fixed top-0 left-0 z-30 pointer-events-none select-none transition-transform duration-75 ease-out hidden sm:block"
+      className="fixed top-0 left-0 z-[9999] pointer-events-none select-none hidden sm:block"
     >
+      {/* Precision Cursor Hotspot Reticle at Exact (0, 0) Click Tip */}
+      <div
+        className="absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full transition-transform duration-75"
+        style={{
+          backgroundColor: primaryColor,
+          boxShadow: isDark ? `0 0 10px ${primaryColor}` : `0 0 6px rgba(4,120,87,0.6)`,
+          transform: isClicking ? 'scale(1.65)' : 'scale(1)',
+        }}
+      />
+
       {/* Floating Speech Bubble */}
       {showBubble && (
         <div
-          className="mb-2 -ml-16 max-w-[230px] px-3 py-1.5 rounded-xl bg-[#0d1117]/95 border border-[#00ff9d]/50 text-[10px] font-mono text-[#e6edf3] shadow-[0_0_20px_rgba(0,255,157,0.2)] animate-bounce"
-          style={{ animationDuration: '2.8s' }}
+          className={cx(
+            'absolute w-[215px] px-3 py-1.5 rounded-xl border text-[10px] font-mono shadow-xl transition-all',
+            bubbleNearRightEdge ? 'right-4' : 'left-7',
+            bubbleNearTopEdge ? 'top-8' : '-top-16',
+            isDark
+              ? 'bg-[#080d14]/95 border-[#00ff9d]/60 text-[#e6edf3] shadow-[0_0_20px_rgba(0,255,157,0.22)]'
+              : 'bg-white/95 border-emerald-600/60 text-slate-800 shadow-[0_8px_24px_rgba(15,23,42,0.14)]'
+          )}
         >
-          <div className="flex items-center justify-between gap-2 text-[9px] text-[#00ff9d] font-bold mb-0.5">
+          <div
+            className="flex items-center justify-between gap-2 text-[9px] font-bold mb-0.5"
+            style={{ color: primaryColor }}
+          >
             <span>❖ {species.name}</span>
           </div>
-          <p className="leading-snug text-zinc-200">{species.quips[speechIndex]}</p>
+          <p className={cx('leading-snug', isDark ? 'text-slate-200' : 'text-slate-700')}>
+            {species.quips[speechIndex]}
+          </p>
         </div>
       )}
 
-      {/* Floating Pixel Hearts when clicked */}
+      {/* Floating Pixel Hearts when petted or Spacebar pressed */}
       {hearts.map((h) => (
         <div
           key={h}
-          className="absolute -top-6 left-4 text-xs font-mono text-[#f43f5e] font-bold animate-ping"
+          className="absolute -top-6 left-3 text-xs font-mono text-[#ff3366] font-bold animate-ping"
         >
           ♥ +1
         </div>
       ))}
 
-      {/* Clickable Pixel Animal Avatar SVG */}
-      <div
-        onClick={handlePetMascot}
-        title={`Click to pet ${species.name}!`}
-        className="pointer-events-auto cursor-pointer group relative inline-block"
-      >
-        {/* Neon Aura Under Pet */}
-        <div
-          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-10 h-2.5 rounded-full blur-sm opacity-60 group-hover:opacity-100 transition-opacity"
-          style={{ backgroundColor: species.color }}
-        />
-
+      {/* Animal Cursor Sprite Locked Directly to Pointer Coordinates */}
+      <div className="relative -top-1 -left-1">
         <svg
-          width="54"
-          height="54"
+          width="42"
+          height="42"
           viewBox="0 0 16 16"
           shapeRendering="crispEdges"
           style={{
             transform: `${facingLeft ? 'scaleX(-1)' : 'scaleX(1)'} ${
-              isWalking ? (stepFrame === 0 ? 'rotate(-5deg) translateY(-2px)' : 'rotate(5deg)') : ''
+              isClicking
+                ? 'scale(0.84) rotate(-8deg)'
+                : isMoving
+                ? stepFrame === 0
+                  ? 'rotate(-5deg) translateY(-1px)'
+                  : 'rotate(5deg)'
+                : ''
             }`,
-            transition: 'transform 0.12s ease',
+            transition: 'transform 0.06s ease-out',
+            filter: isDark
+              ? `drop-shadow(0 0 6px ${primaryColor}88)`
+              : 'drop-shadow(0 2px 5px rgba(15, 23, 42, 0.28))',
           }}
-          className="drop-shadow-[0_0_8px_rgba(0,255,157,0.45)] group-hover:scale-110"
         >
           {/* Ears / Head Crest by Species */}
           {species.ears === 'cat' && (
             <>
-              <rect x="3" y="2" width="2" height="2" fill={species.color} />
-              <rect x="11" y="2" width="2" height="2" fill={species.color} />
+              <rect x="3" y="2" width="2" height="2" fill={primaryColor} />
+              <rect x="11" y="2" width="2" height="2" fill={primaryColor} />
               <rect x="4" y="3" width="1" height="1" fill={species.accent} />
               <rect x="11" y="3" width="1" height="1" fill={species.accent} />
             </>
           )}
           {species.ears === 'bunny' && (
             <>
-              <rect x="4" y="0" width="2" height="4" fill={species.color} />
-              <rect x="10" y="0" width="2" height="4" fill={species.color} />
+              <rect x="4" y="0" width="2" height="4" fill={primaryColor} />
+              <rect x="10" y="0" width="2" height="4" fill={primaryColor} />
               <rect x="5" y="1" width="1" height="2" fill={species.accent} />
               <rect x="10" y="1" width="1" height="2" fill={species.accent} />
             </>
           )}
           {species.ears === 'fox' && (
             <>
-              <rect x="2" y="1" width="3" height="3" fill={species.color} />
-              <rect x="11" y="1" width="3" height="3" fill={species.color} />
+              <rect x="2" y="1" width="3" height="3" fill={primaryColor} />
+              <rect x="11" y="1" width="3" height="3" fill={primaryColor} />
               <rect x="3" y="2" width="1" height="2" fill="#ffffff" />
               <rect x="12" y="2" width="1" height="2" fill="#ffffff" />
             </>
@@ -566,59 +613,59 @@ const PixelCompanion = ({ activeTab, onPetSound }) => {
           )}
           {species.ears === 'frog' && (
             <>
-              <rect x="3" y="2" width="3" height="2" fill={species.color} />
-              <rect x="10" y="2" width="3" height="2" fill={species.color} />
+              <rect x="3" y="2" width="3" height="2" fill={primaryColor} />
+              <rect x="10" y="2" width="3" height="2" fill={primaryColor} />
             </>
           )}
           {species.ears === 'bird' && (
             <>
               <rect x="7" y="1" width="2" height="3" fill={species.accent} />
-              <rect x="8" y="0" width="2" height="2" fill={species.color} />
+              <rect x="8" y="0" width="2" height="2" fill={primaryColor} />
             </>
           )}
 
           {/* Main Pixel Head & Body */}
-          <rect x="3" y="4" width="10" height="8" fill="#0d1117" />
-          <rect x="2" y="5" width="1" height="6" fill={species.color} />
-          <rect x="13" y="5" width="1" height="6" fill={species.color} />
-          <rect x="3" y="3" width="10" height="1" fill={species.color} />
-          <rect x="3" y="12" width="10" height="1" fill={species.color} />
+          <rect x="3" y="4" width="10" height="8" fill={isDark ? '#080d14' : '#ffffff'} />
+          <rect x="2" y="5" width="1" height="6" fill={primaryColor} />
+          <rect x="13" y="5" width="1" height="6" fill={primaryColor} />
+          <rect x="3" y="3" width="10" height="1" fill={primaryColor} />
+          <rect x="3" y="12" width="10" height="1" fill={primaryColor} />
 
           {/* Glowing Pixel Eyes */}
           {isBlinking ? (
             <>
-              <rect x="5" y="7" width="2" height="1" fill={species.color} />
-              <rect x="9" y="7" width="2" height="1" fill={species.color} />
+              <rect x="5" y="7" width="2" height="1" fill={primaryColor} />
+              <rect x="9" y="7" width="2" height="1" fill={primaryColor} />
             </>
           ) : (
             <>
-              <rect x="5" y="6" width="2" height="2" fill={species.color} />
-              <rect x="9" y="6" width="2" height="2" fill={species.color} />
-              <rect x="6" y="6" width="1" height="1" fill="#ffffff" />
-              <rect x="10" y="6" width="1" height="1" fill="#ffffff" />
+              <rect x="5" y="6" width="2" height="2" fill={primaryColor} />
+              <rect x="9" y="6" width="2" height="2" fill={primaryColor} />
+              <rect x="6" y="6" width="1" height="1" fill={isDark ? '#ffffff' : '#0f172a'} />
+              <rect x="10" y="6" width="1" height="1" fill={isDark ? '#ffffff' : '#0f172a'} />
             </>
           )}
 
           {/* Cute Pixel Cheeks & Nose/Beak */}
           <rect x="4" y="8" width="1" height="1" fill={species.accent} />
           <rect x="11" y="8" width="1" height="1" fill={species.accent} />
-          <rect x="7" y="8" width="2" height="1" fill="#ffffff" />
-          <rect x="6" y="9" width="4" height="1" fill={species.color} />
+          <rect x="7" y="8" width="2" height="1" fill={isDark ? '#ffffff' : '#0f172a'} />
+          <rect x="6" y="9" width="4" height="1" fill={primaryColor} />
 
           {/* Animated Walking Pixel Feet */}
           <rect
-            x={isWalking && stepFrame === 0 ? '3' : '4'}
+            x={isMoving && stepFrame === 0 ? '3' : '4'}
             y="13"
             width="2"
             height="2"
-            fill={species.color}
+            fill={primaryColor}
           />
           <rect
-            x={isWalking && stepFrame === 1 ? '11' : '10'}
+            x={isMoving && stepFrame === 1 ? '11' : '10'}
             y="13"
             width="2"
             height="2"
-            fill={species.color}
+            fill={primaryColor}
           />
 
           {/* Wagging Pixel Tail */}
@@ -1020,6 +1067,9 @@ export default function App() {
 
   const { playClick, playSuccess, playBookmark } = useSoundEffects(isMuted);
 
+  // Signal counter to pet cursor companion via navbar badge
+  const [petSignal, setPetSignal] = useState(0);
+
   // Search & Filter state for Archive
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -1243,7 +1293,6 @@ export default function App() {
     });
     setFormStatus('drafted');
 
-    // Open the user's default mail client with the complete pre-filled draft ready to review & send
     window.location.href = mailtoUrl;
   };
 
@@ -1309,7 +1358,6 @@ export default function App() {
     });
     setSuggestionStatus('drafted');
 
-    // Open the user's default mail client with the complete pre-filled suggestion draft ready to review & send
     window.location.href = mailtoUrl;
   };
 
@@ -1324,23 +1372,43 @@ export default function App() {
 
   const isDark = theme === 'dark';
 
+  // Reusable theme token helpers for crisp Dark Hacker vs High-Contrast Light Academic mode
+  const accentText = isDark ? 'text-[#00ff9d]' : 'text-[#047857]';
+  const pinkText = isDark ? 'text-[#ff3366]' : 'text-[#be123c]';
+  const cyanText = isDark ? 'text-[#00e5ff]' : 'text-[#0369a1]';
+  const mutedText = isDark ? 'text-slate-400' : 'text-slate-600';
+  const bodyText = isDark ? 'text-slate-300' : 'text-slate-700';
+  const cardSurface = isDark
+    ? 'bg-[#0b1017]/88 border-[#1e293b] shadow-[0_8px_30px_rgba(0,0,0,0.55)]'
+    : 'bg-white/92 border-[#cbd5e1] shadow-[0_8px_25px_rgba(15,23,42,0.06)]';
+  const inputSurface = isDark
+    ? 'bg-[#05080c] border-[#1e293b] text-slate-100 placeholder-slate-500 focus:border-[#00ff9d] focus:shadow-[0_0_12px_rgba(0,255,157,0.2)]'
+    : 'bg-[#f8fafc] border-[#cbd5e1] text-slate-900 placeholder-slate-400 focus:bg-white focus:border-[#047857] focus:shadow-[0_0_0_3px_rgba(4,120,87,0.12)]';
+
   return (
     <div
       className={cx(
-        'min-h-screen relative font-mono transition-colors duration-500 selection:bg-[#00ff9d]/30 selection:text-[#00ff9d]',
-        isDark ? 'text-[#e6edf3]' : 'text-[#0f172a]'
+        'min-h-screen relative font-mono transition-colors duration-500',
+        isDark
+          ? 'text-[#f0f6fc] selection:bg-[#00ff9d]/25 selection:text-[#00ff9d]'
+          : 'text-[#0f172a] selection:bg-emerald-600/20 selection:text-[#047857]'
       )}
     >
       {/* Fixed Bottom-Most Solid Backdrop so Background Animation at z-0 is ALWAYS Visible */}
       <div
         className={cx(
           'fixed inset-0 -z-20 transition-colors duration-500',
-          isDark ? 'bg-[#080c11]' : 'bg-[#f4f7fa]'
+          isDark ? 'bg-[#05080c]' : 'bg-[#f4f6f3]'
         )}
       />
 
-      {/* Self-contained CSS for Python syntax highlighting, terminal cursors & glowing borders */}
+      {/* Self-contained CSS: Hide native cursor on desktop so the Pixel Animal IS the cursor */}
       <style>{`
+        @media (min-width: 640px) and (pointer: fine) {
+          html, body, a, button, input, select, textarea, label, [role="button"] {
+            cursor: none !important;
+          }
+        }
         @keyframes blinkCursor {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
@@ -1348,33 +1416,31 @@ export default function App() {
         .blinking-cursor {
           animation: blinkCursor 1s step-start infinite;
         }
-        @keyframes neonPulse {
-          0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 157, 0.25), inset 0 0 15px rgba(0, 255, 157, 0.05); }
-          50% { box-shadow: 0 0 30px rgba(0, 255, 157, 0.45), inset 0 0 20px rgba(0, 255, 157, 0.12); }
-        }
-        .neon-glow-box {
-          animation: neonPulse 3s ease-in-out infinite;
-        }
       `}</style>
 
       {/* Interactive Pixel Matrix + 3D Constellation Background (z-0, always visible) */}
       <BackgroundAnimation theme={theme} />
 
-      {/* Interactive Roaming Pixel Animal Companion (Unique mascot per tab, walks & follows mouse) */}
-      <PixelCompanion activeTab={activeTab} onPetSound={playBookmark} />
+      {/* Custom Pixel Animal Cursor (Replaces system cursor on desktop) */}
+      <PixelCompanion
+        activeTab={activeTab}
+        theme={theme}
+        onPetSound={playBookmark}
+        petSignal={petSignal}
+      />
 
-      {/* Neon Atmospheric Glows */}
+      {/* Atmospheric Glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div
           className={cx(
-            'absolute -top-32 left-1/3 w-[600px] h-[380px] rounded-full blur-[160px] opacity-20 transition-all duration-1000',
-            isDark ? 'bg-[#00ff9d]/25' : 'bg-emerald-300/30'
+            'absolute -top-32 left-1/3 w-[600px] h-[380px] rounded-full blur-[160px] transition-all duration-1000',
+            isDark ? 'bg-[#00ff9d]/15 opacity-25' : 'bg-emerald-400/25 opacity-35'
           )}
         />
         <div
           className={cx(
-            'absolute top-1/2 -right-40 w-[500px] h-[420px] rounded-full blur-[180px] opacity-20',
-            isDark ? 'bg-[#b33973]/25' : 'bg-pink-300/20'
+            'absolute top-1/2 -right-40 w-[500px] h-[420px] rounded-full blur-[180px]',
+            isDark ? 'bg-[#ff3366]/15 opacity-20' : 'bg-sky-300/25 opacity-35'
           )}
         />
       </div>
@@ -1385,10 +1451,10 @@ export default function App() {
       <header className="sticky top-0 z-40 px-3 sm:px-6 py-3 transition-all">
         <div
           className={cx(
-            'max-w-7xl mx-auto rounded-2xl px-4 sm:px-6 py-2.5 flex items-center justify-between border backdrop-blur-xl shadow-2xl transition-all duration-300',
+            'max-w-7xl mx-auto rounded-2xl px-4 sm:px-6 py-2.5 flex items-center justify-between border backdrop-blur-xl transition-all duration-300',
             isDark
-              ? 'bg-[#121720]/85 border-[#30363d] shadow-[0_4px_25px_rgba(0,0,0,0.5)]'
-              : 'bg-white/85 border-[#d0d7de] shadow-[0_4px_20px_rgba(0,0,0,0.08)]'
+              ? 'bg-[#090d14]/88 border-[#1e293b] shadow-[0_6px_30px_rgba(0,0,0,0.65)]'
+              : 'bg-white/90 border-[#cbd5e1] shadow-[0_4px_20px_rgba(15,23,42,0.07)]'
           )}
         >
           {/* Brand Logo with Python Identifier Styling */}
@@ -1396,17 +1462,24 @@ export default function App() {
             onClick={() => handleNavClick('home')}
             className="flex items-center gap-2 sm:gap-3 cursor-pointer group"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#0d1117] border border-[#30363d] flex items-center justify-center p-1 group-hover:border-[#00ff9d] transition-colors shadow-inner">
-              <span className="text-[#00ff9d] text-xs font-bold font-mono">&gt;_</span>
+            <div
+              className={cx(
+                'w-8 h-8 rounded-lg border flex items-center justify-center p-1 transition-colors shadow-inner',
+                isDark
+                  ? 'bg-[#05080c] border-[#1e293b] group-hover:border-[#00ff9d]'
+                  : 'bg-emerald-50 border-emerald-300 group-hover:border-[#047857]'
+              )}
+            >
+              <span className={cx('text-xs font-bold font-mono', accentText)}>&gt;_</span>
             </div>
 
             <div className="flex flex-col">
               <div className="flex items-center gap-1">
-                <span className="text-[#f43f5e] font-extrabold text-base sm:text-lg tracking-tight">open_</span>
-                <span className="text-[#00ff9d] font-extrabold text-base sm:text-lg tracking-tight">board</span>
-                <span className="text-[#00ff9d] text-xs blinking-cursor">█</span>
+                <span className={cx('font-extrabold text-base sm:text-lg tracking-tight', pinkText)}>open_</span>
+                <span className={cx('font-extrabold text-base sm:text-lg tracking-tight', accentText)}>board</span>
+                <span className={cx('text-xs blinking-cursor', accentText)}>█</span>
               </div>
-              <span className="text-[9px] tracking-widest uppercase text-zinc-400 font-mono hidden sm:inline">
+              <span className={cx('text-[9px] tracking-widest uppercase font-mono hidden sm:inline', mutedText)}>
                 ~/iiserb/pedagogical_initiative
               </span>
             </div>
@@ -1432,11 +1505,11 @@ export default function App() {
                     'px-3 py-1.5 rounded-lg font-mono tracking-wider transition-all duration-200',
                     isActive
                       ? isDark
-                        ? 'text-[#00ff9d] bg-[#00ff9d]/10 border border-[#00ff9d]/40 shadow-[0_0_12px_rgba(0,255,157,0.25)]'
-                        : 'text-[#047857] bg-emerald-50 border border-emerald-300 font-bold'
+                        ? 'text-[#00ff9d] bg-[#00ff9d]/12 border border-[#00ff9d]/45 font-bold shadow-[0_0_15px_rgba(0,255,157,0.22)]'
+                        : 'text-[#047857] bg-emerald-100/80 border border-emerald-500/50 font-bold shadow-sm'
                       : isDark
-                      ? 'text-zinc-400 hover:text-zinc-100 hover:bg-[#21262d]'
-                      : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                      ? 'text-slate-400 hover:text-slate-100 hover:bg-[#161f2c]'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   )}
                 >
                   {tab.label}
@@ -1445,22 +1518,28 @@ export default function App() {
             })}
           </nav>
 
-          {/* Controls: Audio Synth Mute + Theme Switch */}
+          {/* Controls: Cursor Pet Badge + Audio Synth Mute + Theme Switch */}
           <div className="flex items-center gap-2">
-            {/* Active Mascot Indicator Badge */}
-            <div
-              onClick={playBookmark}
-              title="Your page companion! Move mouse or click the pixel pet floating on screen."
+            {/* Active Mascot Cursor Badge (Click or Press Spacebar to Pet) */}
+            <button
+              type="button"
+              onClick={() => setPetSignal((s) => s + 1)}
+              title="Click or press [Spacebar] to pet your animal cursor!"
               className={cx(
-                'hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] border cursor-pointer transition-all',
+                'hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] border transition-all font-mono font-bold',
                 isDark
-                  ? 'bg-[#0d1117]/80 border-[#30363d] text-[#00ff9d] hover:border-[#00ff9d]'
-                  : 'bg-zinc-100 border-zinc-300 text-emerald-700'
+                  ? 'bg-[#05080c] border-[#1e293b] text-[#00ff9d] hover:border-[#00ff9d]'
+                  : 'bg-emerald-50/90 border-emerald-300 text-[#047857] hover:bg-emerald-100'
               )}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00ff9d] animate-ping" />
+              <span
+                className={cx(
+                  'w-1.5 h-1.5 rounded-full animate-ping',
+                  isDark ? 'bg-[#00ff9d]' : 'bg-[#047857]'
+                )}
+              />
               <span>{(MASCOT_SPECIES[activeTab] || MASCOT_SPECIES.home).name}</span>
-            </div>
+            </button>
 
             {/* Web Audio Synth Toggle */}
             <button
@@ -1469,8 +1548,8 @@ export default function App() {
               className={cx(
                 'px-2.5 py-1.5 rounded-lg text-xs border transition-all flex items-center gap-1 font-mono',
                 isDark
-                  ? 'bg-[#21262d] border-[#30363d] text-zinc-200 hover:border-[#00ff9d] hover:text-[#00ff9d]'
-                  : 'bg-zinc-100 border-zinc-300 text-zinc-700 hover:border-emerald-500'
+                  ? 'bg-[#111822] border-[#1e293b] text-slate-200 hover:border-[#00ff9d] hover:text-[#00ff9d]'
+                  : 'bg-slate-100 border-slate-300 text-slate-800 hover:border-[#047857] hover:text-[#047857]'
               )}
             >
               <span>{isMuted ? '🔇' : '🔊'}</span>
@@ -1480,15 +1559,15 @@ export default function App() {
             {/* Light / Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
-              title="Toggle Theme"
+              title="Switch Colour Scheme"
               className={cx(
-                'px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all',
+                'px-3 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all flex items-center gap-1.5',
                 isDark
-                  ? 'bg-[#21262d] border-[#30363d] text-[#eab308] hover:border-[#eab308]'
-                  : 'bg-zinc-100 border-zinc-300 text-zinc-700 hover:border-zinc-400'
+                  ? 'bg-[#111822] border-[#1e293b] text-amber-300 hover:border-amber-400'
+                  : 'bg-slate-900 border-slate-800 text-[#00ff9d] hover:bg-slate-800'
               )}
             >
-              {isDark ? 'LIGHT' : 'DARK'}
+              <span>{isDark ? '☀ LIGHT' : '☾ DARK'}</span>
             </button>
 
             {/* Mobile Drawer Button */}
@@ -1497,7 +1576,10 @@ export default function App() {
                 playClick();
                 setIsMobileMenuOpen(!isMobileMenuOpen);
               }}
-              className="lg:hidden p-2 rounded-lg border border-[#30363d] text-zinc-300"
+              className={cx(
+                'lg:hidden p-2 rounded-lg border',
+                isDark ? 'border-[#1e293b] text-slate-300' : 'border-slate-300 text-slate-700'
+              )}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMobileMenuOpen ? (
@@ -1515,7 +1597,7 @@ export default function App() {
           <div
             className={cx(
               'lg:hidden mt-2 p-4 rounded-2xl border backdrop-blur-2xl shadow-2xl flex flex-col gap-1.5 transition-all text-xs font-mono',
-              isDark ? 'bg-[#161b22]/95 border-[#30363d]' : 'bg-white/95 border-zinc-200'
+              isDark ? 'bg-[#0b1017]/95 border-[#1e293b]' : 'bg-white/95 border-slate-300'
             )}
           >
             {[
@@ -1533,8 +1615,12 @@ export default function App() {
                 className={cx(
                   'px-3 py-2 rounded-lg text-left tracking-wider transition-all',
                   activeTab === tab.id
-                    ? 'bg-[#00ff9d]/15 text-[#00ff9d] border border-[#00ff9d]/30 font-bold'
-                    : 'text-zinc-400 hover:text-zinc-100 hover:bg-[#21262d]'
+                    ? isDark
+                      ? 'bg-[#00ff9d]/15 text-[#00ff9d] border border-[#00ff9d]/30 font-bold'
+                      : 'bg-emerald-100 text-[#047857] border border-emerald-400 font-bold'
+                    : isDark
+                    ? 'text-slate-400 hover:text-slate-100 hover:bg-[#161f2c]'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 )}
               >
                 {tab.label}
@@ -1559,17 +1645,17 @@ export default function App() {
               <div className="lg:col-span-7">
                 <div
                   className={cx(
-                    'rounded-2xl border overflow-hidden shadow-2xl backdrop-blur-xl transition-all duration-300',
+                    'rounded-2xl border overflow-hidden backdrop-blur-xl transition-all duration-300',
                     isDark
-                      ? 'bg-[#0d1117]/85 border-[#30363d] shadow-[0_0_35px_rgba(0,255,157,0.08)]'
-                      : 'bg-white/90 border-[#d0d7de] shadow-xl'
+                      ? 'bg-[#070b10]/92 border-[#1e293b] shadow-[0_0_40px_rgba(0,255,157,0.09)]'
+                      : 'bg-white/95 border-[#cbd5e1] shadow-[0_14px_35px_rgba(15,23,42,0.08)]'
                   )}
                 >
                   {/* macOS / Linux Terminal Window Bar */}
                   <div
                     className={cx(
                       'px-4 py-3 flex items-center justify-between border-b select-none',
-                      isDark ? 'bg-[#161b22]/90 border-[#30363d]' : 'bg-[#f6f8fa] border-[#d0d7de]'
+                      isDark ? 'bg-[#0d131c] border-[#1e293b]' : 'bg-[#f1f5f9] border-[#cbd5e1]'
                     )}
                   >
                     <div className="flex items-center gap-2">
@@ -1577,32 +1663,35 @@ export default function App() {
                       <span className="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block shadow-sm" />
                       <span className="w-3 h-3 rounded-full bg-[#27c93f] inline-block shadow-sm" />
                     </div>
-                    <span className="text-xs font-mono text-zinc-400 font-semibold tracking-wide">
+                    <span className={cx('text-xs font-mono font-semibold tracking-wide', mutedText)}>
                       open_board — mission.py
                     </span>
-                    <span className="text-[10px] font-mono text-zinc-500">Python 3.12</span>
+                    <span className={cx('text-[10px] font-mono', mutedText)}>Python 3.12</span>
                   </div>
 
-                  {/* Terminal Code Content with Full Python Syntax Coloring */}
+                  {/* Terminal Code Content with Dual-Theme Python Syntax Coloring */}
                   <div className="p-5 sm:p-7 text-xs sm:text-sm leading-relaxed overflow-x-auto font-mono">
-                    <p className="text-zinc-500 mb-2"># -*- coding: utf-8 -*-</p>
-                    <p className="text-zinc-500 mb-3">
+                    <p className={cx('mb-2', isDark ? 'text-slate-500' : 'text-slate-400')}>
+                      # -*- coding: utf-8 -*-
+                    </p>
+                    <p className={cx('mb-3', isDark ? 'text-slate-500' : 'text-slate-500')}>
                       # OpenBoard: An interdisciplinary pedagogical initiative at IISER Bhopal
                     </p>
 
-                    <p className="text-[#ec4899] font-bold">
-                      from <span className="text-[#38bdf8]">human_curiosity</span>{' '}
-                      <span className="text-[#ec4899]">import</span> unconstrained_learning
+                    <p className={cx('font-bold', pinkText)}>
+                      from <span className={cyanText}>human_curiosity</span>{' '}
+                      <span className={pinkText}>import</span>{' '}
+                      <span className={isDark ? 'text-slate-100' : 'text-slate-900'}>unconstrained_learning</span>
                     </p>
-                    <p className="text-[#ec4899] font-bold mb-4">
-                      import <span className="text-[#38bdf8]">mathematics, physics, biology, chemistry, cs</span>
+                    <p className={cx('font-bold mb-4', pinkText)}>
+                      import <span className={cyanText}>mathematics, physics, biology, chemistry, cs</span>
                     </p>
 
                     <p>
-                      <span className="text-[#ec4899] font-bold">class</span>{' '}
-                      <span className="text-[#00ff9d] font-bold">OpenBoard</span>:
+                      <span className={cx('font-bold', pinkText)}>class</span>{' '}
+                      <span className={cx('font-bold', accentText)}>OpenBoard</span>:
                     </p>
-                    <p className="pl-4 text-[#eab308]">
+                    <p className={cx('pl-4', isDark ? 'text-amber-300' : 'text-amber-800')}>
                       """
                       <br />
                       Breaking down academic silos. A peer-to-peer forum where
@@ -1614,34 +1703,48 @@ export default function App() {
 
                     <div className="pl-4 my-3">
                       <p>
-                        <span className="text-[#ec4899] font-bold">def</span>{' '}
-                        <span className="text-[#00ff9d] font-bold">ignite_curiosity</span>(
-                        <span className="text-[#f97316]">self</span>):
+                        <span className={cx('font-bold', pinkText)}>def</span>{' '}
+                        <span className={cx('font-bold', accentText)}>ignite_curiosity</span>(
+                        <span className={isDark ? 'text-orange-400' : 'text-orange-700'}>self</span>):
                       </p>
-                      <p className="pl-4 text-zinc-400">
-                        mission = <span className="text-[#fde047]">"Traverse the vast landscape of knowledge"</span>
+                      <p className={cx('pl-4', bodyText)}>
+                        mission ={' '}
+                        <span className={isDark ? 'text-[#fde047]' : 'text-[#b45309] font-semibold'}>
+                          "Traverse the vast landscape of knowledge"
+                        </span>
                       </p>
-                      <p className="pl-4 text-zinc-400">
-                        format = <span className="text-[#fde047]">"30-45 min blackboard & slide sessions"</span>
+                      <p className={cx('pl-4', bodyText)}>
+                        format ={' '}
+                        <span className={isDark ? 'text-[#fde047]' : 'text-[#b45309] font-semibold'}>
+                          "30-45 min blackboard &amp; slide sessions"
+                        </span>
                       </p>
-                      <p className="pl-4 text-zinc-400">
-                        venue = <span className="text-[#fde047]">"L-8, Lecture Hall Complex, IISER Bhopal"</span>
+                      <p className={cx('pl-4', bodyText)}>
+                        venue ={' '}
+                        <span className={isDark ? 'text-[#fde047]' : 'text-[#b45309] font-semibold'}>
+                          "L-8, Lecture Hall Complex, IISER Bhopal"
+                        </span>
                       </p>
-                      <p className="pl-4 text-[#ec4899] font-bold mt-1">
-                        return <span className="text-[#00ff9d] font-semibold">True</span>
+                      <p className={cx('pl-4 font-bold mt-1', pinkText)}>
+                        return <span className={cx('font-semibold', accentText)}>True</span>
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-[#30363d]/60 text-zinc-400">
+                    <div
+                      className={cx(
+                        'mt-4 pt-3 border-t',
+                        isDark ? 'border-[#1e293b] text-slate-300' : 'border-slate-200 text-slate-700'
+                      )}
+                    >
                       <p className="flex items-center gap-1.5">
-                        <span className="text-[#00ff9d] font-bold">&gt;&gt;&gt;</span>
+                        <span className={cx('font-bold', accentText)}>&gt;&gt;&gt;</span>
                         <span>ob = OpenBoard()</span>
                       </p>
                       <p className="flex items-center gap-1.5">
-                        <span className="text-[#00ff9d] font-bold">&gt;&gt;&gt;</span>
+                        <span className={cx('font-bold', accentText)}>&gt;&gt;&gt;</span>
                         <span>ob.ignite_curiosity()</span>
                       </p>
-                      <p className="text-[#00ff9d] font-bold mt-1 flex items-center gap-1">
+                      <p className={cx('font-bold mt-1 flex items-center gap-1', accentText)}>
                         <span>[SESSION ACTIVE] Curiosity ignited. Welcome to OpenBoard.</span>
                         <span className="blinking-cursor">█</span>
                       </p>
@@ -1652,26 +1755,38 @@ export default function App() {
 
               {/* Right Column: Hero Proposition, Serifs & Action CTAs */}
               <div className="lg:col-span-5 space-y-6 text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#00ff9d]/15 text-[#00ff9d] border border-[#00ff9d]/30">
-                  <span className="w-2 h-2 rounded-full bg-[#00ff9d] animate-ping" />
+                <div
+                  className={cx(
+                    'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold border',
+                    isDark
+                      ? 'bg-[#00ff9d]/12 text-[#00ff9d] border-[#00ff9d]/35'
+                      : 'bg-emerald-100 text-[#047857] border-emerald-300'
+                  )}
+                >
+                  <span
+                    className={cx(
+                      'w-2 h-2 rounded-full animate-ping',
+                      isDark ? 'bg-[#00ff9d]' : 'bg-[#047857]'
+                    )}
+                  />
                   <span>00 // INITIATIVE OVERVIEW</span>
                 </div>
 
                 <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-                  <span className="text-[#f43f5e]">open_</span>
-                  <span className="text-[#00ff9d]">board</span>
+                  <span className={pinkText}>open_</span>
+                  <span className={accentText}>board</span>
                   <br />
-                  <span className="font-serif italic text-2xl sm:text-3xl font-normal text-zinc-300">
+                  <span
+                    className={cx(
+                      'font-serif italic text-2xl sm:text-3xl font-normal',
+                      isDark ? 'text-slate-300' : 'text-slate-700'
+                    )}
+                  >
                     Open Knowledge, Shared Insights.
                   </span>
                 </h1>
 
-                <p
-                  className={cx(
-                    'text-xs sm:text-sm leading-relaxed font-sans',
-                    isDark ? 'text-zinc-300' : 'text-zinc-700'
-                  )}
-                >
+                <p className={cx('text-xs sm:text-sm leading-relaxed font-sans', bodyText)}>
                   A community fueled by curiosity. A space where a future historian explores neural representations, an
                   aspiring chemist appreciates topological invariants, and an artist understands mathematical rigor.
                 </p>
@@ -1680,7 +1795,12 @@ export default function App() {
                 <div className="flex flex-wrap items-center gap-3 pt-2">
                   <button
                     onClick={() => handleNavClick('archive')}
-                    className="px-5 py-2.5 rounded-xl font-mono text-xs font-bold tracking-wider bg-[#00ff9d] text-black shadow-[0_0_20px_rgba(0,255,157,0.4)] hover:shadow-[0_0_30px_rgba(0,255,157,0.6)] hover:-translate-y-0.5 transition-all flex items-center gap-1.5"
+                    className={cx(
+                      'px-5 py-2.5 rounded-xl font-mono text-xs font-bold tracking-wider hover:-translate-y-0.5 transition-all flex items-center gap-1.5',
+                      isDark
+                        ? 'bg-[#00ff9d] text-black shadow-[0_0_20px_rgba(0,255,157,0.4)] hover:shadow-[0_0_30px_rgba(0,255,157,0.6)]'
+                        : 'bg-[#047857] text-white shadow-[0_6px_18px_rgba(4,120,87,0.3)] hover:bg-[#065f46]'
+                    )}
                   >
                     <span>EXPLORE ARCHIVE</span>
                     <span>↗</span>
@@ -1688,7 +1808,12 @@ export default function App() {
 
                   <button
                     onClick={() => handleNavClick('submit')}
-                    className="px-5 py-2.5 rounded-xl font-mono text-xs font-bold tracking-wider border border-[#f43f5e] text-[#f43f5e] hover:bg-[#f43f5e]/10 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] hover:-translate-y-0.5 transition-all flex items-center gap-1.5"
+                    className={cx(
+                      'px-5 py-2.5 rounded-xl font-mono text-xs font-bold tracking-wider border hover:-translate-y-0.5 transition-all flex items-center gap-1.5',
+                      isDark
+                        ? 'border-[#ff3366] text-[#ff3366] hover:bg-[#ff3366]/12 hover:shadow-[0_0_20px_rgba(255,51,102,0.3)]'
+                        : 'border-[#be123c] text-[#be123c] bg-rose-50/70 hover:bg-rose-100'
+                    )}
                   >
                     <span>SUBMIT AN ABSTRACT</span>
                     <span>→</span>
@@ -1696,9 +1821,14 @@ export default function App() {
                 </div>
 
                 {/* Quick Coordinator Info */}
-                <div className="pt-4 border-t border-[#30363d] flex items-center gap-3 text-xs text-zinc-400">
-                  <span className="text-[#00ff9d]">❖</span>
-                  <span>Coordinated by Samriddha Ganguly & Adeetya Choubey</span>
+                <div
+                  className={cx(
+                    'pt-4 border-t flex items-center gap-3 text-xs',
+                    isDark ? 'border-[#1e293b] text-slate-400' : 'border-slate-300 text-slate-600'
+                  )}
+                >
+                  <span className={accentText}>❖</span>
+                  <span>Coordinated by Samriddha Ganguly &amp; Adeetya Choubey</span>
                 </div>
               </div>
             </div>
@@ -1715,15 +1845,21 @@ export default function App() {
                   key={idx}
                   onClick={playClick}
                   className={cx(
-                    'p-5 rounded-2xl border backdrop-blur-md transition-all hover:border-[#00ff9d]/50 group cursor-pointer',
-                    isDark ? 'bg-[#161b22]/75 border-[#30363d]' : 'bg-white/85 border-[#d0d7de]'
+                    'p-5 rounded-2xl border backdrop-blur-md transition-all group cursor-pointer',
+                    cardSurface,
+                    isDark ? 'hover:border-[#00ff9d]/50' : 'hover:border-[#047857]'
                   )}
                 >
-                  <div className="text-3xl font-extrabold text-[#00ff9d] font-mono group-hover:scale-105 transition-transform">
+                  <div
+                    className={cx(
+                      'text-3xl font-extrabold font-mono group-hover:scale-105 transition-transform',
+                      accentText
+                    )}
+                  >
                     {m.number}
                   </div>
                   <div className="text-xs font-bold tracking-wider mt-1">{m.label}</div>
-                  <div className="text-[11px] text-zinc-500 mt-0.5">{m.doc}</div>
+                  <div className={cx('text-[11px] mt-0.5', mutedText)}>{m.doc}</div>
                 </div>
               ))}
             </div>
@@ -1731,11 +1867,17 @@ export default function App() {
             {/* Featured Talk Spotlight (Samriddha Ganguly's Entanglement Lecture) */}
             <div
               className={cx(
-                'rounded-3xl border backdrop-blur-xl p-6 sm:p-8 flex flex-col md:flex-row gap-8 items-center transition-all hover:border-[#00ff9d]/40 shadow-2xl relative overflow-hidden',
-                isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white/90 border-[#d0d7de]'
+                'rounded-3xl border backdrop-blur-xl p-6 sm:p-8 flex flex-col md:flex-row gap-8 items-center transition-all relative overflow-hidden',
+                cardSurface,
+                isDark ? 'hover:border-[#00ff9d]/45' : 'hover:border-[#047857]/60'
               )}
             >
-              <div className="relative w-full md:w-80 h-64 md:h-80 rounded-2xl overflow-hidden flex-shrink-0 border border-[#00ff9d]/40 group shadow-lg">
+              <div
+                className={cx(
+                  'relative w-full md:w-80 h-64 md:h-80 rounded-2xl overflow-hidden flex-shrink-0 border group shadow-lg',
+                  isDark ? 'border-[#00ff9d]/40' : 'border-emerald-600/40'
+                )}
+              >
                 <img
                   src="/sam.png"
                   alt="Featured Speaker Samriddha Ganguly"
@@ -1745,33 +1887,32 @@ export default function App() {
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-                <div className="absolute top-3 left-3 px-2 py-0.5 rounded bg-black/80 text-[#00ff9d] text-xs font-bold border border-[#00ff9d]/50">
+                <div className="absolute top-3 left-3 px-2.5 py-0.5 rounded bg-black/80 text-[#00ff9d] text-xs font-bold border border-[#00ff9d]/50">
                   FEATURED TALK #09
                 </div>
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-zinc-300 font-mono">
-                  <span className="text-[#38bdf8]">Physics & Topology</span>
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-slate-200 font-mono">
+                  <span className="text-[#38bdf8]">Physics &amp; Topology</span>
                   <span>2025-10-09</span>
                 </div>
               </div>
 
               <div className="flex-1 space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-[#f43f5e] font-bold">09 // TOPOLOGY & QUANTUM PHASES</span>
-                  <span className="text-zinc-500">•</span>
-                  <span className="text-xs text-zinc-400">IISER Bhopal</span>
+                  <span className={cx('text-xs font-mono font-bold', pinkText)}>
+                    09 // TOPOLOGY &amp; QUANTUM PHASES
+                  </span>
+                  <span className={mutedText}>•</span>
+                  <span className={cx('text-xs', mutedText)}>IISER Bhopal</span>
                 </div>
 
                 <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                   Everything Entangled All at Once
                 </h3>
-                <p className="text-xs font-mono text-[#00ff9d]">Speaker: Samriddha Ganguly (Physics Major, 2022 Batch)</p>
+                <p className={cx('text-xs font-mono font-bold', accentText)}>
+                  Speaker: Samriddha Ganguly (Physics Major, 2022 Batch)
+                </p>
 
-                <p
-                  className={cx(
-                    'text-xs sm:text-sm font-sans leading-relaxed',
-                    isDark ? 'text-zinc-300' : 'text-zinc-700'
-                  )}
-                >
+                <p className={cx('text-xs sm:text-sm font-sans leading-relaxed', bodyText)}>
                   Beyond classical Landau paradigm of symmetry breaking lies the realm of topological order and quantum
                   matter. We explore how quantum entanglement ceases to be just an EPR paradox and becomes the
                   fundamental glue structuring exotic phases of matter.
@@ -1781,7 +1922,12 @@ export default function App() {
                   {['Quantum Matter', 'Entanglement Entropy', 'Topology', 'Quantum Information'].map((tg) => (
                     <span
                       key={tg}
-                      className="text-[11px] font-mono px-2.5 py-0.5 rounded bg-[#21262d] text-zinc-300 border border-[#30363d]"
+                      className={cx(
+                        'text-[11px] font-mono px-2.5 py-0.5 rounded border',
+                        isDark
+                          ? 'bg-[#111822] text-slate-300 border-[#1e293b]'
+                          : 'bg-slate-100 text-slate-700 border-slate-300'
+                      )}
                     >
                       #{tg}
                     </span>
@@ -1794,7 +1940,12 @@ export default function App() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={playClick}
-                    className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[#00ff9d] text-black hover:bg-[#34d399] transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,255,157,0.3)]"
+                    className={cx(
+                      'px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5',
+                      isDark
+                        ? 'bg-[#00ff9d] text-black hover:bg-[#34d399] shadow-[0_0_15px_rgba(0,255,157,0.3)]'
+                        : 'bg-[#047857] text-white hover:bg-[#065f46] shadow-md'
+                    )}
                   >
                     <span>📄 DOWNLOAD SLIDES (PDF)</span>
                   </a>
@@ -1803,9 +1954,14 @@ export default function App() {
                       playClick();
                       setActiveModalTalk(TALKS_DATA[8]);
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-mono border border-[#30363d] hover:border-[#00ff9d] hover:text-[#00ff9d] transition-all"
+                    className={cx(
+                      'px-4 py-2 rounded-xl text-xs font-mono border transition-all font-semibold',
+                      isDark
+                        ? 'border-[#1e293b] text-slate-200 hover:border-[#00ff9d] hover:text-[#00ff9d]'
+                        : 'border-slate-300 text-slate-800 hover:border-[#047857] hover:text-[#047857] bg-slate-50'
+                    )}
                   >
-                    VIEW NOTES & ABSTRACT
+                    VIEW NOTES &amp; ABSTRACT
                   </button>
                 </div>
               </div>
@@ -1814,7 +1970,9 @@ export default function App() {
             {/* How It Works (3 Pillars) */}
             <div className="space-y-6">
               <div className="text-left">
-                <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">Structure</span>
+                <span className={cx('text-xs font-mono uppercase tracking-widest font-bold', accentText)}>
+                  Structure
+                </span>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
                   How <span className="font-serif italic font-normal">It Works</span>
                 </h2>
@@ -1842,20 +2000,14 @@ export default function App() {
                     key={i}
                     onClick={playClick}
                     className={cx(
-                      'p-6 rounded-2xl border backdrop-blur-md transition-all hover:-translate-y-1 hover:border-[#00ff9d]/50 shadow-lg cursor-pointer',
-                      isDark ? 'bg-[#161b22]/75 border-[#30363d]' : 'bg-white/85 border-[#d0d7de]'
+                      'p-6 rounded-2xl border backdrop-blur-md transition-all hover:-translate-y-1 cursor-pointer',
+                      cardSurface,
+                      isDark ? 'hover:border-[#00ff9d]/50' : 'hover:border-[#047857]'
                     )}
                   >
-                    <div className="text-xs font-mono text-[#f43f5e] font-bold mb-2">{pillar.step}</div>
+                    <div className={cx('text-xs font-mono font-bold mb-2', pinkText)}>{pillar.step}</div>
                     <h3 className="text-lg font-bold tracking-tight">{pillar.title}</h3>
-                    <p
-                      className={cx(
-                        'text-xs font-sans mt-2 leading-relaxed',
-                        isDark ? 'text-zinc-400' : 'text-zinc-600'
-                      )}
-                    >
-                      {pillar.desc}
-                    </p>
+                    <p className={cx('text-xs font-sans mt-2 leading-relaxed', bodyText)}>{pillar.desc}</p>
                   </div>
                 ))}
               </div>
@@ -1869,20 +2021,15 @@ export default function App() {
         {activeTab === 'about' && (
           <div className="space-y-16">
             <div className="text-left max-w-3xl">
-              <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">
-                01 // PEDAGOGY & LEADERSHIP
+              <span className={cx('text-xs font-mono uppercase tracking-widest font-bold', accentText)}>
+                01 // PEDAGOGY &amp; LEADERSHIP
               </span>
               <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight mt-1">
                 About{' '}
-                <span className="text-[#f43f5e]">open_</span>
-                <span className="text-[#00ff9d]">board</span>
+                <span className={pinkText}>open_</span>
+                <span className={accentText}>board</span>
               </h2>
-              <p
-                className={cx(
-                  'mt-3 text-sm sm:text-base font-sans leading-relaxed',
-                  isDark ? 'text-zinc-300' : 'text-zinc-700'
-                )}
-              >
+              <p className={cx('mt-3 text-sm sm:text-base font-sans leading-relaxed', bodyText)}>
                 Founded at the Indian Institute of Science Education and Research, Bhopal (IISERB) as a peer-led
                 forum for genuine interdisciplinary discourse.
               </p>
@@ -1892,18 +2039,14 @@ export default function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div
                 className={cx(
-                  'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl relative overflow-hidden transition-all hover:border-[#00ff9d]/50 shadow-xl',
-                  isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white/90 border-[#d0d7de]'
+                  'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl relative overflow-hidden transition-all',
+                  cardSurface,
+                  isDark ? 'hover:border-[#00ff9d]/50' : 'hover:border-[#047857]'
                 )}
               >
-                <div className="text-xs font-mono text-[#00ff9d] font-bold mb-2">&gt; def our_mission():</div>
+                <div className={cx('text-xs font-mono font-bold mb-2', accentText)}>&gt; def our_mission():</div>
                 <h3 className="text-xl font-bold tracking-tight mb-3">Breaking Down Academic Silos</h3>
-                <p
-                  className={cx(
-                    'text-xs sm:text-sm font-sans leading-relaxed',
-                    isDark ? 'text-zinc-300' : 'text-zinc-700'
-                  )}
-                >
+                <p className={cx('text-xs sm:text-sm font-sans leading-relaxed', bodyText)}>
                   open_board is a peer-to-peer knowledge-sharing platform designed to break down academic silos. Our
                   mission is to create a space where students from any field can present their passion projects and
                   research in a way that is accessible and engaging to a non-specialist audience.
@@ -1912,18 +2055,14 @@ export default function App() {
 
               <div
                 className={cx(
-                  'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl relative overflow-hidden transition-all hover:border-[#f43f5e]/50 shadow-xl',
-                  isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white/90 border-[#d0d7de]'
+                  'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl relative overflow-hidden transition-all',
+                  cardSurface,
+                  isDark ? 'hover:border-[#ff3366]/50' : 'hover:border-[#be123c]'
                 )}
               >
-                <div className="text-xs font-mono text-[#f43f5e] font-bold mb-2">&gt; def the_vision():</div>
+                <div className={cx('text-xs font-mono font-bold mb-2', pinkText)}>&gt; def the_vision():</div>
                 <h3 className="text-xl font-bold tracking-tight mb-3">Curiosity Over Compartmentalization</h3>
-                <p
-                  className={cx(
-                    'text-xs sm:text-sm font-sans leading-relaxed',
-                    isDark ? 'text-zinc-300' : 'text-zinc-700'
-                  )}
-                >
+                <p className={cx('text-xs sm:text-sm font-sans leading-relaxed', bodyText)}>
                   We envision a community fueled by curiosity. A place where a future historian can learn about machine
                   learning, a budding chemist can appreciate poetic structures, and an aspiring artist can understand
                   the elegance of a mathematical theorem.
@@ -1934,7 +2073,9 @@ export default function App() {
             {/* Coordinators Section */}
             <div className="space-y-6">
               <div className="text-left">
-                <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">Coordinators</span>
+                <span className={cx('text-xs font-mono uppercase tracking-widest font-bold', accentText)}>
+                  Coordinators
+                </span>
                 <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">Founding Organizers</h3>
               </div>
 
@@ -1943,11 +2084,17 @@ export default function App() {
                   <div
                     key={idx}
                     className={cx(
-                      'p-6 rounded-2xl border backdrop-blur-xl flex flex-col sm:flex-row items-center sm:items-start gap-5 transition-all hover:border-[#00ff9d]/50 hover:shadow-xl group',
-                      isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white/90 border-[#d0d7de]'
+                      'p-6 rounded-2xl border backdrop-blur-xl flex flex-col sm:flex-row items-center sm:items-start gap-5 transition-all group',
+                      cardSurface,
+                      isDark ? 'hover:border-[#00ff9d]/50' : 'hover:border-[#047857]'
                     )}
                   >
-                    <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 border-2 border-[#00ff9d]/40 shadow-md">
+                    <div
+                      className={cx(
+                        'w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 border-2 shadow-md',
+                        isDark ? 'border-[#00ff9d]/40' : 'border-emerald-600/50'
+                      )}
+                    >
                       <img
                         src={person.avatar}
                         alt={person.name}
@@ -1959,22 +2106,22 @@ export default function App() {
                     </div>
 
                     <div className="flex-1 text-center sm:text-left">
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#00ff9d]/15 text-[#00ff9d] border border-[#00ff9d]/30">
+                      <span
+                        className={cx(
+                          'text-[10px] font-mono font-bold px-2 py-0.5 rounded border',
+                          isDark
+                            ? 'bg-[#00ff9d]/15 text-[#00ff9d] border-[#00ff9d]/30'
+                            : 'bg-emerald-100 text-[#047857] border-emerald-300'
+                        )}
+                      >
                         {person.role}
                       </span>
                       <h4 className="text-lg font-bold mt-1.5">{person.name}</h4>
-                      <p className="text-xs font-mono text-zinc-400">{person.batch}</p>
-                      <p
-                        className={cx(
-                          'text-xs font-sans mt-2 leading-relaxed',
-                          isDark ? 'text-zinc-300' : 'text-zinc-600'
-                        )}
-                      >
-                        {person.bio}
-                      </p>
+                      <p className={cx('text-xs font-mono', mutedText)}>{person.batch}</p>
+                      <p className={cx('text-xs font-sans mt-2 leading-relaxed', bodyText)}>{person.bio}</p>
                       <a
                         href={`mailto:${person.email}`}
-                        className="inline-flex items-center gap-1 text-xs font-mono text-[#00ff9d] hover:underline mt-3"
+                        className={cx('inline-flex items-center gap-1 text-xs font-mono font-bold hover:underline mt-3', accentText)}
                       >
                         ✉ {person.email}
                       </a>
@@ -1987,7 +2134,7 @@ export default function App() {
             {/* Contributing Speakers */}
             <div className="space-y-6">
               <div className="text-left">
-                <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">Network</span>
+                <span className={cx('text-xs font-mono uppercase tracking-widest font-bold', accentText)}>Network</span>
                 <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight mt-1">Contributing Speakers</h3>
               </div>
 
@@ -1997,11 +2144,17 @@ export default function App() {
                     key={idx}
                     onClick={playClick}
                     className={cx(
-                      'p-4 rounded-xl border backdrop-blur-md flex flex-col items-center text-center transition-all hover:border-[#00ff9d]/40 cursor-pointer',
-                      isDark ? 'bg-[#161b22]/65 border-[#30363d]' : 'bg-white/85 border-[#d0d7de]'
+                      'p-4 rounded-xl border backdrop-blur-md flex flex-col items-center text-center transition-all cursor-pointer',
+                      cardSurface,
+                      isDark ? 'hover:border-[#00ff9d]/40' : 'hover:border-[#047857]'
                     )}
                   >
-                    <div className="w-14 h-14 rounded-full overflow-hidden mb-2.5 border border-[#00ff9d]/40 shadow-sm">
+                    <div
+                      className={cx(
+                        'w-14 h-14 rounded-full overflow-hidden mb-2.5 border shadow-sm',
+                        isDark ? 'border-[#00ff9d]/40' : 'border-emerald-600/40'
+                      )}
+                    >
                       <img
                         src={speaker.avatar}
                         alt={speaker.name}
@@ -2012,7 +2165,7 @@ export default function App() {
                       />
                     </div>
                     <div className="font-bold text-xs">{speaker.name}</div>
-                    <div className="text-[10px] font-mono text-[#00ff9d] mt-0.5">{speaker.batch}</div>
+                    <div className={cx('text-[10px] font-mono font-semibold mt-0.5', accentText)}>{speaker.batch}</div>
                   </div>
                 ))}
               </div>
@@ -2027,11 +2180,11 @@ export default function App() {
           <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
-                <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">
+                <span className={cx('text-xs font-mono uppercase tracking-widest font-bold', accentText)}>
                   02 // REPOSITORY
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Talks & Papers Archive</h2>
-                <p className={cx('text-xs sm:text-sm mt-1', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
+                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Talks &amp; Papers Archive</h2>
+                <p className={cx('text-xs sm:text-sm mt-1', mutedText)}>
                   All 14 delivered lectures with slides (PDF/PPTX), abstracts, and speaker notes.
                 </p>
               </div>
@@ -2044,14 +2197,21 @@ export default function App() {
                 className={cx(
                   'px-3.5 py-2 rounded-xl text-xs font-mono font-bold border transition-all flex items-center gap-2 self-start md:self-auto',
                   showOnlyBookmarked
-                    ? 'bg-[#f43f5e]/20 text-[#f43f5e] border-[#f43f5e]'
+                    ? isDark
+                      ? 'bg-[#ff3366]/20 text-[#ff3366] border-[#ff3366]'
+                      : 'bg-rose-100 text-[#be123c] border-rose-400'
                     : isDark
-                    ? 'bg-[#161b22] border-[#30363d] text-zinc-400 hover:text-zinc-100'
-                    : 'bg-white border-zinc-300 text-zinc-700'
+                    ? 'bg-[#0b1017] border-[#1e293b] text-slate-300 hover:text-white'
+                    : 'bg-white border-slate-300 text-slate-700 hover:border-slate-400'
                 )}
               >
                 <span>{showOnlyBookmarked ? '♥ SAVED ONLY' : '♡ FILTER SAVED'}</span>
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-[#21262d] text-zinc-200">
+                <span
+                  className={cx(
+                    'px-1.5 py-0.2 rounded-full text-[10px]',
+                    isDark ? 'bg-[#161f2c] text-slate-200' : 'bg-slate-200 text-slate-800'
+                  )}
+                >
                   {bookmarkedIds.length}
                 </span>
               </button>
@@ -2064,21 +2224,18 @@ export default function App() {
                 placeholder="Search talks, speakers, topics (e.g. 'Entanglement', 'Chaos', 'Analysis')..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={cx(
-                  'w-full px-5 py-3 pl-11 rounded-xl text-xs sm:text-sm font-mono border outline-none transition-all',
-                  isDark
-                    ? 'bg-[#161b22]/90 border-[#30363d] text-zinc-100 placeholder-zinc-500 focus:border-[#00ff9d] focus:shadow-[0_0_15px_rgba(0,255,157,0.2)]'
-                    : 'bg-white border-[#d0d7de] text-zinc-900 placeholder-zinc-400 focus:border-emerald-500'
-                )}
+                className={cx('w-full px-5 py-3 pl-11 rounded-xl text-xs sm:text-sm font-mono border outline-none transition-all', inputSurface)}
               />
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-mono text-xs">&gt;</span>
+              <span className={cx('absolute left-4 top-1/2 -translate-y-1/2 font-mono text-xs font-bold', accentText)}>
+                &gt;
+              </span>
               {searchQuery && (
                 <button
                   onClick={() => {
                     playClick();
                     setSearchQuery('');
                   }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-mono text-zinc-400 hover:text-white"
+                  className={cx('absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold', mutedText)}
                 >
                   CLEAR
                 </button>
@@ -2099,10 +2256,12 @@ export default function App() {
                     className={cx(
                       'px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all',
                       isSelected
-                        ? 'bg-[#00ff9d] text-black font-bold shadow-[0_0_12px_rgba(0,255,157,0.3)]'
+                        ? isDark
+                          ? 'bg-[#00ff9d] text-black font-bold shadow-[0_0_12px_rgba(0,255,157,0.3)]'
+                          : 'bg-[#047857] text-white font-bold shadow-sm'
                         : isDark
-                        ? 'bg-[#161b22]/90 border border-[#30363d] text-zinc-400 hover:text-zinc-200'
-                        : 'bg-white border border-[#d0d7de] text-zinc-600'
+                        ? 'bg-[#0b1017] border border-[#1e293b] text-slate-400 hover:text-slate-200'
+                        : 'bg-white border border-slate-300 text-slate-600 hover:text-slate-900'
                     )}
                   >
                     {category}
@@ -2124,13 +2283,19 @@ export default function App() {
                     }}
                     className={cx(
                       'group rounded-2xl border backdrop-blur-xl p-5 flex flex-col justify-between transition-all duration-300 cursor-pointer hover:-translate-y-1 relative overflow-hidden',
+                      cardSurface,
                       isDark
-                        ? 'bg-[#161b22]/85 border-[#30363d] hover:border-[#00ff9d]/50 hover:shadow-[0_0_25px_rgba(0,255,157,0.15)]'
-                        : 'bg-white/90 border-[#d0d7de] hover:border-emerald-500 hover:shadow-xl'
+                        ? 'hover:border-[#00ff9d]/50 hover:shadow-[0_0_25px_rgba(0,255,157,0.15)]'
+                        : 'hover:border-[#047857] hover:shadow-xl'
                     )}
                   >
                     {/* Poster */}
-                    <div className="relative w-full h-44 rounded-xl overflow-hidden mb-4 bg-[#0d1117] border border-[#30363d]/60">
+                    <div
+                      className={cx(
+                        'relative w-full h-44 rounded-xl overflow-hidden mb-4 border',
+                        isDark ? 'bg-[#05080c] border-[#1e293b]' : 'bg-slate-900 border-slate-300'
+                      )}
+                    >
                       <img
                         src={talk.poster}
                         alt={talk.title}
@@ -2151,8 +2316,8 @@ export default function App() {
                         {isBookmarked ? '❤️' : '🤍'}
                       </button>
 
-                      <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[11px] font-mono text-zinc-300">
-                        <span className="text-[#00ff9d]">{talk.category}</span>
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[11px] font-mono text-slate-200">
+                        <span className="text-[#00ff9d] font-bold">{talk.category}</span>
                         <span>{talk.date}</span>
                       </div>
                     </div>
@@ -2160,27 +2325,35 @@ export default function App() {
                     {/* Content */}
                     <div className="flex-1 flex flex-col justify-between space-y-3">
                       <div>
-                        <h3 className="font-bold text-base group-hover:text-[#00ff9d] transition-colors leading-snug">
-                          {talk.title}
-                        </h3>
-                        <div className="text-xs font-mono text-zinc-400 mt-1">{talk.speaker}</div>
-                        <p
+                        <h3
                           className={cx(
-                            'text-xs font-sans mt-2 line-clamp-3 leading-relaxed',
-                            isDark ? 'text-zinc-400' : 'text-zinc-600'
+                            'font-bold text-base transition-colors leading-snug',
+                            isDark ? 'group-hover:text-[#00ff9d]' : 'group-hover:text-[#047857]'
                           )}
                         >
+                          {talk.title}
+                        </h3>
+                        <div className={cx('text-xs font-mono font-semibold mt-1', mutedText)}>{talk.speaker}</div>
+                        <p className={cx('text-xs font-sans mt-2 line-clamp-3 leading-relaxed', bodyText)}>
                           {talk.abstract}
                         </p>
                       </div>
 
                       {/* Footer */}
-                      <div className="pt-3 border-t border-[#30363d]/70 flex items-center justify-between">
+                      <div
+                        className={cx(
+                          'pt-3 border-t flex items-center justify-between',
+                          isDark ? 'border-[#1e293b]' : 'border-slate-200'
+                        )}
+                      >
                         <div className="flex items-center gap-1">
                           {talk.tags.slice(0, 2).map((tg) => (
                             <span
                               key={tg}
-                              className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-zinc-300"
+                              className={cx(
+                                'text-[10px] font-mono px-2 py-0.5 rounded',
+                                isDark ? 'bg-[#111822] text-slate-300' : 'bg-slate-100 text-slate-700 border border-slate-200'
+                              )}
                             >
                               {tg}
                             </span>
@@ -2197,12 +2370,17 @@ export default function App() {
                                 e.stopPropagation();
                                 playClick();
                               }}
-                              className="px-2.5 py-1 rounded text-[11px] font-mono font-bold bg-[#00ff9d]/20 text-[#00ff9d] border border-[#00ff9d]/40 hover:bg-[#00ff9d] hover:text-black transition-all"
+                              className={cx(
+                                'px-2.5 py-1 rounded text-[11px] font-mono font-bold border transition-all',
+                                isDark
+                                  ? 'bg-[#00ff9d]/15 text-[#00ff9d] border-[#00ff9d]/40 hover:bg-[#00ff9d] hover:text-black'
+                                  : 'bg-emerald-50 text-[#047857] border-emerald-400 hover:bg-[#047857] hover:text-white'
+                              )}
                             >
                               SLIDES
                             </a>
                           )}
-                          <span className="text-xs text-zinc-500 group-hover:text-[#00ff9d]">→</span>
+                          <span className={cx('text-xs', mutedText)}>→</span>
                         </div>
                       </div>
                     </div>
@@ -2219,11 +2397,11 @@ export default function App() {
         {activeTab === 'gallery' && (
           <div className="space-y-8">
             <div className="text-left max-w-2xl">
-              <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">
+              <span className={cx('text-xs font-mono uppercase tracking-widest font-bold', accentText)}>
                 03 // VISUAL ARCHIVE
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Sessions & Blackboard Notes</h2>
-              <p className={cx('text-xs sm:text-sm mt-1', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Sessions &amp; Blackboard Notes</h2>
+              <p className={cx('text-xs sm:text-sm mt-1', mutedText)}>
                 Photographic log of peer presentations, live derivations, and audience debates in Room L-8, LHC.
               </p>
             </div>
@@ -2237,11 +2415,12 @@ export default function App() {
                     setActiveLightboxImg(item);
                   }}
                   className={cx(
-                    'group relative rounded-xl overflow-hidden border backdrop-blur-md cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:border-[#00ff9d]/50',
-                    isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                    'group relative rounded-xl overflow-hidden border backdrop-blur-md cursor-pointer transition-all duration-300 hover:-translate-y-1',
+                    cardSurface,
+                    isDark ? 'hover:border-[#00ff9d]/50' : 'hover:border-[#047857]'
                   )}
                 >
-                  <div className="w-full h-52 bg-[#0d1117] overflow-hidden">
+                  <div className="w-full h-52 bg-[#05080c] overflow-hidden">
                     <img
                       src={item.src}
                       alt={item.title}
@@ -2252,9 +2431,9 @@ export default function App() {
                     />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent opacity-95 sm:opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
-                    <span className="text-[10px] font-mono text-[#00ff9d] uppercase">{item.category}</span>
+                    <span className="text-[10px] font-mono text-[#00ff9d] uppercase font-bold">{item.category}</span>
                     <h4 className="font-bold text-xs text-white">{item.title}</h4>
-                    <p className="text-[11px] text-zinc-300 line-clamp-2 mt-0.5">{item.caption}</p>
+                    <p className="text-[11px] text-slate-300 line-clamp-2 mt-0.5">{item.caption}</p>
                   </div>
                 </div>
               ))}
@@ -2268,11 +2447,11 @@ export default function App() {
         {activeTab === 'events' && (
           <div className="space-y-8">
             <div className="text-left max-w-2xl">
-              <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">
+              <span className={cx('text-xs font-mono uppercase tracking-widest font-bold', accentText)}>
                 04 // SCHEDULE
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Upcoming Talks</h2>
-              <p className={cx('text-xs sm:text-sm mt-1', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
+              <p className={cx('text-xs sm:text-sm mt-1', mutedText)}>
                 Held weekly in Room L-8, Lecture Hall Complex (LHC), IISER Bhopal.
               </p>
             </div>
@@ -2303,44 +2482,62 @@ export default function App() {
                 <div
                   key={evt.id}
                   className={cx(
-                    'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl flex flex-col justify-between transition-all hover:border-[#00ff9d]/50 shadow-xl',
-                    isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white/90 border-[#d0d7de]'
+                    'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl flex flex-col justify-between transition-all',
+                    cardSurface,
+                    isDark ? 'hover:border-[#00ff9d]/50' : 'hover:border-[#047857]'
                   )}
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-xs font-mono">
-                      <span className="px-2.5 py-0.5 rounded bg-[#00ff9d]/20 text-[#00ff9d] border border-[#00ff9d]/40 font-bold">
+                      <span
+                        className={cx(
+                          'px-2.5 py-0.5 rounded border font-bold',
+                          isDark
+                            ? 'bg-[#00ff9d]/15 text-[#00ff9d] border-[#00ff9d]/40'
+                            : 'bg-emerald-100 text-[#047857] border-emerald-300'
+                        )}
+                      >
                         SCHEDULED
                       </span>
-                      <span className="text-zinc-400">{evt.date}</span>
+                      <span className={mutedText}>{evt.date}</span>
                     </div>
 
                     <h3 className="text-xl font-bold tracking-tight">{evt.title}</h3>
-                    <p className="text-xs font-mono text-[#00ff9d]">
+                    <p className={cx('text-xs font-mono font-bold', accentText)}>
                       {evt.speaker} • {evt.batch}
                     </p>
-                    <p
+                    <p className={cx('text-xs font-sans leading-relaxed', bodyText)}>{evt.desc}</p>
+
+                    <div
                       className={cx(
-                        'text-xs font-sans leading-relaxed',
-                        isDark ? 'text-zinc-300' : 'text-zinc-700'
+                        'p-3.5 rounded-xl border text-xs font-mono space-y-1',
+                        isDark
+                          ? 'bg-[#05080c]/80 border-[#1e293b] text-slate-300'
+                          : 'bg-slate-100 border-slate-300 text-slate-700'
                       )}
                     >
-                      {evt.desc}
-                    </p>
-
-                    <div className="p-3.5 rounded-xl bg-[#0d1117]/60 border border-[#30363d] text-xs font-mono space-y-1 text-zinc-300">
                       <div>📍 {evt.venue}</div>
                       <div>⏰ {evt.time}</div>
                     </div>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-[#30363d] flex items-center justify-between">
+                  <div
+                    className={cx(
+                      'mt-6 pt-4 border-t flex items-center justify-between',
+                      isDark ? 'border-[#1e293b]' : 'border-slate-200'
+                    )}
+                  >
                     <button
                       onClick={() => {
                         playSuccess();
                         alert(`RSVP confirmed for "${evt.title}". See you at ${evt.venue}!`);
                       }}
-                      className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[#00ff9d] text-black hover:bg-[#34d399] transition-all"
+                      className={cx(
+                        'px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all',
+                        isDark
+                          ? 'bg-[#00ff9d] text-black hover:bg-[#34d399]'
+                          : 'bg-[#047857] text-white hover:bg-[#065f46]'
+                      )}
                     >
                       RSVP FOR TALK
                     </button>
@@ -2352,7 +2549,7 @@ export default function App() {
                         )}&dates=20251114T123000Z/20251114T133000Z&location=${encodeURIComponent(evt.venue)}`;
                         window.open(gcalUrl, '_blank');
                       }}
-                      className="text-xs font-mono text-zinc-400 hover:text-[#00ff9d]"
+                      className={cx('text-xs font-mono font-bold hover:underline', accentText)}
                     >
                       📅 Add to Calendar
                     </button>
@@ -2369,15 +2566,15 @@ export default function App() {
         {activeTab === 'submit' && (
           <div className="max-w-3xl mx-auto space-y-8">
             <div className="text-left">
-              <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">
+              <span className={cx('text-xs font-mono uppercase tracking-widest font-bold', accentText)}>
                 05 // CALL FOR SPEAKERS
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Propose Your Talk</h2>
-              <p className={cx('text-xs sm:text-sm mt-1 leading-relaxed', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
+              <p className={cx('text-xs sm:text-sm mt-1 leading-relaxed', bodyText)}>
                 Fill out the proposal form below first. Upon clicking draft, a complete email with your unique{' '}
-                <span className="text-[#00ff9d] font-bold">#OB-2026</span> submission tag, talk title in the subject,
+                <span className={cx('font-bold', accentText)}>#OB-2026</span> submission tag, talk title in the subject,
                 and structured details in the body is automatically drafted to{' '}
-                <span className="text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span> so you can review and hit send.
+                <span className={cx('font-bold', accentText)}>{OPENBOARD_EMAIL}</span> so you can review and hit send.
               </p>
             </div>
 
@@ -2385,16 +2582,35 @@ export default function App() {
               <div
                 className={cx(
                   'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl space-y-6 shadow-2xl',
-                  isDark ? 'bg-[#161b22]/90 border-[#00ff9d]/50' : 'bg-white border-emerald-400'
+                  isDark ? 'bg-[#0b1017]/95 border-[#00ff9d]/50' : 'bg-white border-emerald-500'
                 )}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#30363d] pb-4">
+                <div
+                  className={cx(
+                    'flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4',
+                    isDark ? 'border-[#1e293b]' : 'border-slate-200'
+                  )}
+                >
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-[#00ff9d]/20 text-[#00ff9d] flex items-center justify-center text-xl border border-[#00ff9d]/40">
+                    <div
+                      className={cx(
+                        'w-11 h-11 rounded-xl flex items-center justify-center text-xl border',
+                        isDark
+                          ? 'bg-[#00ff9d]/20 text-[#00ff9d] border-[#00ff9d]/40'
+                          : 'bg-emerald-100 text-[#047857] border-emerald-300'
+                      )}
+                    >
                       ✉
                     </div>
                     <div>
-                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-[#00ff9d]/15 border border-[#00ff9d]/40 text-[10px] font-mono text-[#00ff9d] font-bold">
+                      <div
+                        className={cx(
+                          'inline-block px-2.5 py-0.5 rounded-full border text-[10px] font-mono font-bold',
+                          isDark
+                            ? 'bg-[#00ff9d]/15 border-[#00ff9d]/40 text-[#00ff9d]'
+                            : 'bg-emerald-100 border-emerald-300 text-[#047857]'
+                        )}
+                      >
                         TAG: SUBMISSION • SERIAL #{lastSerialNumber}
                       </div>
                       <h3 className="text-lg sm:text-xl font-bold font-mono mt-0.5">
@@ -2404,9 +2620,9 @@ export default function App() {
                   </div>
                 </div>
 
-                <p className={cx('text-xs font-sans leading-relaxed', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                <p className={cx('text-xs font-sans leading-relaxed', bodyText)}>
                   Your talk proposal for <strong>"{formState.title}"</strong> has been formatted into a complete email
-                  draft addressed to <span className="font-mono text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span>. If
+                  draft addressed to <span className={cx('font-mono font-bold', accentText)}>{OPENBOARD_EMAIL}</span>. If
                   your email app did not open automatically, choose your preferred option below to review and send it:
                 </p>
 
@@ -2415,7 +2631,12 @@ export default function App() {
                   <a
                     href={proposalDraft.mailtoUrl}
                     onClick={playClick}
-                    className="px-5 py-2.5 rounded-xl text-xs font-mono font-bold bg-[#00ff9d] text-black hover:bg-[#34d399] shadow-[0_0_20px_rgba(0,255,157,0.35)] transition-all flex items-center gap-2"
+                    className={cx(
+                      'px-5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2',
+                      isDark
+                        ? 'bg-[#00ff9d] text-black hover:bg-[#34d399] shadow-[0_0_20px_rgba(0,255,157,0.35)]'
+                        : 'bg-[#047857] text-white hover:bg-[#065f46] shadow-md'
+                    )}
                   >
                     <span>✉ OPEN IN DEFAULT MAIL APP &amp; SEND</span>
                   </a>
@@ -2425,7 +2646,12 @@ export default function App() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={playClick}
-                    className="px-5 py-2.5 rounded-xl text-xs font-mono font-bold border border-[#00ff9d] text-[#00ff9d] hover:bg-[#00ff9d]/15 transition-all flex items-center gap-2"
+                    className={cx(
+                      'px-5 py-2.5 rounded-xl text-xs font-mono font-bold border transition-all flex items-center gap-2',
+                      isDark
+                        ? 'border-[#00ff9d] text-[#00ff9d] hover:bg-[#00ff9d]/15'
+                        : 'border-[#047857] text-[#047857] hover:bg-emerald-50'
+                    )}
                   >
                     <span>🌐 OPEN IN GMAIL WEB COMPOSE ↗</span>
                   </a>
@@ -2435,7 +2661,12 @@ export default function App() {
                     onClick={() =>
                       handleCopyText(`Subject: ${proposalDraft.subject}\n\n${proposalDraft.body}`, setCopiedProposal)
                     }
-                    className="px-4 py-2.5 rounded-xl text-xs font-mono border border-[#30363d] text-zinc-300 hover:border-zinc-400 hover:text-white transition-all"
+                    className={cx(
+                      'px-4 py-2.5 rounded-xl text-xs font-mono border transition-all font-semibold',
+                      isDark
+                        ? 'border-[#1e293b] text-slate-300 hover:border-slate-400 hover:text-white'
+                        : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                    )}
                   >
                     {copiedProposal ? '✓ COPIED FULL DRAFT' : '📋 COPY DRAFT TEXT'}
                   </button>
@@ -2445,35 +2676,57 @@ export default function App() {
                 <div
                   className={cx(
                     'rounded-xl border p-4 space-y-3 font-mono text-xs',
-                    isDark ? 'bg-[#0d1117] border-[#30363d]' : 'bg-zinc-50 border-zinc-300'
+                    isDark ? 'bg-[#05080c] border-[#1e293b]' : 'bg-slate-50 border-slate-300'
                   )}
                 >
-                  <div className="text-[10px] uppercase tracking-wider text-[#00ff9d] font-bold">
+                  <div className={cx('text-[10px] uppercase tracking-wider font-bold', accentText)}>
                     DRAFTED EMAIL PREVIEW (VERIFY BEFORE SENDING)
                   </div>
-                  <div className="space-y-1 border-b border-[#30363d] pb-2.5 text-[11px]">
+                  <div
+                    className={cx(
+                      'space-y-1 border-b pb-2.5 text-[11px]',
+                      isDark ? 'border-[#1e293b]' : 'border-slate-200'
+                    )}
+                  >
                     <div>
-                      <span className="text-zinc-500">To: </span>
-                      <span className="text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span>
+                      <span className={mutedText}>To: </span>
+                      <span className={cx('font-bold', accentText)}>{OPENBOARD_EMAIL}</span>
                     </div>
                     <div>
-                      <span className="text-zinc-500">Subject: </span>
-                      <span className="font-bold text-amber-300">{proposalDraft.subject}</span>
+                      <span className={mutedText}>Subject: </span>
+                      <span className={cx('font-bold', isDark ? 'text-amber-300' : 'text-amber-800')}>
+                        {proposalDraft.subject}
+                      </span>
                     </div>
                   </div>
-                  <pre className="whitespace-pre-wrap text-[11px] leading-relaxed text-zinc-300 max-h-64 overflow-y-auto font-mono">
+                  <pre
+                    className={cx(
+                      'whitespace-pre-wrap text-[11px] leading-relaxed max-h-64 overflow-y-auto font-mono',
+                      bodyText
+                    )}
+                  >
                     {proposalDraft.body}
                   </pre>
                 </div>
 
-                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-[#30363d]">
+                <div
+                  className={cx(
+                    'pt-2 flex flex-wrap items-center justify-between gap-3 border-t',
+                    isDark ? 'border-[#1e293b]' : 'border-slate-200'
+                  )}
+                >
                   <button
                     type="button"
                     onClick={() => {
                       playClick();
                       setFormStatus('idle');
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-mono border border-[#30363d] text-zinc-300 hover:text-white hover:border-[#00ff9d]"
+                    className={cx(
+                      'px-4 py-2 rounded-xl text-xs font-mono border font-semibold',
+                      isDark
+                        ? 'border-[#1e293b] text-slate-300 hover:text-white hover:border-[#00ff9d]'
+                        : 'border-slate-300 text-slate-700 hover:border-[#047857]'
+                    )}
                   >
                     ← Edit Proposal Details
                   </button>
@@ -2495,7 +2748,10 @@ export default function App() {
                         tags: 'Interdisciplinary, Theory',
                       });
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-mono bg-[#21262d] text-zinc-300 hover:text-white"
+                    className={cx(
+                      'px-4 py-2 rounded-xl text-xs font-mono font-semibold',
+                      isDark ? 'bg-[#161f2c] text-slate-300 hover:text-white' : 'bg-slate-200 text-slate-800 hover:bg-slate-300'
+                    )}
                   >
                     Start Fresh Proposal
                   </button>
@@ -2504,171 +2760,130 @@ export default function App() {
             ) : (
               <form
                 onSubmit={handleSubmitProposal}
-                className={cx(
-                  'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl shadow-2xl space-y-4 font-mono text-xs',
-                  isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white/95 border-[#d0d7de]'
-                )}
+                className={cx('p-6 sm:p-8 rounded-2xl border backdrop-blur-xl space-y-4 font-mono text-xs', cardSurface)}
               >
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#30363d] pb-3 text-[11px] text-zinc-400">
+                <div
+                  className={cx(
+                    'flex flex-wrap items-center justify-between gap-2 border-b pb-3 text-[11px]',
+                    isDark ? 'border-[#1e293b] text-slate-400' : 'border-slate-200 text-slate-600'
+                  )}
+                >
                   <span>&gt; recipient = "{OPENBOARD_EMAIL}"</span>
-                  <span className="text-[#00ff9d] font-bold">[STEP 1: FILL FORM → STEP 2: REVIEW &amp; SEND MAIL]</span>
+                  <span className={cx('font-bold', accentText)}>
+                    [STEP 1: FILL FORM → STEP 2: REVIEW &amp; SEND MAIL]
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
                   <div>
-                    <label className="block text-zinc-400 mb-1">Speaker Name *</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Speaker Name *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Emmy Noether"
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">Speaker Email *</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Speaker Email *</label>
                     <input
                       type="email"
                       required
                       placeholder="username22@iiserb.ac.in"
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">Batch / Affiliation</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Batch / Affiliation</label>
                     <input
                       type="text"
                       placeholder="e.g. 2022 Batch, IISERB"
                       value={formState.batchOrAffiliation}
                       onChange={(e) => setFormState({ ...formState, batchOrAffiliation: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-zinc-400 mb-1">Talk Title *</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Talk Title *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Symmetries & Conservation Laws"
                       value={formState.title}
                       onChange={(e) => setFormState({ ...formState, title: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">Academic Discipline *</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Academic Discipline *</label>
                     <select
                       value={formState.department}
                       onChange={(e) => setFormState({ ...formState, department: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     >
                       <option value="Physics">Physics</option>
                       <option value="Mathematics">Mathematics</option>
                       <option value="Chemistry">Chemistry</option>
                       <option value="Biology">Biology</option>
                       <option value="Computer Science">Computer Science</option>
-                      <option value="Economics & Social Sciences">Economics & Social Sciences</option>
+                      <option value="Economics & Social Sciences">Economics &amp; Social Sciences</option>
                       <option value="Interdisciplinary">Interdisciplinary / Other</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-zinc-400 mb-1">Abstract &amp; Pedagogical Hook *</label>
+                  <label className={cx('block mb-1 font-semibold', mutedText)}>Abstract &amp; Pedagogical Hook *</label>
                   <textarea
                     required
                     rows={4}
                     placeholder="Provide a 2-4 sentence summary of your presentation. What fundamental question are you answering for non-specialists?"
                     value={formState.abstract}
                     onChange={(e) => setFormState({ ...formState, abstract: e.target.value })}
-                    className={cx(
-                      'w-full px-3.5 py-2.5 rounded-lg border outline-none font-sans text-xs',
-                      isDark
-                        ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                        : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                    )}
+                    className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-sans text-xs', inputSurface)}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-zinc-400 mb-1">Recommended Audience Prerequisites</label>
+                  <label className={cx('block mb-1 font-semibold', mutedText)}>Recommended Audience Prerequisites</label>
                   <input
                     type="text"
                     placeholder="e.g. None! Just curiosity (or 1st-year linear algebra)"
                     value={formState.prerequisites}
                     onChange={(e) => setFormState({ ...formState, prerequisites: e.target.value })}
-                    className={cx(
-                      'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                      isDark
-                        ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                        : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                    )}
+                    className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-zinc-400 mb-1">Preferred Session Date</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Preferred Session Date</label>
                     <input
                       type="date"
                       value={formState.preferredDate}
                       onChange={(e) => setFormState({ ...formState, preferredDate: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">Topic Tags (Comma-separated)</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Topic Tags (Comma-separated)</label>
                     <input
                       type="text"
                       placeholder="e.g. Noether Theorem, Group Theory"
                       value={formState.tags}
                       onChange={(e) => setFormState({ ...formState, tags: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     />
                   </div>
                 </div>
@@ -2677,10 +2892,12 @@ export default function App() {
                 <div
                   className={cx(
                     'p-3 rounded-lg border text-[11px] font-mono',
-                    isDark ? 'bg-[#0d1117]/90 border-[#30363d] text-zinc-400' : 'bg-zinc-100 border-zinc-300 text-zinc-600'
+                    isDark
+                      ? 'bg-[#05080c] border-[#1e293b] text-slate-300'
+                      : 'bg-emerald-50/70 border-emerald-300 text-slate-700'
                   )}
                 >
-                  <span className="text-[#00ff9d] font-bold">Draft Subject Preview: </span>
+                  <span className={cx('font-bold', accentText)}>Draft Subject Preview: </span>
                   <span>
                     [Submission #OB-2026-XXXX] OpenBoard Talk Proposal:{' '}
                     {formState.title.trim() ? formState.title.trim() : '<Your Talk Title>'}
@@ -2689,7 +2906,12 @@ export default function App() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl font-mono text-xs font-bold tracking-wider bg-[#00ff9d] text-black shadow-[0_0_20px_rgba(0,255,157,0.35)] hover:shadow-[0_0_30px_rgba(0,255,157,0.55)] transition-all flex items-center justify-center gap-2"
+                  className={cx(
+                    'w-full py-3.5 rounded-xl font-mono text-xs font-bold tracking-wider transition-all flex items-center justify-center gap-2',
+                    isDark
+                      ? 'bg-[#00ff9d] text-black shadow-[0_0_20px_rgba(0,255,157,0.35)] hover:shadow-[0_0_30px_rgba(0,255,157,0.55)]'
+                      : 'bg-[#047857] text-white shadow-[0_6px_20px_rgba(4,120,87,0.3)] hover:bg-[#065f46]'
+                  )}
                 >
                   <span>&gt; DRAFT SUBMISSION EMAIL TO OPENBOARDINITIATIVE@GMAIL.COM (REVIEW &amp; SEND)</span>
                 </button>
@@ -2704,59 +2926,49 @@ export default function App() {
         {activeTab === 'contact' && (
           <div className="max-w-3xl mx-auto space-y-8">
             <div className="text-left">
-              <span className="text-xs font-mono text-[#00ff9d] uppercase tracking-widest font-bold">
+              <span className={cx('text-xs font-mono uppercase tracking-widest font-bold', accentText)}>
                 06 // COMMUNICATIONS &amp; FEEDBACK
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">
                 Suggestions &amp; Coordinator Channels
               </h2>
-              <p className={cx('text-xs sm:text-sm mt-1 leading-relaxed', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
+              <p className={cx('text-xs sm:text-sm mt-1 leading-relaxed', bodyText)}>
                 Have a suggestion for a topic, speaker, collaboration, or improvement? Fill out the form below to
                 generate a properly structured email draft to{' '}
-                <span className="text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span> ready for you to review and send.
+                <span className={cx('font-bold', accentText)}>{OPENBOARD_EMAIL}</span> ready for you to review and send.
               </p>
             </div>
 
             {/* Direct Info Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div
-                className={cx(
-                  'p-6 rounded-2xl border backdrop-blur-xl space-y-2',
-                  isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white border-[#d0d7de]'
-                )}
-              >
-                <div className="text-xs font-mono text-[#00ff9d] font-bold">📍 CAMPUS LOCATION</div>
+              <div className={cx('p-6 rounded-2xl border backdrop-blur-xl space-y-2', cardSurface)}>
+                <div className={cx('text-xs font-mono font-bold', accentText)}>📍 CAMPUS LOCATION</div>
                 <h4 className="font-bold text-sm">Lecture Hall Complex (LHC)</h4>
-                <p className="text-xs text-zinc-400 font-mono leading-relaxed">
+                <p className={cx('text-xs font-mono leading-relaxed', mutedText)}>
                   Room L-8, Ground Floor
                   <br />
                   IISER Bhopal, Bhauri, Bhopal, MP 462066
                 </p>
               </div>
 
-              <div
-                className={cx(
-                  'p-6 rounded-2xl border backdrop-blur-xl space-y-2',
-                  isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white border-[#d0d7de]'
-                )}
-              >
-                <div className="text-xs font-mono text-[#f43f5e] font-bold">✉ OFFICIAL CHANNELS</div>
-                <div className="text-xs font-mono space-y-1.5 text-zinc-300">
+              <div className={cx('p-6 rounded-2xl border backdrop-blur-xl space-y-2', cardSurface)}>
+                <div className={cx('text-xs font-mono font-bold', pinkText)}>✉ OFFICIAL CHANNELS</div>
+                <div className={cx('text-xs font-mono space-y-1.5', bodyText)}>
                   <div>
                     Official Inbox:{' '}
-                    <a href={`mailto:${OPENBOARD_EMAIL}`} className="text-[#00ff9d] font-bold hover:underline">
+                    <a href={`mailto:${OPENBOARD_EMAIL}`} className={cx('font-bold hover:underline', accentText)}>
                       {OPENBOARD_EMAIL}
                     </a>
                   </div>
                   <div>
                     Samriddha:{' '}
-                    <a href="mailto:samriddha22@iiserb.ac.in" className="text-[#00ff9d] hover:underline">
+                    <a href="mailto:samriddha22@iiserb.ac.in" className={cx('font-bold hover:underline', accentText)}>
                       samriddha22@iiserb.ac.in
                     </a>
                   </div>
                   <div>
                     Adeetya:{' '}
-                    <a href="mailto:adeety22@iiserb.ac.in" className="text-[#00ff9d] hover:underline">
+                    <a href="mailto:adeety22@iiserb.ac.in" className={cx('font-bold hover:underline', accentText)}>
                       adeety22@iiserb.ac.in
                     </a>
                   </div>
@@ -2769,16 +2981,35 @@ export default function App() {
               <div
                 className={cx(
                   'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl space-y-6 shadow-2xl',
-                  isDark ? 'bg-[#161b22]/90 border-[#f43f5e]/50' : 'bg-white border-rose-300'
+                  isDark ? 'bg-[#0b1017]/95 border-[#ff3366]/50' : 'bg-white border-rose-400'
                 )}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#30363d] pb-4">
+                <div
+                  className={cx(
+                    'flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4',
+                    isDark ? 'border-[#1e293b]' : 'border-slate-200'
+                  )}
+                >
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-[#f43f5e]/20 text-[#f43f5e] flex items-center justify-center text-xl border border-[#f43f5e]/40">
+                    <div
+                      className={cx(
+                        'w-11 h-11 rounded-xl flex items-center justify-center text-xl border',
+                        isDark
+                          ? 'bg-[#ff3366]/20 text-[#ff3366] border-[#ff3366]/40'
+                          : 'bg-rose-100 text-[#be123c] border-rose-300'
+                      )}
+                    >
                       ✉
                     </div>
                     <div>
-                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-[#f43f5e]/15 border border-[#f43f5e]/40 text-[10px] font-mono text-[#f43f5e] font-bold">
+                      <div
+                        className={cx(
+                          'inline-block px-2.5 py-0.5 rounded-full border text-[10px] font-mono font-bold',
+                          isDark
+                            ? 'bg-[#ff3366]/15 border-[#ff3366]/40 text-[#ff3366]'
+                            : 'bg-rose-100 border-rose-300 text-[#be123c]'
+                        )}
+                      >
                         TAG: SUGGESTION • REF #{lastSuggestionSerial}
                       </div>
                       <h3 className="text-lg sm:text-xl font-bold font-mono mt-0.5">
@@ -2788,17 +3019,22 @@ export default function App() {
                   </div>
                 </div>
 
-                <p className={cx('text-xs font-sans leading-relaxed', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                <p className={cx('text-xs font-sans leading-relaxed', bodyText)}>
                   Your suggestion regarding <strong>"{suggestionState.topic}"</strong> has been formatted into an email
-                  draft to <span className="font-mono text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span>. Please review
-                  and send it via your preferred email client below:
+                  draft to <span className={cx('font-mono font-bold', accentText)}>{OPENBOARD_EMAIL}</span>. Please
+                  review and send it via your preferred email client below:
                 </p>
 
                 <div className="flex flex-wrap items-center gap-3">
                   <a
                     href={suggestionDraft.mailtoUrl}
                     onClick={playClick}
-                    className="px-5 py-2.5 rounded-xl text-xs font-mono font-bold bg-[#00ff9d] text-black hover:bg-[#34d399] shadow-[0_0_20px_rgba(0,255,157,0.35)] transition-all flex items-center gap-2"
+                    className={cx(
+                      'px-5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2',
+                      isDark
+                        ? 'bg-[#00ff9d] text-black hover:bg-[#34d399] shadow-[0_0_20px_rgba(0,255,157,0.35)]'
+                        : 'bg-[#047857] text-white hover:bg-[#065f46] shadow-md'
+                    )}
                   >
                     <span>✉ OPEN IN DEFAULT MAIL APP &amp; SEND</span>
                   </a>
@@ -2808,7 +3044,12 @@ export default function App() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={playClick}
-                    className="px-5 py-2.5 rounded-xl text-xs font-mono font-bold border border-[#00ff9d] text-[#00ff9d] hover:bg-[#00ff9d]/15 transition-all flex items-center gap-2"
+                    className={cx(
+                      'px-5 py-2.5 rounded-xl text-xs font-mono font-bold border transition-all flex items-center gap-2',
+                      isDark
+                        ? 'border-[#00ff9d] text-[#00ff9d] hover:bg-[#00ff9d]/15'
+                        : 'border-[#047857] text-[#047857] hover:bg-emerald-50'
+                    )}
                   >
                     <span>🌐 OPEN IN GMAIL WEB COMPOSE ↗</span>
                   </a>
@@ -2821,7 +3062,12 @@ export default function App() {
                         setCopiedSuggestion
                       )
                     }
-                    className="px-4 py-2.5 rounded-xl text-xs font-mono border border-[#30363d] text-zinc-300 hover:border-zinc-400 hover:text-white transition-all"
+                    className={cx(
+                      'px-4 py-2.5 rounded-xl text-xs font-mono border transition-all font-semibold',
+                      isDark
+                        ? 'border-[#1e293b] text-slate-300 hover:border-slate-400 hover:text-white'
+                        : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                    )}
                   >
                     {copiedSuggestion ? '✓ COPIED FULL DRAFT' : '📋 COPY DRAFT TEXT'}
                   </button>
@@ -2831,35 +3077,57 @@ export default function App() {
                 <div
                   className={cx(
                     'rounded-xl border p-4 space-y-3 font-mono text-xs',
-                    isDark ? 'bg-[#0d1117] border-[#30363d]' : 'bg-zinc-50 border-zinc-300'
+                    isDark ? 'bg-[#05080c] border-[#1e293b]' : 'bg-slate-50 border-slate-300'
                   )}
                 >
-                  <div className="text-[10px] uppercase tracking-wider text-[#f43f5e] font-bold">
+                  <div className={cx('text-[10px] uppercase tracking-wider font-bold', pinkText)}>
                     DRAFTED SUGGESTION EMAIL PREVIEW (VERIFY BEFORE SENDING)
                   </div>
-                  <div className="space-y-1 border-b border-[#30363d] pb-2.5 text-[11px]">
+                  <div
+                    className={cx(
+                      'space-y-1 border-b pb-2.5 text-[11px]',
+                      isDark ? 'border-[#1e293b]' : 'border-slate-200'
+                    )}
+                  >
                     <div>
-                      <span className="text-zinc-500">To: </span>
-                      <span className="text-[#00ff9d] font-bold">{OPENBOARD_EMAIL}</span>
+                      <span className={mutedText}>To: </span>
+                      <span className={cx('font-bold', accentText)}>{OPENBOARD_EMAIL}</span>
                     </div>
                     <div>
-                      <span className="text-zinc-500">Subject: </span>
-                      <span className="font-bold text-amber-300">{suggestionDraft.subject}</span>
+                      <span className={mutedText}>Subject: </span>
+                      <span className={cx('font-bold', isDark ? 'text-amber-300' : 'text-amber-800')}>
+                        {suggestionDraft.subject}
+                      </span>
                     </div>
                   </div>
-                  <pre className="whitespace-pre-wrap text-[11px] leading-relaxed text-zinc-300 max-h-64 overflow-y-auto font-mono">
+                  <pre
+                    className={cx(
+                      'whitespace-pre-wrap text-[11px] leading-relaxed max-h-64 overflow-y-auto font-mono',
+                      bodyText
+                    )}
+                  >
                     {suggestionDraft.body}
                   </pre>
                 </div>
 
-                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-[#30363d]">
+                <div
+                  className={cx(
+                    'pt-2 flex flex-wrap items-center justify-between gap-3 border-t',
+                    isDark ? 'border-[#1e293b]' : 'border-slate-200'
+                  )}
+                >
                   <button
                     type="button"
                     onClick={() => {
                       playClick();
                       setSuggestionStatus('idle');
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-mono border border-[#30363d] text-zinc-300 hover:text-white hover:border-[#00ff9d]"
+                    className={cx(
+                      'px-4 py-2 rounded-xl text-xs font-mono border font-semibold',
+                      isDark
+                        ? 'border-[#1e293b] text-slate-300 hover:text-white hover:border-[#00ff9d]'
+                        : 'border-slate-300 text-slate-700 hover:border-[#047857]'
+                    )}
                   >
                     ← Edit Suggestion Details
                   </button>
@@ -2878,7 +3146,10 @@ export default function App() {
                         details: '',
                       });
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-mono bg-[#21262d] text-zinc-300 hover:text-white"
+                    className={cx(
+                      'px-4 py-2 rounded-xl text-xs font-mono font-semibold',
+                      isDark ? 'bg-[#161f2c] text-slate-300 hover:text-white' : 'bg-slate-200 text-slate-800 hover:bg-slate-300'
+                    )}
                   >
                     Draft Another Suggestion
                   </button>
@@ -2887,14 +3158,16 @@ export default function App() {
             ) : (
               <form
                 onSubmit={handleSubmitSuggestion}
-                className={cx(
-                  'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl shadow-2xl space-y-4 font-mono text-xs',
-                  isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white/95 border-[#d0d7de]'
-                )}
+                className={cx('p-6 sm:p-8 rounded-2xl border backdrop-blur-xl space-y-4 font-mono text-xs', cardSurface)}
               >
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#30363d] pb-3 text-[11px] text-zinc-400">
+                <div
+                  className={cx(
+                    'flex flex-wrap items-center justify-between gap-2 border-b pb-3 text-[11px]',
+                    isDark ? 'border-[#1e293b] text-slate-400' : 'border-slate-200 text-slate-600'
+                  )}
+                >
                   <span>&gt; submit_suggestion_to = "{OPENBOARD_EMAIL}"</span>
-                  <span className="text-[#f43f5e] font-bold">[TAG: SUGGESTION / FEEDBACK]</span>
+                  <span className={cx('font-bold', pinkText)}>[TAG: SUGGESTION / FEEDBACK]</span>
                 </div>
 
                 <h3 className="text-base sm:text-lg font-bold tracking-tight pt-1">
@@ -2903,68 +3176,48 @@ export default function App() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-zinc-400 mb-1">Your Name *</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Your Name *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Alan Turing"
                       value={suggestionState.name}
                       onChange={(e) => setSuggestionState({ ...suggestionState, name: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">Your Email *</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Your Email *</label>
                     <input
                       type="email"
                       required
                       placeholder="student@iiserb.ac.in"
                       value={suggestionState.email}
                       onChange={(e) => setSuggestionState({ ...suggestionState, email: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">Batch / Department</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Batch / Department</label>
                     <input
                       type="text"
                       placeholder="e.g. Physics 2023 Batch"
                       value={suggestionState.affiliation}
                       onChange={(e) => setSuggestionState({ ...suggestionState, affiliation: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-zinc-400 mb-1">Suggestion Category *</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Suggestion Category *</label>
                     <select
                       value={suggestionState.category}
                       onChange={(e) => setSuggestionState({ ...suggestionState, category: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     >
                       <option value="Topic / Speaker Suggestion">Topic / Speaker Suggestion</option>
                       <option value="Session Format & Pedagogy">Session Format &amp; Pedagogy</option>
@@ -2975,37 +3228,27 @@ export default function App() {
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">Subject / Topic Title *</label>
+                    <label className={cx('block mb-1 font-semibold', mutedText)}>Subject / Topic Title *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Request for a session on Category Theory"
                       value={suggestionState.topic}
                       onChange={(e) => setSuggestionState({ ...suggestionState, topic: e.target.value })}
-                      className={cx(
-                        'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
-                        isDark
-                          ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                          : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                      )}
+                      className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs', inputSurface)}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-zinc-400 mb-1">Detailed Suggestion / Message *</label>
+                  <label className={cx('block mb-1 font-semibold', mutedText)}>Detailed Suggestion / Message *</label>
                   <textarea
                     required
                     rows={4}
                     placeholder="Describe your suggestion, recommended speaker, or feedback in detail so we can review it..."
                     value={suggestionState.details}
                     onChange={(e) => setSuggestionState({ ...suggestionState, details: e.target.value })}
-                    className={cx(
-                      'w-full px-3.5 py-2.5 rounded-lg border outline-none font-sans text-xs',
-                      isDark
-                        ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
-                        : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
-                    )}
+                    className={cx('w-full px-3.5 py-2.5 rounded-lg border outline-none font-sans text-xs', inputSurface)}
                   />
                 </div>
 
@@ -3013,10 +3256,12 @@ export default function App() {
                 <div
                   className={cx(
                     'p-3 rounded-lg border text-[11px] font-mono',
-                    isDark ? 'bg-[#0d1117]/90 border-[#30363d] text-zinc-400' : 'bg-zinc-100 border-zinc-300 text-zinc-600'
+                    isDark
+                      ? 'bg-[#05080c] border-[#1e293b] text-slate-300'
+                      : 'bg-rose-50/70 border-rose-300 text-slate-700'
                   )}
                 >
-                  <span className="text-[#f43f5e] font-bold">Draft Subject Preview: </span>
+                  <span className={cx('font-bold', pinkText)}>Draft Subject Preview: </span>
                   <span>
                     [Suggestion #OB-SUG-2026-XXXX] OpenBoard ({suggestionState.category}):{' '}
                     {suggestionState.topic.trim() ? suggestionState.topic.trim() : '<Your Topic / Subject>'}
@@ -3025,7 +3270,12 @@ export default function App() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl font-mono text-xs font-bold tracking-wider bg-[#f43f5e] text-white shadow-[0_0_20px_rgba(244,63,94,0.35)] hover:shadow-[0_0_30px_rgba(244,63,94,0.55)] transition-all flex items-center justify-center gap-2"
+                  className={cx(
+                    'w-full py-3.5 rounded-xl font-mono text-xs font-bold tracking-wider text-white transition-all flex items-center justify-center gap-2',
+                    isDark
+                      ? 'bg-[#ff3366] shadow-[0_0_20px_rgba(255,51,102,0.35)] hover:shadow-[0_0_30px_rgba(255,51,102,0.55)]'
+                      : 'bg-[#be123c] shadow-[0_6px_20px_rgba(190,18,60,0.28)] hover:bg-[#9f1239]'
+                  )}
                 >
                   <span>&gt; DRAFT SUGGESTION EMAIL TO OPENBOARDINITIATIVE@GMAIL.COM (REVIEW &amp; SEND)</span>
                 </button>
@@ -3039,11 +3289,11 @@ export default function App() {
       {/* MODAL: TALK DETAILS & ABSTRACT VIEWER                     */}
       {/* ========================================================= */}
       {activeModalTalk && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
           <div
             className={cx(
               'max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl border p-6 sm:p-8 shadow-2xl relative font-mono',
-              isDark ? 'bg-[#0d1117] border-[#00ff9d]/40' : 'bg-white border-zinc-300'
+              isDark ? 'bg-[#080d14] border-[#00ff9d]/45 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
             )}
           >
             <button
@@ -3051,47 +3301,53 @@ export default function App() {
                 playClick();
                 setActiveModalTalk(null);
               }}
-              className="absolute top-5 right-5 w-7 h-7 rounded-lg bg-[#21262d] text-zinc-300 hover:text-white flex items-center justify-center text-xs"
+              className={cx(
+                'absolute top-5 right-5 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold',
+                isDark ? 'bg-[#161f2c] text-slate-300 hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+              )}
             >
               ✕
             </button>
 
             <div className="flex items-center gap-2 mb-2 text-xs">
-              <span className="px-2 py-0.5 rounded bg-[#00ff9d]/20 text-[#00ff9d] font-bold border border-[#00ff9d]/40">
+              <span
+                className={cx(
+                  'px-2 py-0.5 rounded font-bold border',
+                  isDark
+                    ? 'bg-[#00ff9d]/20 text-[#00ff9d] border-[#00ff9d]/40'
+                    : 'bg-emerald-100 text-[#047857] border-emerald-300'
+                )}
+              >
                 TALK #{activeModalTalk.number}
               </span>
-              <span className="text-zinc-400">{activeModalTalk.date}</span>
-              <span className="text-zinc-500">•</span>
-              <span className="text-[#38bdf8]">{activeModalTalk.category}</span>
+              <span className={mutedText}>{activeModalTalk.date}</span>
+              <span className={mutedText}>•</span>
+              <span className={cx('font-bold', cyanText)}>{activeModalTalk.category}</span>
             </div>
 
             <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight mt-1">{activeModalTalk.title}</h3>
-            <p className="text-xs text-[#00ff9d] mt-1">Speaker: {activeModalTalk.speaker}</p>
-            <p className="text-[11px] text-zinc-400">{activeModalTalk.affiliation}</p>
+            <p className={cx('text-xs font-bold mt-1', accentText)}>Speaker: {activeModalTalk.speaker}</p>
+            <p className={cx('text-[11px]', mutedText)}>{activeModalTalk.affiliation}</p>
 
-            <div className="my-5 border-t border-[#30363d]" />
+            <div className={cx('my-5 border-t', isDark ? 'border-[#1e293b]' : 'border-slate-200')} />
 
             <div>
-              <h4 className="text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5 font-bold">
+              <h4 className={cx('text-[11px] uppercase tracking-wider mb-1.5 font-bold', mutedText)}>
                 Abstract &amp; Core Theorems
               </h4>
-              <p
-                className={cx(
-                  'text-xs font-sans leading-relaxed',
-                  isDark ? 'text-zinc-300' : 'text-zinc-700'
-                )}
-              >
-                {activeModalTalk.abstract}
-              </p>
+              <p className={cx('text-xs font-sans leading-relaxed', bodyText)}>{activeModalTalk.abstract}</p>
             </div>
 
             <div className="mt-5">
-              <h4 className="text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5 font-bold">Topic Tags</h4>
+              <h4 className={cx('text-[11px] uppercase tracking-wider mb-1.5 font-bold', mutedText)}>Topic Tags</h4>
               <div className="flex flex-wrap gap-1.5">
                 {activeModalTalk.tags.map((t) => (
                   <span
                     key={t}
-                    className="px-2 py-0.5 rounded text-[11px] bg-[#161b22] text-zinc-300 border border-[#30363d]"
+                    className={cx(
+                      'px-2 py-0.5 rounded text-[11px] border',
+                      isDark ? 'bg-[#111822] text-slate-300 border-[#1e293b]' : 'bg-slate-100 text-slate-700 border-slate-300'
+                    )}
                   >
                     #{t}
                   </span>
@@ -3099,14 +3355,24 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mt-7 pt-4 border-t border-[#30363d] flex flex-wrap items-center justify-between gap-3">
+            <div
+              className={cx(
+                'mt-7 pt-4 border-t flex flex-wrap items-center justify-between gap-3',
+                isDark ? 'border-[#1e293b]' : 'border-slate-200'
+              )}
+            >
               {activeModalTalk.slidesUrl && (
                 <a
                   href={activeModalTalk.slidesUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={playClick}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-[#00ff9d] text-black hover:bg-[#34d399] transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,255,157,0.3)]"
+                  className={cx(
+                    'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5',
+                    isDark
+                      ? 'bg-[#00ff9d] text-black hover:bg-[#34d399] shadow-[0_0_15px_rgba(0,255,157,0.3)]'
+                      : 'bg-[#047857] text-white hover:bg-[#065f46] shadow-md'
+                  )}
                 >
                   📥 DOWNLOAD PRESENTATION ({activeModalTalk.slidesName})
                 </a>
@@ -3114,7 +3380,12 @@ export default function App() {
 
               <button
                 onClick={(e) => handleToggleBookmark(activeModalTalk.id, e)}
-                className="px-3.5 py-2 rounded-xl text-xs border border-[#30363d] hover:border-[#00ff9d] transition-all"
+                className={cx(
+                  'px-3.5 py-2 rounded-xl text-xs border transition-all font-semibold',
+                  isDark
+                    ? 'border-[#1e293b] hover:border-[#00ff9d]'
+                    : 'border-slate-300 hover:border-[#047857] bg-slate-50'
+                )}
               >
                 {bookmarkedIds.includes(activeModalTalk.id) ? '❤️ In Bookmarks' : '🤍 Bookmark Talk'}
               </button>
@@ -3132,18 +3403,21 @@ export default function App() {
             playClick();
             setActiveLightboxImg(null);
           }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md cursor-zoom-out"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="max-w-4xl w-full rounded-2xl overflow-hidden border border-[#30363d] bg-[#0d1117] p-2 relative font-mono"
+            className={cx(
+              'max-w-4xl w-full rounded-2xl overflow-hidden border p-2 relative font-mono',
+              isDark ? 'border-[#1e293b] bg-[#080d14]' : 'border-slate-300 bg-white'
+            )}
           >
             <button
               onClick={() => {
                 playClick();
                 setActiveLightboxImg(null);
               }}
-              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-lg bg-black/70 text-white flex items-center justify-center text-xs hover:bg-zinc-800"
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-lg bg-black/75 text-white flex items-center justify-center text-xs hover:bg-slate-800"
             >
               ✕
             </button>
@@ -3154,12 +3428,19 @@ export default function App() {
                 className="max-h-[75vh] w-auto object-contain"
               />
             </div>
-            <div className="p-3 flex items-center justify-between text-xs text-zinc-400">
+            <div className="p-3 flex items-center justify-between text-xs">
               <div>
-                <span className="text-[#00ff9d] font-bold">{activeLightboxImg.title}</span>
-                <p className="text-[11px] text-zinc-300 mt-0.5">{activeLightboxImg.caption}</p>
+                <span className={cx('font-bold', accentText)}>{activeLightboxImg.title}</span>
+                <p className={cx('text-[11px] mt-0.5', bodyText)}>{activeLightboxImg.caption}</p>
               </div>
-              <span className="px-2 py-0.5 rounded bg-[#21262d] text-zinc-300">{activeLightboxImg.category}</span>
+              <span
+                className={cx(
+                  'px-2 py-0.5 rounded font-semibold',
+                  isDark ? 'bg-[#161f2c] text-slate-300' : 'bg-slate-200 text-slate-800'
+                )}
+              >
+                {activeLightboxImg.category}
+              </span>
             </div>
           </div>
         </div>
@@ -3171,39 +3452,39 @@ export default function App() {
       <footer
         className={cx(
           'relative z-10 mt-20 border-t py-8 px-4 sm:px-6 transition-colors font-mono text-xs backdrop-blur-md',
-          isDark ? 'border-[#30363d] bg-[#0d1117]/80' : 'border-[#d0d7de] bg-zinc-50/80'
+          isDark ? 'border-[#1e293b] bg-[#05080c]/88' : 'border-slate-300 bg-white/85'
         )}
       >
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-500">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-zinc-300">open_board</span>
+        <div className={cx('max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4', mutedText)}>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={cx('font-bold', isDark ? 'text-slate-200' : 'text-slate-900')}>open_board</span>
             <span>•</span>
             <span>IISER Bhopal Pedagogical Initiative</span>
             <span>•</span>
-            <span className="text-[#00ff9d]">{OPENBOARD_EMAIL}</span>
+            <span className={cx('font-bold', accentText)}>{OPENBOARD_EMAIL}</span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <button onClick={() => handleNavClick('home')} className="hover:text-[#00ff9d]">
+          <div className="flex flex-wrap items-center gap-4">
+            <button onClick={() => handleNavClick('home')} className={cx('hover:underline', accentText)}>
               Home
             </button>
-            <button onClick={() => handleNavClick('archive')} className="hover:text-[#00ff9d]">
+            <button onClick={() => handleNavClick('archive')} className={cx('hover:underline', accentText)}>
               Archive
             </button>
-            <button onClick={() => handleNavClick('gallery')} className="hover:text-[#00ff9d]">
+            <button onClick={() => handleNavClick('gallery')} className={cx('hover:underline', accentText)}>
               Gallery
             </button>
-            <button onClick={() => handleNavClick('submit')} className="hover:text-[#00ff9d]">
+            <button onClick={() => handleNavClick('submit')} className={cx('hover:underline', accentText)}>
               Propose Talk
             </button>
-            <button onClick={() => handleNavClick('contact')} className="hover:text-[#00ff9d]">
+            <button onClick={() => handleNavClick('contact')} className={cx('hover:underline', accentText)}>
               Suggest
             </button>
             <a
               href="https://github.com/samriddhaganguly/open_board-web"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#00ff9d] hover:underline"
+              className={cx('font-bold hover:underline', accentText)}
             >
               GitHub ↗
             </a>
