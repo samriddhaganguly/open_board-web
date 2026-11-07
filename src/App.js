@@ -1,225 +1,643 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
 
-// Utility helper for conditional classes
+// Conditional class joiner
 const cx = (...classes) => classes.filter(Boolean).join(' ');
 
-// ==========================================
-// 1. SOUND MANAGEMENT HOOK (Tone.js via CDN)
-// ==========================================
+// =========================================================
+// 1. NATIVE WEB AUDIO SYNTHESIZER ENGINE (Zero-dependency, Instant Sound)
+// =========================================================
 const useSoundEffects = (isMuted) => {
-  const clickSynth = useRef(null);
-  const successSynth = useRef(null);
-  const chimeSynth = useRef(null);
-  const isAudioReady = useRef(false);
+  const audioCtxRef = useRef(null);
 
-  useEffect(() => {
-    const setupAudio = async () => {
-      if (typeof window !== 'undefined' && window.Tone && !isAudioReady.current) {
-        try {
-          await window.Tone.start();
-
-          // Tactile coder keyclick synth
-          clickSynth.current = new window.Tone.Synth({
-            oscillator: { type: 'triangle' },
-            envelope: { attack: 0.001, decay: 0.07, sustain: 0.01, release: 0.07 },
-          }).toDestination();
-          clickSynth.current.volume.value = -12;
-
-          // Harmonic ascending arpeggio for proposal submission
-          successSynth.current = new window.Tone.PolySynth(window.Tone.Synth, {
-            oscillator: { type: 'fmsquare' },
-            envelope: { attack: 0.01, decay: 0.25, sustain: 0.15, release: 0.35 },
-          }).toDestination();
-          successSynth.current.volume.value = -8;
-
-          // Crisp shimmer chime for bookmarking
-          chimeSynth.current = new window.Tone.Synth({
-            oscillator: { type: 'sine' },
-            envelope: { attack: 0.005, decay: 0.15, sustain: 0.02, release: 0.2 },
-          }).toDestination();
-          chimeSynth.current.volume.value = -10;
-
-          isAudioReady.current = true;
-          document.body.removeEventListener('click', setupAudio);
-        } catch (e) {
-          console.warn('Audio context deferred:', e);
-        }
-      }
-    };
-
-    document.body.addEventListener('click', setupAudio, { once: true });
-    return () => {
-      document.body.removeEventListener('click', setupAudio);
-    };
+  const getContext = useCallback(() => {
+    if (typeof window === 'undefined') return null;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new AudioContextClass();
+    }
+    if (audioCtxRef.current.state === 'suspended') {
+      audioCtxRef.current.resume().catch(() => {});
+    }
+    return audioCtxRef.current;
   }, []);
 
-  const playClick = () => {
-    if (!isMuted && clickSynth.current && window.Tone?.context?.state === 'running') {
-      try {
-        clickSynth.current.triggerAttackRelease('F#5', '32n');
-      } catch (e) {}
-    }
-  };
+  // Crisp mechanical coder keyclick + harmonic blip
+  const playClick = useCallback(() => {
+    if (isMuted) return;
+    try {
+      const ctx = getContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(587.33, now); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.045); // A5
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.06);
+    } catch (e) {}
+  }, [isMuted, getContext]);
 
-  const playSuccess = () => {
-    if (!isMuted && successSynth.current && window.Tone?.context?.state === 'running') {
-      try {
-        const now = window.Tone.now();
-        successSynth.current.triggerAttackRelease(['C4', 'E4', 'G4', 'C5'], '16n', now);
-      } catch (e) {}
-    }
-  };
+  // Cyber ascending arpeggio fanfare on submission & RSVP
+  const playSuccess = useCallback(() => {
+    if (isMuted) return;
+    try {
+      const ctx = getContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.065);
+        gain.gain.setValueAtTime(0.16, now + idx * 0.065);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.065 + 0.28);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.065);
+        osc.stop(now + idx * 0.065 + 0.3);
+      });
+    } catch (e) {}
+  }, [isMuted, getContext]);
 
-  const playBookmark = () => {
-    if (!isMuted && chimeSynth.current && window.Tone?.context?.state === 'running') {
-      try {
-        chimeSynth.current.triggerAttackRelease('E6', '32n');
-      } catch (e) {}
-    }
-  };
+  // High crystal chime for bookmarking & pet interaction
+  const playBookmark = useCallback(() => {
+    if (isMuted) return;
+    try {
+      const ctx = getContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1046.5, now); // C6
+      osc.frequency.exponentialRampToValueAtTime(1318.5, now + 0.09); // E6
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } catch (e) {}
+  }, [isMuted, getContext]);
 
   return { playClick, playSuccess, playBookmark };
 };
 
-// ==========================================
-// 2. 3D WEBGL PARTICLE & CONSTELLATION MESH
-// ==========================================
+// =========================================================
+// 2. SLEEK PIXEL MATRIX + 3D CONSTELLATION BACKGROUND
+// =========================================================
 const BackgroundAnimation = ({ theme }) => {
-  const mountRef = useRef(null);
-  const threeRef = useRef({});
+  const pixelCanvasRef = useRef(null);
+  const threeMountRef = useRef(null);
+  const mouseRef = useRef({ x: -9999, y: -9999, normX: 0, normY: 0 });
 
+  // 2A. Interactive 2D Pixel Grid Canvas (Glowing Cyber Voxels & Cursor Trail)
   useEffect(() => {
-    if (typeof window === 'undefined' || !mountRef.current) return;
-    const container = mountRef.current;
+    const canvas = pixelCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animId;
 
-    // Scene setup
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Floating digital firefly pixels
+    const pixelNodes = Array.from({ length: 65 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.45,
+      vy: (Math.random() - 0.5) * 0.45,
+      size: Math.random() > 0.5 ? 4 : 3,
+      phase: Math.random() * Math.PI * 2,
+      colorType: Math.random() > 0.78 ? 'pink' : Math.random() > 0.5 ? 'cyan' : 'green',
+    }));
+
+    const handleMove = (e) => {
+      mouseRef.current.x = e.clientX;
+      mouseRef.current.y = e.clientY;
+      mouseRef.current.normX = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseRef.current.normY = -(e.clientY / window.innerHeight) * 2 + 1;
+    };
+    window.addEventListener('mousemove', handleMove);
+
+    let tick = 0;
+    const renderPixels = () => {
+      tick += 0.025;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const isDark = theme === 'dark';
+      const gridSpacing = 36;
+
+      // Draw interactive pixel matrix around mouse and subtle ambient grid dots
+      for (let gx = 0; gx < canvas.width; gx += gridSpacing) {
+        for (let gy = 0; gy < canvas.height; gy += gridSpacing) {
+          const dx = gx - mouseRef.current.x;
+          const dy = gy - mouseRef.current.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 170) {
+            const intensity = (1 - dist / 170) * (isDark ? 0.65 : 0.4);
+            ctx.fillStyle = isDark
+              ? `rgba(0, 255, 157, ${intensity.toFixed(3)})`
+              : `rgba(5, 150, 105, ${intensity.toFixed(3)})`;
+            const s = dist < 75 ? 5 : 3;
+            ctx.fillRect(gx - s / 2, gy - s / 2, s, s);
+          } else if ((gx + gy) % 72 === 0) {
+            ctx.fillStyle = isDark ? 'rgba(48, 54, 61, 0.35)' : 'rgba(148, 163, 184, 0.28)';
+            ctx.fillRect(gx, gy, 2, 2);
+          }
+        }
+      }
+
+      // Draw floating neon pixel blocks
+      pixelNodes.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        // Gentle repulsion/attraction to mouse
+        const dx = mouseRef.current.x - p.x;
+        const dy = mouseRef.current.y - p.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 140 && d > 5) {
+          p.x -= (dx / d) * 0.8;
+          p.y -= (dy / d) * 0.8;
+        }
+
+        const alpha = (Math.sin(tick + p.phase) * 0.35 + 0.55) * (isDark ? 0.85 : 0.55);
+        if (p.colorType === 'pink') {
+          ctx.fillStyle = `rgba(244, 63, 94, ${alpha})`;
+        } else if (p.colorType === 'cyan') {
+          ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`;
+        } else {
+          ctx.fillStyle = isDark ? `rgba(0, 255, 157, ${alpha})` : `rgba(16, 185, 129, ${alpha})`;
+        }
+        // Snap to 2px crisp pixel coordinates
+        const snapX = Math.round(p.x / 2) * 2;
+        const snapY = Math.round(p.y / 2) * 2;
+        ctx.fillRect(snapX, snapY, p.size, p.size);
+      });
+
+      animId = requestAnimationFrame(renderPixels);
+    };
+    renderPixels();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', handleMove);
+    };
+  }, [theme]);
+
+  // 2B. Three.js 3D Wireframe Polyhedron & Starfield
+  useEffect(() => {
+    if (typeof window === 'undefined' || !threeMountRef.current) return;
+    const container = threeMountRef.current;
+
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(65, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.z = 4.5;
+    const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 4.6;
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' });
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // 4,500 Interactive Constellation Nodes
-    const particleCount = 4500;
+    const particleCount = 1800;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
-
     for (let i = 0; i < particleCount * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 15;
-      positions[i + 1] = (Math.random() - 0.5) * 15;
-      positions[i + 2] = (Math.random() - 0.5) * 10;
+      positions[i] = (Math.random() - 0.5) * 14;
+      positions[i + 1] = (Math.random() - 0.5) * 14;
+      positions[i + 2] = (Math.random() - 0.5) * 9;
     }
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
+    const isDark = theme === 'dark';
     const material = new THREE.PointsMaterial({
-      size: 0.024,
+      size: 0.025,
+      color: isDark ? 0x00ff9d : 0x0f766e,
       transparent: true,
-      opacity: theme === 'dark' ? 0.8 : 0.45,
+      opacity: isDark ? 0.65 : 0.35,
       depthWrite: false,
     });
 
-    const particleSystem = new THREE.Points(geometry, material);
-    scene.add(particleSystem);
+    const points = new THREE.Points(geometry, material);
+    scene.add(points);
 
-    // Rotating 3D Icosahedron Core Wireframe
-    const icosaGeometry = new THREE.IcosahedronGeometry(2.3, 1);
-    const icosaWireframe = new THREE.WireframeGeometry(icosaGeometry);
-    const lineMaterial = new THREE.LineBasicMaterial({
-      color: theme === 'dark' ? 0x00ff9d : 0x059669,
+    const icosaGeo = new THREE.IcosahedronGeometry(2.2, 1);
+    const wireGeo = new THREE.WireframeGeometry(icosaGeo);
+    const lineMat = new THREE.LineBasicMaterial({
+      color: isDark ? 0x00ff9d : 0x059669,
       transparent: true,
-      opacity: theme === 'dark' ? 0.14 : 0.07,
+      opacity: isDark ? 0.13 : 0.07,
     });
-    const icosaLines = new THREE.LineSegments(icosaWireframe, lineMaterial);
-    scene.add(icosaLines);
+    const wireframe = new THREE.LineSegments(wireGeo, lineMat);
+    scene.add(wireframe);
 
-    threeRef.current = { scene, camera, renderer, particleSystem, material, icosaLines, lineMaterial };
-
-    // Fluid mouse parallax
-    const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
-    const handleMouseMove = (e) => {
-      mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
-      mouse.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-
-    let animationFrameId;
+    let frameId;
     const clock = new THREE.Clock();
-
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      frameId = requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+      const mx = mouseRef.current.normX;
+      const my = mouseRef.current.normY;
 
-      mouse.x += (mouse.targetX - mouse.x) * 0.035;
-      mouse.y += (mouse.targetY - mouse.y) * 0.035;
+      points.rotation.y = t * 0.035 + mx * 0.18;
+      points.rotation.x = t * 0.02 - my * 0.18;
 
-      particleSystem.rotation.y = elapsedTime * 0.045 + mouse.x * 0.22;
-      particleSystem.rotation.x = elapsedTime * 0.025 - mouse.y * 0.22;
-
-      icosaLines.rotation.y = -elapsedTime * 0.05 + mouse.x * 0.18;
-      icosaLines.rotation.x = elapsedTime * 0.035 + mouse.y * 0.18;
-
-      camera.position.x += (mouse.x * 0.35 - camera.position.x) * 0.03;
-      camera.position.y += (mouse.y * 0.35 - camera.position.y) * 0.03;
-      camera.lookAt(scene.position);
+      wireframe.rotation.y = -t * 0.045 + mx * 0.25;
+      wireframe.rotation.x = t * 0.03 + my * 0.25;
 
       renderer.render(scene, camera);
     };
     animate();
 
-    const handleResize = () => {
-      if (!container) return;
-      camera.aspect = container.clientWidth / container.clientHeight;
+    const onResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setSize(window.innerWidth, window.innerHeight);
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', onResize);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(frameId);
+      window.removeEventListener('resize', onResize);
       renderer.dispose();
       geometry.dispose();
       material.dispose();
-      icosaGeometry.dispose();
-      lineMaterial.dispose();
+      icosaGeo.dispose();
+      lineMat.dispose();
     };
-  }, []);
-
-  // Update dynamic colors on theme switch
-  useEffect(() => {
-    if (!threeRef.current.material) return;
-    const isDark = theme === 'dark';
-    const primaryNeon = isDark ? 0x00ff9d : 0x0f172a;
-    const wireColor = isDark ? 0x00ff9d : 0x0f766e;
-
-    threeRef.current.material.color.setHex(primaryNeon);
-    threeRef.current.material.opacity = isDark ? 0.8 : 0.45;
-    threeRef.current.material.blending = isDark ? THREE.AdditiveBlending : THREE.NormalBlending;
-
-    if (threeRef.current.lineMaterial) {
-      threeRef.current.lineMaterial.color.setHex(wireColor);
-      threeRef.current.lineMaterial.opacity = isDark ? 0.15 : 0.07;
-    }
   }, [theme]);
 
   return (
-    <div
-      ref={mountRef}
-      className="fixed inset-0 pointer-events-none -z-10 transition-opacity duration-700"
-      style={{ opacity: 0.95 }}
-    />
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <canvas ref={pixelCanvasRef} className="absolute inset-0 w-full h-full" />
+      <div ref={threeMountRef} className="absolute inset-0 w-full h-full" />
+    </div>
   );
 };
 
-// ==========================================
-// 3. ARCHIVAL TALKS DATA (ALL 14 TALKS)
-// ==========================================
+// =========================================================
+// 3. INTERACTIVE PIXEL ANIMAL COMPANION (Follows Mouse, Walks & Reacts)
+// =========================================================
+const MASCOT_SPECIES = {
+  home: {
+    name: 'Schrödinger’s Pixel Cat',
+    role: 'Quantum Guardian',
+    color: '#00ff9d',
+    accent: '#f43f5e',
+    ears: 'cat',
+    quips: [
+      'Meow! Both |Alive⟩ & |Curious⟩!',
+      'Click any talk to inspect slides!',
+      'Try moving your cursor around me!',
+      '>>> ob.ignite_curiosity() == True',
+    ],
+  },
+  about: {
+    name: 'Euler’s Night Owl',
+    role: 'Keeper of Theorems',
+    color: '#38bdf8',
+    accent: '#eab308',
+    ears: 'owl',
+    quips: [
+      'Hoot! Breaking academic silos since 2025!',
+      'e^(iπ) + 1 = 0 ... pure elegance!',
+      'Meet our founding coordinators!',
+    ],
+  },
+  archive: {
+    name: 'Maxwell’s Cyber Fox',
+    role: 'Entropy Sorter',
+    color: '#f43f5e',
+    accent: '#00ff9d',
+    ears: 'fox',
+    quips: [
+      'Sorting low-entropy knowledge!',
+      '14 peer-reviewed student talks archived!',
+      'Filter by Physics, Math, CS, or Bio!',
+    ],
+  },
+  gallery: {
+    name: 'Fibonacci Bunny',
+    role: 'Visual Archivist',
+    color: '#a855f7',
+    accent: '#00ff9d',
+    ears: 'bunny',
+    quips: [
+      '1, 1, 2, 3, 5, 8... Hop through L-8 photos!',
+      'Click any blackboard photo to zoom in!',
+      'Real chalk, real derivations!',
+    ],
+  },
+  events: {
+    name: 'Lorenz’s Chaos Frog',
+    role: 'Strange Attractor',
+    color: '#10b981',
+    accent: '#fde047',
+    ears: 'frog',
+    quips: [
+      'Ribbit! Small hops → huge breakthroughs!',
+      'See you in Room L-8, LHC at 18:00 IST!',
+      'Add our next talk to your Google Calendar!',
+    ],
+  },
+  submit: {
+    name: 'Darwin’s Carrier Pigeon',
+    role: 'Proposal Dispatcher',
+    color: '#eab308',
+    accent: '#00ff9d',
+    ears: 'bird',
+    quips: [
+      'Coo! Ready to fly your abstract to openboardinitiative@gmail.com!',
+      'Every submission gets a unique #OB-2026 serial tag!',
+      'Share your passion project with IISERB!',
+    ],
+  },
+  contact: {
+    name: 'Turing’s Red Panda',
+    role: 'Protocol Operator',
+    color: '#f97316',
+    accent: '#00ff9d',
+    ears: 'fox',
+    quips: [
+      'Ping us anytime at openboardinitiative@gmail.com!',
+      'State machine ready for your message!',
+      'Room L-8, Lecture Hall Complex!',
+    ],
+  },
+};
+
+const PixelCompanion = ({ activeTab, onPetSound }) => {
+  const species = MASCOT_SPECIES[activeTab] || MASCOT_SPECIES.home;
+  const [pos, setPos] = useState({ x: 140, y: 180 });
+  const targetRef = useRef({ x: 140, y: 180 });
+  const posRef = useRef({ x: 140, y: 180 });
+  const [facingLeft, setFacingLeft] = useState(false);
+  const [isWalking, setIsWalking] = useState(false);
+  const [stepFrame, setStepFrame] = useState(0);
+  const [isBlinking, setIsBlinking] = useState(false);
+  const [speechIndex, setSpeechIndex] = useState(0);
+  const [showBubble, setShowBubble] = useState(true);
+  const [hearts, setHearts] = useState([]);
+
+  // Track mouse movement so the pixel animal gently walks/floats near the cursor
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      // Offset slightly from cursor so it never blocks clicks
+      const offsetX = e.clientX > window.innerWidth - 160 ? e.clientX - 95 : e.clientX + 55;
+      const offsetY = Math.max(85, Math.min(window.innerHeight - 95, e.clientY + 35));
+      targetRef.current = { x: offsetX, y: offsetY };
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Smooth physics loop for walking & floating along the page
+  useEffect(() => {
+    let animId;
+    let frameCounter = 0;
+
+    const updatePhysics = () => {
+      frameCounter++;
+      const dx = targetRef.current.x - posRef.current.x;
+      const dy = targetRef.current.y - posRef.current.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist > 8) {
+        posRef.current.x += dx * 0.045;
+        posRef.current.y += dy * 0.045;
+        if (Math.abs(dx) > 2) {
+          setFacingLeft(dx < 0);
+        }
+        setIsWalking(true);
+        if (frameCounter % 8 === 0) {
+          setStepFrame((s) => (s + 1) % 2);
+        }
+      } else {
+        setIsWalking(false);
+      }
+
+      setPos({
+        x: Math.round(posRef.current.x),
+        y: Math.round(posRef.current.y + Math.sin(frameCounter * 0.07) * 4),
+      });
+
+      animId = requestAnimationFrame(updatePhysics);
+    };
+
+    animId = requestAnimationFrame(updatePhysics);
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  // Periodic blinking & quip rotation
+  useEffect(() => {
+    const blinkInterval = setInterval(() => {
+      setIsBlinking(true);
+      setTimeout(() => setIsBlinking(false), 180);
+    }, 3400);
+
+    return () => clearInterval(blinkInterval);
+  }, []);
+
+  // Show new quip when changing page tabs
+  useEffect(() => {
+    setSpeechIndex(0);
+    setShowBubble(true);
+    const timer = setTimeout(() => setShowBubble(false), 6500);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
+
+  const handlePetMascot = () => {
+    if (onPetSound) onPetSound();
+    setSpeechIndex((prev) => (prev + 1) % species.quips.length);
+    setShowBubble(true);
+    const id = Date.now();
+    setHearts((prev) => [...prev, id]);
+    setTimeout(() => {
+      setHearts((prev) => prev.filter((h) => h !== id));
+    }, 1000);
+  };
+
+  return (
+    <div
+      style={{
+        transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,
+      }}
+      className="fixed top-0 left-0 z-30 pointer-events-none select-none transition-transform duration-75 ease-out hidden sm:block"
+    >
+      {/* Floating Speech Bubble */}
+      {showBubble && (
+        <div
+          className="mb-2 -ml-16 max-w-[230px] px-3 py-1.5 rounded-xl bg-[#0d1117]/95 border border-[#00ff9d]/50 text-[10px] font-mono text-[#e6edf3] shadow-[0_0_20px_rgba(0,255,157,0.2)] animate-bounce"
+          style={{ animationDuration: '2.8s' }}
+        >
+          <div className="flex items-center justify-between gap-2 text-[9px] text-[#00ff9d] font-bold mb-0.5">
+            <span>❖ {species.name}</span>
+          </div>
+          <p className="leading-snug text-zinc-200">{species.quips[speechIndex]}</p>
+        </div>
+      )}
+
+      {/* Floating Pixel Hearts when clicked */}
+      {hearts.map((h) => (
+        <div
+          key={h}
+          className="absolute -top-6 left-4 text-xs font-mono text-[#f43f5e] font-bold animate-ping"
+        >
+          ♥ +1
+        </div>
+      ))}
+
+      {/* Clickable Pixel Animal Avatar SVG */}
+      <div
+        onClick={handlePetMascot}
+        title={`Click to pet ${species.name}!`}
+        className="pointer-events-auto cursor-pointer group relative inline-block"
+      >
+        {/* Neon Aura Under Pet */}
+        <div
+          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-10 h-2.5 rounded-full blur-sm opacity-60 group-hover:opacity-100 transition-opacity"
+          style={{ backgroundColor: species.color }}
+        />
+
+        <svg
+          width="54"
+          height="54"
+          viewBox="0 0 16 16"
+          shapeRendering="crispEdges"
+          style={{
+            transform: `${facingLeft ? 'scaleX(-1)' : 'scaleX(1)'} ${
+              isWalking ? (stepFrame === 0 ? 'rotate(-5deg) translateY(-2px)' : 'rotate(5deg)') : ''
+            }`,
+            transition: 'transform 0.12s ease',
+          }}
+          className="drop-shadow-[0_0_8px_rgba(0,255,157,0.45)] group-hover:scale-110"
+        >
+          {/* Ears / Head Crest by Species */}
+          {species.ears === 'cat' && (
+            <>
+              <rect x="3" y="2" width="2" height="2" fill={species.color} />
+              <rect x="11" y="2" width="2" height="2" fill={species.color} />
+              <rect x="4" y="3" width="1" height="1" fill={species.accent} />
+              <rect x="11" y="3" width="1" height="1" fill={species.accent} />
+            </>
+          )}
+          {species.ears === 'bunny' && (
+            <>
+              <rect x="4" y="0" width="2" height="4" fill={species.color} />
+              <rect x="10" y="0" width="2" height="4" fill={species.color} />
+              <rect x="5" y="1" width="1" height="2" fill={species.accent} />
+              <rect x="10" y="1" width="1" height="2" fill={species.accent} />
+            </>
+          )}
+          {species.ears === 'fox' && (
+            <>
+              <rect x="2" y="1" width="3" height="3" fill={species.color} />
+              <rect x="11" y="1" width="3" height="3" fill={species.color} />
+              <rect x="3" y="2" width="1" height="2" fill="#ffffff" />
+              <rect x="12" y="2" width="1" height="2" fill="#ffffff" />
+            </>
+          )}
+          {species.ears === 'owl' && (
+            <>
+              <rect x="2" y="2" width="2" height="2" fill={species.accent} />
+              <rect x="12" y="2" width="2" height="2" fill={species.accent} />
+            </>
+          )}
+          {species.ears === 'frog' && (
+            <>
+              <rect x="3" y="2" width="3" height="2" fill={species.color} />
+              <rect x="10" y="2" width="3" height="2" fill={species.color} />
+            </>
+          )}
+          {species.ears === 'bird' && (
+            <>
+              <rect x="7" y="1" width="2" height="3" fill={species.accent} />
+              <rect x="8" y="0" width="2" height="2" fill={species.color} />
+            </>
+          )}
+
+          {/* Main Pixel Head & Body */}
+          <rect x="3" y="4" width="10" height="8" fill="#0d1117" />
+          <rect x="2" y="5" width="1" height="6" fill={species.color} />
+          <rect x="13" y="5" width="1" height="6" fill={species.color} />
+          <rect x="3" y="3" width="10" height="1" fill={species.color} />
+          <rect x="3" y="12" width="10" height="1" fill={species.color} />
+
+          {/* Glowing Pixel Eyes */}
+          {isBlinking ? (
+            <>
+              <rect x="5" y="7" width="2" height="1" fill={species.color} />
+              <rect x="9" y="7" width="2" height="1" fill={species.color} />
+            </>
+          ) : (
+            <>
+              <rect x="5" y="6" width="2" height="2" fill={species.color} />
+              <rect x="9" y="6" width="2" height="2" fill={species.color} />
+              <rect x="6" y="6" width="1" height="1" fill="#ffffff" />
+              <rect x="10" y="6" width="1" height="1" fill="#ffffff" />
+            </>
+          )}
+
+          {/* Cute Pixel Cheeks & Nose/Beak */}
+          <rect x="4" y="8" width="1" height="1" fill={species.accent} />
+          <rect x="11" y="8" width="1" height="1" fill={species.accent} />
+          <rect x="7" y="8" width="2" height="1" fill="#ffffff" />
+          <rect x="6" y="9" width="4" height="1" fill={species.color} />
+
+          {/* Animated Walking Pixel Feet */}
+          <rect
+            x={isWalking && stepFrame === 0 ? '3' : '4'}
+            y="13"
+            width="2"
+            height="2"
+            fill={species.color}
+          />
+          <rect
+            x={isWalking && stepFrame === 1 ? '11' : '10'}
+            y="13"
+            width="2"
+            height="2"
+            fill={species.color}
+          />
+
+          {/* Wagging Pixel Tail */}
+          <rect
+            x="1"
+            y={stepFrame === 0 ? '9' : '8'}
+            width="1"
+            height="2"
+            fill={species.accent}
+          />
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+// =========================================================
+// 4. ARCHIVAL TALKS DATA (ALL 14 TALKS)
+// =========================================================
 const TALKS_DATA = [
   {
     id: 'talk-1',
@@ -433,9 +851,9 @@ const TALKS_DATA = [
   },
 ];
 
-// ==========================================
-// 4. TEAM & SPEAKERS DIRECTORY
-// ==========================================
+// =========================================================
+// 5. TEAM & SPEAKERS DIRECTORY
+// =========================================================
 const TEAM_MEMBERS = [
   {
     name: 'Samriddha Ganguly',
@@ -539,9 +957,9 @@ const TEAM_MEMBERS = [
   },
 ];
 
-// ==========================================
-// 5. GALLERY DATA (ALL MEDIA FROM PUBLIC/)
-// ==========================================
+// =========================================================
+// 6. GALLERY DATA (ALL MEDIA FROM PUBLIC/)
+// =========================================================
 const GALLERY_ITEMS = [
   { src: '/photo1.jpeg', title: 'OpenBoard In Session', caption: 'Lively whiteboard debate on geometric topology', category: 'Talks' },
   { src: '/photo2.jpeg', title: 'Interactive Audience', caption: 'Cross-department students interrogating models', category: 'Audience' },
@@ -575,9 +993,9 @@ const GALLERY_ITEMS = [
   { src: '/vv3.jpeg', title: 'AI & Math Discussion', caption: 'Debating machine intuition with mathematicians', category: 'Audience' },
 ];
 
-// ==========================================
-// 6. MAIN COMPONENT WITH PYTHON CODER AESTHETIC
-// ==========================================
+// =========================================================
+// 7. MAIN APPLICATION COMPONENT
+// =========================================================
 export default function App() {
   // Theme state
   const [theme, setTheme] = useState(() => {
@@ -621,32 +1039,20 @@ export default function App() {
   // Modals state
   const [activeModalTalk, setActiveModalTalk] = useState(null);
   const [activeLightboxImg, setActiveLightboxImg] = useState(null);
-  const [showSubmissionsLog, setShowSubmissionsLog] = useState(false);
 
-  // Proposal Submission Form state & local log
+  // Proposal Submission Form state
   const [formState, setFormState] = useState({
     name: '',
     email: '',
     title: '',
     department: 'Physics',
     abstract: '',
+    prerequisites: 'Basic undergraduate calculus & linear algebra',
     preferredDate: '',
     tags: 'Interdisciplinary, Theory',
   });
   const [formStatus, setFormStatus] = useState('idle'); // 'idle' | 'submitting' | 'success'
-
-  // Submissions Log stored in localStorage so no submissions are ever lost
-  const [savedSubmissions, setSavedSubmissions] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const local = localStorage.getItem('openboard_submissions');
-        return local ? JSON.parse(local) : [];
-      } catch (e) {
-        return [];
-      }
-    }
-    return [];
-  });
+  const [lastSerialNumber, setLastSerialNumber] = useState('');
 
   // Mobile menu open state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -666,7 +1072,9 @@ export default function App() {
     const next = !isMuted;
     setIsMuted(next);
     localStorage.setItem('openboard_muted', String(next));
-    if (!next) playClick();
+    if (!next) {
+      setTimeout(() => playClick(), 20);
+    }
   };
 
   const toggleTheme = () => {
@@ -710,7 +1118,21 @@ export default function App() {
     });
   }, [searchQuery, selectedCategory, showOnlyBookmarked, bookmarkedIds]);
 
-  // Robust Submission Handler: Sends to Webhook AND saves locally with fallback
+  // Generate Sequential + Unique Serial Number (#OB-2026-XXXX)
+  const generateSerialNumber = () => {
+    let seq = 101;
+    try {
+      const current = parseInt(localStorage.getItem('openboard_seq_counter') || '100', 10);
+      seq = current + 1;
+      localStorage.setItem('openboard_seq_counter', String(seq));
+    } catch (e) {}
+    const now = new Date();
+    const mmdd = `${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    const rand = Math.floor(100 + Math.random() * 900);
+    return `OB-${now.getFullYear()}-${mmdd}-${seq}-${rand}`;
+  };
+
+  // Formatted Proposal Submission Handler -> Sends directly to openboardinitiative@gmail.com
   const handleSubmitProposal = async (e) => {
     e.preventDefault();
     if (!formState.name || !formState.email || !formState.title || !formState.abstract) {
@@ -721,36 +1143,44 @@ export default function App() {
     setFormStatus('submitting');
     playClick();
 
-    const newRecord = {
-      ...formState,
-      timestamp: new Date().toISOString(),
-      id: `prop-${Date.now()}`,
-    };
+    const serialNumber = generateSerialNumber();
+    setLastSerialNumber(serialNumber);
+    const submittedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-    // 1. Immediately store in localStorage so coordinators NEVER lose a submission
-    const updatedSubmissions = [newRecord, ...savedSubmissions];
-    setSavedSubmissions(updatedSubmissions);
+    // Send cleanly structured email to openboardinitiative@gmail.com via FormSubmit AJAX API
     try {
-      localStorage.setItem('openboard_submissions', JSON.stringify(updatedSubmissions));
-    } catch (err) {}
-
-    // 2. Dispatch to Google Apps Script webhook
-    try {
-      await fetch(
-        'https://script.google.com/macros/s/AKfycbwYyY7ZqXz5ZGgg8Nq6pQ3t2M7k8wP/exec',
-        {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newRecord),
-        }
-      ).catch(() => null);
-    } catch (err) {}
+      await fetch('https://formsubmit.co/ajax/openboardinitiative@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          _subject: `[Submission #${serialNumber}] OpenBoard Proposal: ${formState.title}`,
+          _replyto: formState.email,
+          _template: 'table',
+          _captcha: 'false',
+          Tag: 'Submission',
+          Serial_Number: `#${serialNumber}`,
+          Speaker_Name: formState.name,
+          Speaker_Email: formState.email,
+          Academic_Discipline: formState.department,
+          Talk_Title: formState.title,
+          Abstract_and_Pedagogical_Hook: formState.abstract,
+          Prerequisites: formState.prerequisites || 'None (Accessible to all)',
+          Preferred_Session_Date: formState.preferredDate || 'Flexible',
+          Topic_Tags: formState.tags,
+          Timestamp_IST: submittedAt,
+        }),
+      });
+    } catch (err) {
+      console.warn('FormSubmit AJAX dispatch warning:', err);
+    }
 
     setTimeout(() => {
       setFormStatus('success');
       playSuccess();
-    }, 600);
+    }, 500);
   };
 
   const isDark = theme === 'dark';
@@ -759,9 +1189,17 @@ export default function App() {
     <div
       className={cx(
         'min-h-screen relative font-mono transition-colors duration-500 selection:bg-[#00ff9d]/30 selection:text-[#00ff9d]',
-        isDark ? 'bg-[#0d1117] text-[#e6edf3]' : 'bg-[#f6f8fa] text-[#0f172a]'
+        isDark ? 'text-[#e6edf3]' : 'text-[#0f172a]'
       )}
     >
+      {/* Fixed Bottom-Most Solid Backdrop so Background Animation at z-0 is ALWAYS Visible */}
+      <div
+        className={cx(
+          'fixed inset-0 -z-20 transition-colors duration-500',
+          isDark ? 'bg-[#080c11]' : 'bg-[#f4f7fa]'
+        )}
+      />
+
       {/* Self-contained CSS for Python syntax highlighting, terminal cursors & glowing borders */}
       <style>{`
         @keyframes blinkCursor {
@@ -778,33 +1216,25 @@ export default function App() {
         .neon-glow-box {
           animation: neonPulse 3s ease-in-out infinite;
         }
-        .shimmer-text {
-          background: linear-gradient(90deg, #00ff9d 0%, #38bdf8 50%, #f43f5e 100%);
-          background-size: 200% auto;
-          color: transparent;
-          -webkit-background-clip: text;
-          background-clip: text;
-          animation: shimmer 4s linear infinite;
-        }
-        @keyframes shimmer {
-          to { background-position: 200% center; }
-        }
       `}</style>
 
-      {/* 3D WebGL Background Canvas */}
+      {/* Interactive Pixel Matrix + 3D Constellation Background (z-0, always visible) */}
       <BackgroundAnimation theme={theme} />
 
-      {/* Neon Atmospheric Background Glows */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+      {/* Interactive Roaming Pixel Animal Companion (Unique mascot per tab, walks & follows mouse) */}
+      <PixelCompanion activeTab={activeTab} onPetSound={playBookmark} />
+
+      {/* Neon Atmospheric Glows */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div
           className={cx(
-            'absolute -top-32 left-1/3 w-[650px] h-[400px] rounded-full blur-[160px] opacity-25 transition-all duration-1000',
-            isDark ? 'bg-[#00ff9d]/20' : 'bg-emerald-300/30'
+            'absolute -top-32 left-1/3 w-[600px] h-[380px] rounded-full blur-[160px] opacity-20 transition-all duration-1000',
+            isDark ? 'bg-[#00ff9d]/25' : 'bg-emerald-300/30'
           )}
         />
         <div
           className={cx(
-            'absolute top-1/2 -right-40 w-[550px] h-[450px] rounded-full blur-[180px] opacity-20',
+            'absolute top-1/2 -right-40 w-[500px] h-[420px] rounded-full blur-[180px] opacity-20',
             isDark ? 'bg-[#b33973]/25' : 'bg-pink-300/20'
           )}
         />
@@ -818,8 +1248,8 @@ export default function App() {
           className={cx(
             'max-w-7xl mx-auto rounded-2xl px-4 sm:px-6 py-2.5 flex items-center justify-between border backdrop-blur-xl shadow-2xl transition-all duration-300',
             isDark
-              ? 'bg-[#161b22]/90 border-[#30363d] shadow-[0_4px_25px_rgba(0,0,0,0.5)]'
-              : 'bg-white/90 border-[#d0d7de] shadow-[0_4px_20px_rgba(0,0,0,0.08)]'
+              ? 'bg-[#121720]/85 border-[#30363d] shadow-[0_4px_25px_rgba(0,0,0,0.5)]'
+              : 'bg-white/85 border-[#d0d7de] shadow-[0_4px_20px_rgba(0,0,0,0.08)]'
           )}
         >
           {/* Brand Logo with Python Identifier Styling */}
@@ -827,7 +1257,6 @@ export default function App() {
             onClick={() => handleNavClick('home')}
             className="flex items-center gap-2 sm:gap-3 cursor-pointer group"
           >
-            {/* Terminal Icon Box */}
             <div className="w-8 h-8 rounded-lg bg-[#0d1117] border border-[#30363d] flex items-center justify-center p-1 group-hover:border-[#00ff9d] transition-colors shadow-inner">
               <span className="text-[#00ff9d] text-xs font-bold font-mono">&gt;_</span>
             </div>
@@ -877,37 +1306,36 @@ export default function App() {
             })}
           </nav>
 
-          {/* Controls: Audio Synth Mute + Theme Switch + Submissions Log */}
+          {/* Controls: Audio Synth Mute + Theme Switch */}
           <div className="flex items-center gap-2">
-            {/* Coordinators Submissions Drawer Button */}
-            {savedSubmissions.length > 0 && (
-              <button
-                onClick={() => {
-                  playClick();
-                  setShowSubmissionsLog(true);
-                }}
-                title="View Saved Proposals Log"
-                className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-[#b33973]/20 border border-[#f43f5e]/40 text-[#f43f5e] hover:bg-[#b33973]/30 transition-all"
-              >
-                <span>📬 Proposals</span>
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-[#f43f5e] text-black font-bold">
-                  {savedSubmissions.length}
-                </span>
-              </button>
-            )}
+            {/* Active Mascot Indicator Badge */}
+            <div
+              onClick={playBookmark}
+              title="Your page companion! Move mouse or click the pixel pet floating on screen."
+              className={cx(
+                'hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] border cursor-pointer transition-all',
+                isDark
+                  ? 'bg-[#0d1117]/80 border-[#30363d] text-[#00ff9d] hover:border-[#00ff9d]'
+                  : 'bg-zinc-100 border-zinc-300 text-emerald-700'
+              )}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00ff9d] animate-ping" />
+              <span>{(MASCOT_SPECIES[activeTab] || MASCOT_SPECIES.home).name}</span>
+            </div>
 
-            {/* Audio Synth Toggle */}
+            {/* Web Audio Synth Toggle */}
             <button
               onClick={toggleMute}
-              title={isMuted ? 'Unmute Synthesizer Audio' : 'Mute Synthesizer Audio'}
+              title={isMuted ? 'Unmute Audio Synthesizer' : 'Mute Audio Synthesizer'}
               className={cx(
-                'p-2 rounded-lg text-xs border transition-all flex items-center gap-1 font-mono',
+                'px-2.5 py-1.5 rounded-lg text-xs border transition-all flex items-center gap-1 font-mono',
                 isDark
-                  ? 'bg-[#21262d] border-[#30363d] text-zinc-300 hover:border-[#00ff9d] hover:text-[#00ff9d]'
+                  ? 'bg-[#21262d] border-[#30363d] text-zinc-200 hover:border-[#00ff9d] hover:text-[#00ff9d]'
                   : 'bg-zinc-100 border-zinc-300 text-zinc-700 hover:border-emerald-500'
               )}
             >
-              {isMuted ? '🔇' : '🔊'}
+              <span>{isMuted ? '🔇' : '🔊'}</span>
+              <span className="hidden sm:inline text-[10px] font-bold">{isMuted ? 'MUTED' : 'SFX ON'}</span>
             </button>
 
             {/* Light / Dark Mode Toggle */}
@@ -926,7 +1354,10 @@ export default function App() {
 
             {/* Mobile Drawer Button */}
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={() => {
+                playClick();
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+              }}
               className="lg:hidden p-2 rounded-lg border border-[#30363d] text-zinc-300"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -970,29 +1401,14 @@ export default function App() {
                 {tab.label}
               </button>
             ))}
-
-            {savedSubmissions.length > 0 && (
-              <button
-                onClick={() => {
-                  setShowSubmissionsLog(true);
-                  setIsMobileMenuOpen(false);
-                }}
-                className="mt-2 px-3 py-2 rounded-lg text-left tracking-wider text-[#f43f5e] bg-[#f43f5e]/10 border border-[#f43f5e]/30 flex items-center justify-between"
-              >
-                <span>📬 VIEW SUBMITTED PROPOSALS</span>
-                <span className="px-2 py-0.5 rounded-full bg-[#f43f5e] text-black font-bold">
-                  {savedSubmissions.length}
-                </span>
-              </button>
-            )}
           </div>
         )}
       </header>
 
       {/* ========================================================= */}
-      {/* MAIN CONTAINER                                            */}
+      {/* MAIN CONTENT CONTAINER (z-10 above background canvas)     */}
       {/* ========================================================= */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {/* ----------------------------------------------------- */}
         {/* VIEW 0: HOME — PYTHON REPL & MISSION TERMINAL         */}
         {/* ----------------------------------------------------- */}
@@ -1004,17 +1420,17 @@ export default function App() {
               <div className="lg:col-span-7">
                 <div
                   className={cx(
-                    'rounded-2xl border overflow-hidden shadow-2xl transition-all duration-300',
+                    'rounded-2xl border overflow-hidden shadow-2xl backdrop-blur-xl transition-all duration-300',
                     isDark
-                      ? 'bg-[#0d1117] border-[#30363d] shadow-[0_0_35px_rgba(0,255,157,0.08)]'
-                      : 'bg-white border-[#d0d7de] shadow-xl'
+                      ? 'bg-[#0d1117]/85 border-[#30363d] shadow-[0_0_35px_rgba(0,255,157,0.08)]'
+                      : 'bg-white/90 border-[#d0d7de] shadow-xl'
                   )}
                 >
                   {/* macOS / Linux Terminal Window Bar */}
                   <div
                     className={cx(
                       'px-4 py-3 flex items-center justify-between border-b select-none',
-                      isDark ? 'bg-[#161b22] border-[#30363d]' : 'bg-[#f6f8fa] border-[#d0d7de]'
+                      isDark ? 'bg-[#161b22]/90 border-[#30363d]' : 'bg-[#f6f8fa] border-[#d0d7de]'
                     )}
                   >
                     <div className="flex items-center gap-2">
@@ -1158,9 +1574,10 @@ export default function App() {
               ].map((m, idx) => (
                 <div
                   key={idx}
+                  onClick={playClick}
                   className={cx(
-                    'p-5 rounded-2xl border backdrop-blur-md transition-all hover:border-[#00ff9d]/50 group',
-                    isDark ? 'bg-[#161b22]/70 border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                    'p-5 rounded-2xl border backdrop-blur-md transition-all hover:border-[#00ff9d]/50 group cursor-pointer',
+                    isDark ? 'bg-[#161b22]/75 border-[#30363d]' : 'bg-white/85 border-[#d0d7de]'
                   )}
                 >
                   <div className="text-3xl font-extrabold text-[#00ff9d] font-mono group-hover:scale-105 transition-transform">
@@ -1176,7 +1593,7 @@ export default function App() {
             <div
               className={cx(
                 'rounded-3xl border backdrop-blur-xl p-6 sm:p-8 flex flex-col md:flex-row gap-8 items-center transition-all hover:border-[#00ff9d]/40 shadow-2xl relative overflow-hidden',
-                isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white/90 border-[#d0d7de]'
               )}
             >
               <div className="relative w-full md:w-80 h-64 md:h-80 rounded-2xl overflow-hidden flex-shrink-0 border border-[#00ff9d]/40 group shadow-lg">
@@ -1237,12 +1654,16 @@ export default function App() {
                     href="/Everything__Entangled__All_At_Once.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={playClick}
                     className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[#00ff9d] text-black hover:bg-[#34d399] transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,255,157,0.3)]"
                   >
                     <span>📄 DOWNLOAD SLIDES (PDF)</span>
                   </a>
                   <button
-                    onClick={() => setActiveModalTalk(TALKS_DATA[8])}
+                    onClick={() => {
+                      playClick();
+                      setActiveModalTalk(TALKS_DATA[8]);
+                    }}
                     className="px-4 py-2 rounded-xl text-xs font-mono border border-[#30363d] hover:border-[#00ff9d] hover:text-[#00ff9d] transition-all"
                   >
                     VIEW NOTES & ABSTRACT
@@ -1280,9 +1701,10 @@ export default function App() {
                 ].map((pillar, i) => (
                   <div
                     key={i}
+                    onClick={playClick}
                     className={cx(
-                      'p-6 rounded-2xl border backdrop-blur-md transition-all hover:-translate-y-1 hover:border-[#00ff9d]/50 shadow-lg',
-                      isDark ? 'bg-[#161b22]/70 border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                      'p-6 rounded-2xl border backdrop-blur-md transition-all hover:-translate-y-1 hover:border-[#00ff9d]/50 shadow-lg cursor-pointer',
+                      isDark ? 'bg-[#161b22]/75 border-[#30363d]' : 'bg-white/85 border-[#d0d7de]'
                     )}
                   >
                     <div className="text-xs font-mono text-[#f43f5e] font-bold mb-2">{pillar.step}</div>
@@ -1332,7 +1754,7 @@ export default function App() {
               <div
                 className={cx(
                   'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl relative overflow-hidden transition-all hover:border-[#00ff9d]/50 shadow-xl',
-                  isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                  isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white/90 border-[#d0d7de]'
                 )}
               >
                 <div className="text-xs font-mono text-[#00ff9d] font-bold mb-2">&gt; def our_mission():</div>
@@ -1352,7 +1774,7 @@ export default function App() {
               <div
                 className={cx(
                   'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl relative overflow-hidden transition-all hover:border-[#f43f5e]/50 shadow-xl',
-                  isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                  isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white/90 border-[#d0d7de]'
                 )}
               >
                 <div className="text-xs font-mono text-[#f43f5e] font-bold mb-2">&gt; def the_vision():</div>
@@ -1383,7 +1805,7 @@ export default function App() {
                     key={idx}
                     className={cx(
                       'p-6 rounded-2xl border backdrop-blur-xl flex flex-col sm:flex-row items-center sm:items-start gap-5 transition-all hover:border-[#00ff9d]/50 hover:shadow-xl group',
-                      isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                      isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white/90 border-[#d0d7de]'
                     )}
                   >
                     <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 border-2 border-[#00ff9d]/40 shadow-md">
@@ -1434,9 +1856,10 @@ export default function App() {
                 {TEAM_MEMBERS.filter((m) => !m.isCoordinator).map((speaker, idx) => (
                   <div
                     key={idx}
+                    onClick={playClick}
                     className={cx(
-                      'p-4 rounded-xl border backdrop-blur-md flex flex-col items-center text-center transition-all hover:border-[#00ff9d]/40',
-                      isDark ? 'bg-[#161b22]/60 border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                      'p-4 rounded-xl border backdrop-blur-md flex flex-col items-center text-center transition-all hover:border-[#00ff9d]/40 cursor-pointer',
+                      isDark ? 'bg-[#161b22]/65 border-[#30363d]' : 'bg-white/85 border-[#d0d7de]'
                     )}
                   >
                     <div className="w-14 h-14 rounded-full overflow-hidden mb-2.5 border border-[#00ff9d]/40 shadow-sm">
@@ -1505,14 +1928,17 @@ export default function App() {
                 className={cx(
                   'w-full px-5 py-3 pl-11 rounded-xl text-xs sm:text-sm font-mono border outline-none transition-all',
                   isDark
-                    ? 'bg-[#161b22] border-[#30363d] text-zinc-100 placeholder-zinc-500 focus:border-[#00ff9d] focus:shadow-[0_0_15px_rgba(0,255,157,0.2)]'
+                    ? 'bg-[#161b22]/90 border-[#30363d] text-zinc-100 placeholder-zinc-500 focus:border-[#00ff9d] focus:shadow-[0_0_15px_rgba(0,255,157,0.2)]'
                     : 'bg-white border-[#d0d7de] text-zinc-900 placeholder-zinc-400 focus:border-emerald-500'
                 )}
               />
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-mono text-xs">&gt;</span>
               {searchQuery && (
                 <button
-                  onClick={() => setSearchQuery('')}
+                  onClick={() => {
+                    playClick();
+                    setSearchQuery('');
+                  }}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-mono text-zinc-400 hover:text-white"
                 >
                   CLEAR
@@ -1536,7 +1962,7 @@ export default function App() {
                       isSelected
                         ? 'bg-[#00ff9d] text-black font-bold shadow-[0_0_12px_rgba(0,255,157,0.3)]'
                         : isDark
-                        ? 'bg-[#161b22] border border-[#30363d] text-zinc-400 hover:text-zinc-200'
+                        ? 'bg-[#161b22]/90 border border-[#30363d] text-zinc-400 hover:text-zinc-200'
                         : 'bg-white border border-[#d0d7de] text-zinc-600'
                     )}
                   >
@@ -1560,8 +1986,8 @@ export default function App() {
                     className={cx(
                       'group rounded-2xl border backdrop-blur-xl p-5 flex flex-col justify-between transition-all duration-300 cursor-pointer hover:-translate-y-1 relative overflow-hidden',
                       isDark
-                        ? 'bg-[#161b22]/90 border-[#30363d] hover:border-[#00ff9d]/50 hover:shadow-[0_0_25px_rgba(0,255,157,0.15)]'
-                        : 'bg-white border-[#d0d7de] hover:border-emerald-500 hover:shadow-xl'
+                        ? 'bg-[#161b22]/85 border-[#30363d] hover:border-[#00ff9d]/50 hover:shadow-[0_0_25px_rgba(0,255,157,0.15)]'
+                        : 'bg-white/90 border-[#d0d7de] hover:border-emerald-500 hover:shadow-xl'
                     )}
                   >
                     {/* Poster */}
@@ -1628,7 +2054,10 @@ export default function App() {
                               href={talk.slidesUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                playClick();
+                              }}
                               className="px-2.5 py-1 rounded text-[11px] font-mono font-bold bg-[#00ff9d]/20 text-[#00ff9d] border border-[#00ff9d]/40 hover:bg-[#00ff9d] hover:text-black transition-all"
                             >
                               SLIDES
@@ -1670,7 +2099,7 @@ export default function App() {
                   }}
                   className={cx(
                     'group relative rounded-xl overflow-hidden border backdrop-blur-md cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:border-[#00ff9d]/50',
-                    isDark ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                    isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white border-[#d0d7de]'
                   )}
                 >
                   <div className="w-full h-52 bg-[#0d1117] overflow-hidden">
@@ -1736,7 +2165,7 @@ export default function App() {
                   key={evt.id}
                   className={cx(
                     'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl flex flex-col justify-between transition-all hover:border-[#00ff9d]/50 shadow-xl',
-                    isDark ? 'bg-[#161b22]/80 border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                    isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white/90 border-[#d0d7de]'
                   )}
                 >
                   <div className="space-y-3">
@@ -1796,7 +2225,7 @@ export default function App() {
         )}
 
         {/* ----------------------------------------------------- */}
-        {/* VIEW 5: PROPOSE — SUBMISSION FORM WITH AUDIT & FIX    */}
+        {/* VIEW 5: PROPOSE — DIRECT EMAIL TO openboardinitiative */}
         {/* ----------------------------------------------------- */}
         {activeTab === 'submit' && (
           <div className="max-w-2xl mx-auto space-y-8">
@@ -1806,7 +2235,8 @@ export default function App() {
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Propose Your Talk</h2>
               <p className={cx('text-xs sm:text-sm mt-1', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
-                Submissions are sent directly to the coordinator webhook and safely archived locally.
+                Every proposal is assigned a unique <span className="text-[#00ff9d]">#OB-2026</span> serial number and
+                dispatched directly to <span className="text-[#00ff9d]">openboardinitiative@gmail.com</span>.
               </p>
             </div>
 
@@ -1814,38 +2244,43 @@ export default function App() {
               <div
                 className={cx(
                   'p-8 rounded-2xl border backdrop-blur-xl text-center space-y-4 shadow-2xl',
-                  isDark ? 'bg-[#161b22] border-[#00ff9d]/50' : 'bg-white border-emerald-300'
+                  isDark ? 'bg-[#161b22]/90 border-[#00ff9d]/50' : 'bg-white border-emerald-300'
                 )}
               >
                 <div className="w-14 h-14 rounded-full bg-[#00ff9d]/20 text-[#00ff9d] flex items-center justify-center text-2xl mx-auto border border-[#00ff9d]/40">
                   ✓
                 </div>
-                <h3 className="text-xl font-bold font-mono text-[#00ff9d]">PROPOSAL DISPATCHED</h3>
+                <div className="inline-block px-3 py-1 rounded-full bg-[#00ff9d]/15 border border-[#00ff9d]/40 text-xs font-mono text-[#00ff9d] font-bold">
+                  TAG: SUBMISSION • SERIAL #{lastSerialNumber}
+                </div>
+                <h3 className="text-xl font-bold font-mono text-white">PROPOSAL DISPATCHED TO OPENBOARD</h3>
                 <p
                   className={cx(
                     'text-xs font-sans max-w-md mx-auto leading-relaxed',
                     isDark ? 'text-zinc-300' : 'text-zinc-700'
                   )}
                 >
-                  Thank you, <strong>{formState.name}</strong>. Your abstract for <strong>"{formState.title}"</strong>{' '}
-                  has been routed to coordinators Samriddha and Adeetya. A copy has also been archived locally on your
-                  browser.
+                  Thank you, <strong>{formState.name}</strong>! Your talk proposal{' '}
+                  <strong>"{formState.title}"</strong> (Serial: <span className="font-mono">#{lastSerialNumber}</span>)
+                  has been formatted and sent to{' '}
+                  <span className="font-mono text-[#00ff9d]">openboardinitiative@gmail.com</span>.
                 </p>
 
-                <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
                   <a
-                    href={`mailto:samriddha22@iiserb.ac.in,adeety22@iiserb.ac.in?subject=${encodeURIComponent(
-                      `[OpenBoard Talk Proposal] ${formState.title}`
+                    href={`mailto:openboardinitiative@gmail.com?subject=${encodeURIComponent(
+                      `[Submission #${lastSerialNumber}] OpenBoard Proposal: ${formState.title}`
                     )}&body=${encodeURIComponent(
-                      `Speaker: ${formState.name}\nEmail: ${formState.email}\nDepartment: ${formState.department}\nPreferred Date: ${formState.preferredDate}\n\nAbstract:\n${formState.abstract}`
+                      `=========================================\nOPENBOARD TALK PROPOSAL SUBMISSION\n=========================================\nTag: Submission\nSerial Number: #${lastSerialNumber}\nSpeaker Name: ${formState.name}\nSpeaker Email: ${formState.email}\nDiscipline: ${formState.department}\nPreferred Date: ${formState.preferredDate || 'Flexible'}\nPrerequisites: ${formState.prerequisites}\nTags: ${formState.tags}\n\n-----------------------------------------\nTALK TITLE:\n${formState.title}\n\nABSTRACT & PEDAGOGICAL HOOK:\n${formState.abstract}\n=========================================`
                     )}`}
                     className="px-4 py-2 rounded-xl text-xs font-mono font-bold border border-[#00ff9d] text-[#00ff9d] hover:bg-[#00ff9d]/10 transition-all flex items-center gap-1.5"
                   >
-                    <span>✉ Send Backup Copy to Email</span>
+                    <span>✉ Open Direct Mail Copy</span>
                   </a>
 
                   <button
                     onClick={() => {
+                      playClick();
                       setFormStatus('idle');
                       setFormState({
                         name: '',
@@ -1853,13 +2288,14 @@ export default function App() {
                         title: '',
                         department: 'Physics',
                         abstract: '',
+                        prerequisites: 'Basic undergraduate calculus & linear algebra',
                         preferredDate: '',
                         tags: 'Interdisciplinary, Theory',
                       });
                     }}
                     className="px-4 py-2 rounded-xl text-xs font-mono bg-[#21262d] text-zinc-300 hover:text-white"
                   >
-                    Submit Another
+                    Submit Another Proposal
                   </button>
                 </div>
               </div>
@@ -1868,16 +2304,21 @@ export default function App() {
                 onSubmit={handleSubmitProposal}
                 className={cx(
                   'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl shadow-2xl space-y-4 font-mono text-xs',
-                  isDark ? 'bg-[#161b22]/90 border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                  isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white/95 border-[#d0d7de]'
                 )}
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-center justify-between border-b border-[#30363d] pb-3 text-[11px] text-zinc-400">
+                  <span>&gt; target_inbox = "openboardinitiative@gmail.com"</span>
+                  <span className="text-[#00ff9d] font-bold">[TAG: SUBMISSION]</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                   <div>
                     <label className="block text-zinc-400 mb-1">Speaker Name *</label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Richard Feynman"
+                      placeholder="e.g. Emmy Noether"
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                       className={cx(
@@ -1890,7 +2331,7 @@ export default function App() {
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">IISERB Email *</label>
+                    <label className="block text-zinc-400 mb-1">Speaker Email *</label>
                     <input
                       type="email"
                       required
@@ -1913,7 +2354,7 @@ export default function App() {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Topological Defects in Crystals"
+                      placeholder="e.g. Symmetries & Conservation Laws"
                       value={formState.title}
                       onChange={(e) => setFormState({ ...formState, title: e.target.value })}
                       className={cx(
@@ -1926,7 +2367,7 @@ export default function App() {
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">Discipline</label>
+                    <label className="block text-zinc-400 mb-1">Academic Discipline</label>
                     <select
                       value={formState.department}
                       onChange={(e) => setFormState({ ...formState, department: e.target.value })}
@@ -1942,6 +2383,7 @@ export default function App() {
                       <option value="Chemistry">Chemistry</option>
                       <option value="Biology">Biology</option>
                       <option value="Computer Science">Computer Science</option>
+                      <option value="Economics & Social Sciences">Economics & Social Sciences</option>
                       <option value="Interdisciplinary">Interdisciplinary / Other</option>
                     </select>
                   </div>
@@ -1952,11 +2394,27 @@ export default function App() {
                   <textarea
                     required
                     rows={4}
-                    placeholder="Provide a 2-4 sentence summary of your presentation. What fundamental question are you answering?"
+                    placeholder="Provide a 2-4 sentence summary of your presentation. What fundamental question are you answering for non-specialists?"
                     value={formState.abstract}
                     onChange={(e) => setFormState({ ...formState, abstract: e.target.value })}
                     className={cx(
                       'w-full px-3.5 py-2.5 rounded-lg border outline-none font-sans text-xs',
+                      isDark
+                        ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
+                        : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
+                    )}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-zinc-400 mb-1">Recommended Audience Prerequisites</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. None! Just curiosity (or 1st-year linear algebra)"
+                    value={formState.prerequisites}
+                    onChange={(e) => setFormState({ ...formState, prerequisites: e.target.value })}
+                    className={cx(
+                      'w-full px-3.5 py-2.5 rounded-lg border outline-none font-mono text-xs',
                       isDark
                         ? 'bg-[#0d1117] border-[#30363d] text-zinc-100 focus:border-[#00ff9d]'
                         : 'bg-zinc-50 border-zinc-300 focus:border-emerald-500'
@@ -1981,10 +2439,10 @@ export default function App() {
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 mb-1">Tags (Comma-separated)</label>
+                    <label className="block text-zinc-400 mb-1">Topic Tags (Comma-separated)</label>
                     <input
                       type="text"
-                      placeholder="e.g. Knot Theory, Genomics"
+                      placeholder="e.g. Noether Theorem, Group Theory"
                       value={formState.tags}
                       onChange={(e) => setFormState({ ...formState, tags: e.target.value })}
                       className={cx(
@@ -2003,9 +2461,9 @@ export default function App() {
                   className="w-full py-3 rounded-xl font-mono text-xs font-bold tracking-wider bg-[#00ff9d] text-black shadow-[0_0_20px_rgba(0,255,157,0.35)] hover:shadow-[0_0_30px_rgba(0,255,157,0.55)] transition-all flex items-center justify-center gap-2"
                 >
                   {formStatus === 'submitting' ? (
-                    <span>DISPATCHING PROPOSAL...</span>
+                    <span>ASSIGNING SERIAL & DISPATCHING...</span>
                   ) : (
-                    <span>&gt; DISPATCH PROPOSAL TO COORDINATORS</span>
+                    <span>&gt; SUBMIT PROPOSAL TO OPENBOARDINITIATIVE@GMAIL.COM</span>
                   )}
                 </button>
               </form>
@@ -2024,7 +2482,7 @@ export default function App() {
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">Get In Touch</h2>
               <p className={cx('text-xs sm:text-sm mt-1', isDark ? 'text-zinc-400' : 'text-zinc-600')}>
-                Contact the coordinators directly for questions, slide submissions, or session feedback.
+                Reach out to our official initiative inbox or directly to the student coordinators.
               </p>
             </div>
 
@@ -2032,7 +2490,7 @@ export default function App() {
               <div
                 className={cx(
                   'p-6 rounded-2xl border backdrop-blur-xl space-y-2',
-                  isDark ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                  isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white border-[#d0d7de]'
                 )}
               >
                 <div className="text-xs font-mono text-[#00ff9d] font-bold">📍 CAMPUS LOCATION</div>
@@ -2047,19 +2505,25 @@ export default function App() {
               <div
                 className={cx(
                   'p-6 rounded-2xl border backdrop-blur-xl space-y-2',
-                  isDark ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-[#d0d7de]'
+                  isDark ? 'bg-[#161b22]/85 border-[#30363d]' : 'bg-white border-[#d0d7de]'
                 )}
               >
-                <div className="text-xs font-mono text-[#f43f5e] font-bold">✉ COORDINATOR EMAILS</div>
-                <div className="text-xs font-mono space-y-1 text-zinc-300">
+                <div className="text-xs font-mono text-[#f43f5e] font-bold">✉ OFFICIAL CHANNELS</div>
+                <div className="text-xs font-mono space-y-1.5 text-zinc-300">
                   <div>
-                    Samriddha Ganguly:{' '}
+                    Official Inbox:{' '}
+                    <a href="mailto:openboardinitiative@gmail.com" className="text-[#00ff9d] font-bold hover:underline">
+                      openboardinitiative@gmail.com
+                    </a>
+                  </div>
+                  <div>
+                    Samriddha:{' '}
                     <a href="mailto:samriddha22@iiserb.ac.in" className="text-[#00ff9d] hover:underline">
                       samriddha22@iiserb.ac.in
                     </a>
                   </div>
                   <div>
-                    Adeetya Choubey:{' '}
+                    Adeetya:{' '}
                     <a href="mailto:adeety22@iiserb.ac.in" className="text-[#00ff9d] hover:underline">
                       adeety22@iiserb.ac.in
                     </a>
@@ -2141,6 +2605,7 @@ export default function App() {
                   href={activeModalTalk.slidesUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={playClick}
                   className="px-4 py-2 rounded-xl text-xs font-bold bg-[#00ff9d] text-black hover:bg-[#34d399] transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,255,157,0.3)]"
                 >
                   📥 DOWNLOAD PRESENTATION ({activeModalTalk.slidesName})
@@ -2163,7 +2628,10 @@ export default function App() {
       {/* ========================================================= */}
       {activeLightboxImg && (
         <div
-          onClick={() => setActiveLightboxImg(null)}
+          onClick={() => {
+            playClick();
+            setActiveLightboxImg(null);
+          }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md cursor-zoom-out"
         >
           <div
@@ -2171,7 +2639,10 @@ export default function App() {
             className="max-w-4xl w-full rounded-2xl overflow-hidden border border-[#30363d] bg-[#0d1117] p-2 relative font-mono"
           >
             <button
-              onClick={() => setActiveLightboxImg(null)}
+              onClick={() => {
+                playClick();
+                setActiveLightboxImg(null);
+              }}
               className="absolute top-4 right-4 z-10 w-8 h-8 rounded-lg bg-black/70 text-white flex items-center justify-center text-xs hover:bg-zinc-800"
             >
               ✕
@@ -2195,89 +2666,12 @@ export default function App() {
       )}
 
       {/* ========================================================= */}
-      {/* MODAL: COORDINATORS SUBMISSIONS AUDIT LOG (SUBMISSIONS FIX)*/}
-      {/* ========================================================= */}
-      {showSubmissionsLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-          <div
-            className={cx(
-              'max-w-3xl w-full max-h-[85vh] overflow-y-auto rounded-2xl border p-6 shadow-2xl relative font-mono text-xs',
-              isDark ? 'bg-[#0d1117] border-[#00ff9d]/40' : 'bg-white border-zinc-300'
-            )}
-          >
-            <div className="flex items-center justify-between mb-4 border-b border-[#30363d] pb-3">
-              <div>
-                <span className="text-[#00ff9d] font-bold">📬 PROPOSALS SUBMISSION LOG</span>
-                <p className="text-[11px] text-zinc-400 mt-0.5">
-                  Archived locally in browser cache. No proposals can be dropped or lost.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowSubmissionsLog(false)}
-                className="w-7 h-7 rounded-lg bg-[#21262d] text-zinc-300 flex items-center justify-center text-xs"
-              >
-                ✕
-              </button>
-            </div>
-
-            {savedSubmissions.length === 0 ? (
-              <p className="text-zinc-500 py-6 text-center">No proposals recorded yet.</p>
-            ) : (
-              <div className="space-y-4">
-                {savedSubmissions.map((sub, idx) => (
-                  <div
-                    key={sub.id || idx}
-                    className="p-4 rounded-xl border border-[#30363d] bg-[#161b22]/70 space-y-1.5"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#00ff9d] font-bold">{sub.title}</span>
-                      <span className="text-[10px] text-zinc-400">{sub.timestamp}</span>
-                    </div>
-                    <div className="text-zinc-300">
-                      Speaker: <span className="font-bold">{sub.name}</span> ({sub.email}) • {sub.department}
-                    </div>
-                    <div className="text-zinc-400 text-[11px] font-sans pt-1 border-t border-[#30363d]/60">
-                      {sub.abstract}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-6 pt-4 border-t border-[#30363d] flex items-center justify-between">
-              <button
-                onClick={() => {
-                  const blob = new Blob([JSON.stringify(savedSubmissions, null, 2)], {
-                    type: 'application/json',
-                  });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = `openboard_proposals_${Date.now()}.json`;
-                  a.click();
-                }}
-                className="px-3 py-1.5 rounded-lg border border-[#30363d] hover:border-[#00ff9d] text-zinc-300"
-              >
-                Export JSON Log
-              </button>
-              <button
-                onClick={() => setShowSubmissionsLog(false)}
-                className="px-4 py-1.5 rounded-lg bg-[#00ff9d] text-black font-bold"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================= */}
       {/* RETRO FOOTER                                              */}
       {/* ========================================================= */}
       <footer
         className={cx(
-          'mt-20 border-t py-8 px-4 sm:px-6 transition-colors font-mono text-xs',
-          isDark ? 'border-[#30363d] bg-[#0d1117]' : 'border-[#d0d7de] bg-zinc-50'
+          'relative z-10 mt-20 border-t py-8 px-4 sm:px-6 transition-colors font-mono text-xs backdrop-blur-md',
+          isDark ? 'border-[#30363d] bg-[#0d1117]/80' : 'border-[#d0d7de] bg-zinc-50/80'
         )}
       >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-500">
@@ -2286,7 +2680,7 @@ export default function App() {
             <span>•</span>
             <span>IISER Bhopal Pedagogical Initiative</span>
             <span>•</span>
-            <span className="text-[#00ff9d]">Est. 2025</span>
+            <span className="text-[#00ff9d]">openboardinitiative@gmail.com</span>
           </div>
 
           <div className="flex items-center gap-4">
