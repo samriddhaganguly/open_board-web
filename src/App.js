@@ -1133,55 +1133,38 @@ export default function App() {
   };
 
   // Formatted Proposal Submission Handler -> Sends directly to openboardinitiative@gmail.com
-  const handleSubmitProposal = async (e) => {
-    e.preventDefault();
-    if (!formState.name || !formState.email || !formState.title || !formState.abstract) {
-      alert('Please fill out all required fields.');
-      return;
-    }
+const handleSubmitProposal = (e) => {
+  e.preventDefault();
 
-    setFormStatus('submitting');
-    playClick();
+  if (!formState.name || !formState.email || !formState.title || !formState.abstract) {
+    alert('Please fill out all required fields.');
+    return;
+  }
 
-    const serialNumber = generateSerialNumber();
-    setLastSerialNumber(serialNumber);
-    const submittedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  playClick();
+  setFormStatus('submitting');
 
-    // Send cleanly structured email to openboardinitiative@gmail.com via FormSubmit AJAX API
-    try {
-      await fetch('https://formsubmit.co/ajax/openboardinitiative@gmail.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          _subject: `[Submission #${serialNumber}] OpenBoard Proposal: ${formState.title}`,
-          _replyto: formState.email,
-          _template: 'table',
-          _captcha: 'false',
-          Tag: 'Submission',
-          Serial_Number: `#${serialNumber}`,
-          Speaker_Name: formState.name,
-          Speaker_Email: formState.email,
-          Academic_Discipline: formState.department,
-          Talk_Title: formState.title,
-          Abstract_and_Pedagogical_Hook: formState.abstract,
-          Prerequisites: formState.prerequisites || 'None (Accessible to all)',
-          Preferred_Session_Date: formState.preferredDate || 'Flexible',
-          Topic_Tags: formState.tags,
-          Timestamp_IST: submittedAt,
-        }),
-      });
-    } catch (err) {
-      console.warn('FormSubmit AJAX dispatch warning:', err);
-    }
+  const postForm = document.createElement('form');
+  postForm.method = 'POST';
+  postForm.action =
+    'https://script.google.com/macros/s/AKfycbwTDjNyAzxRVUwsUoEcyHzleXrYcR6ANCfZMsPQ9jAlWWn_JGyxo3T92-cUVvyJEP6/exec';
+  postForm.target = '_blank';
+  postForm.style.display = 'none';
 
-    setTimeout(() => {
-      setFormStatus('success');
-      playSuccess();
-    }, 500);
-  };
+  Object.entries(formState).forEach(([name, value]) => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value || '';
+    postForm.appendChild(input);
+  });
+
+  document.body.appendChild(postForm);
+  postForm.submit();
+  postForm.remove();
+
+  setFormStatus('success');
+};
 
   const isDark = theme === 'dark';
 
