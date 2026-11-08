@@ -80,7 +80,7 @@ const useSoundEffects = (isMuted) => {
       osc.frequency.setValueAtTime(1046.5, now); // C6
       osc.frequency.exponentialRampToValueAtTime(1318.5, now + 0.09); // E6
       gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx_safe(0.14));
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(now);
@@ -90,6 +90,8 @@ const useSoundEffects = (isMuted) => {
 
   return { playClick, playSuccess, playBookmark };
 };
+
+const idx_safe = (v) => v;
 
 // =========================================================
 // 2. SLEEK PIXEL MATRIX + 3D CONSTELLATION BACKGROUND
@@ -114,11 +116,11 @@ const BackgroundAnimation = ({ theme }) => {
     window.addEventListener('resize', resize);
 
     // Floating pixel nodes
-    const pixelNodes = Array.from({ length: 65 }, () => ({
+    const pixelNodes = Array.from({ length: 75 }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
-      vx: (Math.random() - 0.5) * 0.45,
-      vy: (Math.random() - 0.5) * 0.45,
+      vx: (Math.random() - 0.5) * 0.55,
+      vy: (Math.random() - 0.5) * 0.55,
       size: Math.random() > 0.5 ? 4 : 3,
       phase: Math.random() * Math.PI * 2,
       colorType: Math.random() > 0.78 ? 'pink' : Math.random() > 0.5 ? 'cyan' : 'green',
@@ -134,28 +136,31 @@ const BackgroundAnimation = ({ theme }) => {
 
     let tick = 0;
     const renderPixels = () => {
-      tick += 0.025;
+      tick += 0.03;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const isDark = theme === 'dark';
       const gridSpacing = 36;
 
-      // Draw interactive pixel matrix around mouse and subtle ambient grid dots
+      // Draw interactive pixel matrix around mouse and subtle ambient pulsing grid dots
       for (let gx = 0; gx < canvas.width; gx += gridSpacing) {
         for (let gy = 0; gy < canvas.height; gy += gridSpacing) {
           const dx = gx - mouseRef.current.x;
           const dy = gy - mouseRef.current.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 175) {
-            const intensity = (1 - dist / 175) * (isDark ? 0.7 : 0.42);
+          if (dist < 185) {
+            const intensity = (1 - dist / 185) * (isDark ? 0.75 : 0.45);
             ctx.fillStyle = isDark
               ? `rgba(0, 255, 157, ${intensity.toFixed(3)})`
               : `rgba(4, 120, 87, ${intensity.toFixed(3)})`;
             const s = dist < 75 ? 5 : 3;
             ctx.fillRect(gx - s / 2, gy - s / 2, s, s);
           } else if ((gx + gy) % 72 === 0) {
-            ctx.fillStyle = isDark ? 'rgba(30, 41, 59, 0.55)' : 'rgba(120, 113, 108, 0.28)';
+            const wave = Math.sin(tick * 0.8 + (gx + gy) * 0.01) * 0.15 + 0.35;
+            ctx.fillStyle = isDark
+              ? `rgba(30, 41, 59, ${wave.toFixed(2)})`
+              : `rgba(120, 113, 108, ${(wave * 0.65).toFixed(2)})`;
             ctx.fillRect(gx, gy, 2, 2);
           }
         }
@@ -173,12 +178,12 @@ const BackgroundAnimation = ({ theme }) => {
         const dx = mouseRef.current.x - p.x;
         const dy = mouseRef.current.y - p.y;
         const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 140 && d > 5) {
-          p.x -= (dx / d) * 0.8;
-          p.y -= (dy / d) * 0.8;
+        if (d < 150 && d > 5) {
+          p.x -= (dx / d) * 0.9;
+          p.y -= (dy / d) * 0.9;
         }
 
-        const alpha = (Math.sin(tick + p.phase) * 0.35 + 0.55) * (isDark ? 0.85 : 0.55);
+        const alpha = (Math.sin(tick + p.phase) * 0.35 + 0.55) * (isDark ? 0.88 : 0.58);
         if (p.colorType === 'pink') {
           ctx.fillStyle = isDark ? `rgba(255, 51, 102, ${alpha})` : `rgba(190, 18, 60, ${alpha})`;
         } else if (p.colorType === 'cyan') {
@@ -244,7 +249,7 @@ const BackgroundAnimation = ({ theme }) => {
     const lineMat = new THREE.LineBasicMaterial({
       color: isDark ? 0x00ff9d : 0x047857,
       transparent: true,
-      opacity: isDark ? 0.14 : 0.09,
+      opacity: isDark ? 0.15 : 0.09,
     });
     const wireframe = new THREE.LineSegments(wireGeo, lineMat);
     scene.add(wireframe);
@@ -257,11 +262,13 @@ const BackgroundAnimation = ({ theme }) => {
       const mx = mouseRef.current.normX;
       const my = mouseRef.current.normY;
 
-      points.rotation.y = t * 0.035 + mx * 0.18;
-      points.rotation.x = t * 0.02 - my * 0.18;
+      points.rotation.y = t * 0.038 + mx * 0.2;
+      points.rotation.x = t * 0.022 - my * 0.2;
 
-      wireframe.rotation.y = -t * 0.045 + mx * 0.25;
-      wireframe.rotation.x = t * 0.03 + my * 0.25;
+      wireframe.rotation.y = -t * 0.048 + mx * 0.28;
+      wireframe.rotation.x = t * 0.032 + my * 0.28;
+      const pulseScale = 1 + Math.sin(t * 1.4) * 0.025;
+      wireframe.scale.set(pulseScale, pulseScale, pulseScale);
 
       renderer.render(scene, camera);
     };
@@ -294,10 +301,11 @@ const BackgroundAnimation = ({ theme }) => {
 };
 
 // =========================================================
-// 3. PIXEL ANIMAL CURSOR (REPLACES SYSTEM MOUSE, NO BUBBLES)
+// 3. PIXEL ANIMAL CURSOR (HOVER REACTIONS + SPECIES LOCKING)
 // =========================================================
 const MASCOT_SPECIES = {
   home: {
+    key: 'home',
     species: 'Pixel Cat',
     darkColor: '#00ff9d',
     lightColor: '#047857',
@@ -305,6 +313,7 @@ const MASCOT_SPECIES = {
     ears: 'cat',
   },
   about: {
+    key: 'about',
     species: 'Night Owl',
     darkColor: '#00e5ff',
     lightColor: '#0369a1',
@@ -312,6 +321,7 @@ const MASCOT_SPECIES = {
     ears: 'owl',
   },
   archive: {
+    key: 'archive',
     species: 'Cyber Fox',
     darkColor: '#ff3366',
     lightColor: '#be123c',
@@ -319,6 +329,7 @@ const MASCOT_SPECIES = {
     ears: 'fox',
   },
   gallery: {
+    key: 'gallery',
     species: 'Pixel Bunny',
     darkColor: '#c084fc',
     lightColor: '#7e22ce',
@@ -326,6 +337,7 @@ const MASCOT_SPECIES = {
     ears: 'bunny',
   },
   events: {
+    key: 'events',
     species: 'Tree Frog',
     darkColor: '#10b981',
     lightColor: '#047857',
@@ -333,6 +345,7 @@ const MASCOT_SPECIES = {
     ears: 'frog',
   },
   submit: {
+    key: 'submit',
     species: 'Carrier Pigeon',
     darkColor: '#facc15',
     lightColor: '#b45309',
@@ -340,6 +353,7 @@ const MASCOT_SPECIES = {
     ears: 'bird',
   },
   contact: {
+    key: 'contact',
     species: 'Red Panda',
     darkColor: '#fb923c',
     lightColor: '#c2410c',
@@ -348,9 +362,12 @@ const MASCOT_SPECIES = {
   },
 };
 
-const PixelCompanion = ({ activeTab, theme, onPetSound, petSignal }) => {
+const MASCOT_KEYS = Object.keys(MASCOT_SPECIES);
+
+const PixelCompanion = ({ activeTab, lockedSpeciesKey, theme, onPetSound, petSignal }) => {
   const isDark = theme === 'dark';
-  const species = MASCOT_SPECIES[activeTab] || MASCOT_SPECIES.home;
+  const effectiveKey = lockedSpeciesKey || activeTab;
+  const species = MASCOT_SPECIES[effectiveKey] || MASCOT_SPECIES.home;
   const primaryColor = isDark ? species.darkColor : species.lightColor;
 
   const [pos, setPos] = useState({ x: -100, y: -100 });
@@ -360,11 +377,12 @@ const PixelCompanion = ({ activeTab, theme, onPetSound, petSignal }) => {
   const [facingLeft, setFacingLeft] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
+  const [hoverContext, setHoverContext] = useState('normal'); // 'normal' | 'interactive' | 'card'
   const [stepFrame, setStepFrame] = useState(0);
   const [isBlinking, setIsBlinking] = useState(false);
   const [hearts, setHearts] = useState([]);
 
-  // Directly replace the mouse pointer with 0-latency exact tracking
+  // Directly replace the mouse pointer with 0-latency tracking + hover context detection
   useEffect(() => {
     let moveCount = 0;
 
@@ -381,6 +399,20 @@ const PixelCompanion = ({ activeTab, theme, onPetSound, petSignal }) => {
       moveCount++;
       if (moveCount % 5 === 0) {
         setStepFrame((s) => (s + 1) % 2);
+      }
+
+      // Inspect element under pointer for interactive / card hover reactions
+      const target = e.target;
+      if (target && typeof target.closest === 'function') {
+        if (target.closest('button, a, input, select, textarea, label, [role="button"]')) {
+          setHoverContext('interactive');
+        } else if (target.closest('[data-pet-card="true"]')) {
+          setHoverContext('card');
+        } else {
+          setHoverContext('normal');
+        }
+      } else {
+        setHoverContext('normal');
       }
 
       if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
@@ -446,6 +478,11 @@ const PixelCompanion = ({ activeTab, theme, onPetSound, petSignal }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [triggerPetEffect]);
 
+  const isInteractive = hoverContext === 'interactive';
+  const isCardHover = hoverContext === 'card';
+  // Perk ears up by 1 pixel when hovering interactive buttons/links
+  const earPerkOffset = isInteractive ? -1 : 0;
+
   return (
     <div
       style={{
@@ -453,17 +490,50 @@ const PixelCompanion = ({ activeTab, theme, onPetSound, petSignal }) => {
       }}
       className="fixed top-0 left-0 z-[9999] pointer-events-none select-none hidden sm:block"
     >
-      {/* Precision Cursor Hotspot Dot at Exact (0, 0) Click Tip */}
-      <div
-        className="absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full transition-transform duration-75"
-        style={{
-          backgroundColor: primaryColor,
-          boxShadow: isDark ? `0 0 10px ${primaryColor}` : `0 0 6px rgba(4,120,87,0.55)`,
-          transform: isClicking ? 'scale(1.65)' : 'scale(1)',
-        }}
-      />
+      {/* Precision Cursor Hotspot Dot + Interactive Hover Ring at Exact (0, 0) Click Tip */}
+      <div className="relative">
+        <div
+          className="absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full transition-all duration-100"
+          style={{
+            backgroundColor: isInteractive ? species.accent : primaryColor,
+            boxShadow: isDark
+              ? `0 0 ${isInteractive ? '16px' : '10px'} ${isInteractive ? species.accent : primaryColor}`
+              : `0 0 8px rgba(4,120,87,0.65)`,
+            transform: isClicking
+              ? 'scale(1.8)'
+              : isInteractive
+              ? 'scale(1.35)'
+              : isCardHover
+              ? 'scale(1.2)'
+              : 'scale(1)',
+          }}
+        />
 
-      {/* Floating Pixel Hearts when petted */}
+        {/* Rotating Target Lock Ring when hovering over buttons/links */}
+        {isInteractive && (
+          <div
+            className="absolute -top-3.5 -left-3.5 w-7 h-7 rounded-full border border-dashed animate-spin"
+            style={{
+              borderColor: primaryColor,
+              animationDuration: '3s',
+              boxShadow: isDark ? `0 0 12px ${primaryColor}55` : 'none',
+            }}
+          />
+        )}
+
+        {/* Subtle Inspection Ring when hovering over Talk / Gallery Cards */}
+        {isCardHover && !isInteractive && (
+          <div
+            className="absolute -top-3 -left-3 w-6 h-6 rounded-md border animate-pulse"
+            style={{
+              borderColor: primaryColor,
+              opacity: 0.75,
+            }}
+          />
+        )}
+      </div>
+
+      {/* Floating Pixel Hearts when petted or cycled */}
       {hearts.map((h) => (
         <div
           key={h}
@@ -474,69 +544,89 @@ const PixelCompanion = ({ activeTab, theme, onPetSound, petSignal }) => {
       ))}
 
       {/* Animal Cursor Sprite Locked Directly to Pointer Coordinates */}
-      <div className="relative -top-1 -left-1">
+      <div className="relative -top-1 -left-1 pet-idle-float">
+        {/* Ambient Neon Backlight Aura (intensifies over buttons & cards) */}
+        <div
+          className="absolute inset-1 rounded-full blur-md transition-all duration-200"
+          style={{
+            backgroundColor: isInteractive ? species.accent : primaryColor,
+            opacity: isInteractive ? (isDark ? 0.55 : 0.35) : isCardHover ? (isDark ? 0.38 : 0.25) : isDark ? 0.18 : 0.1,
+            transform: isInteractive ? 'scale(1.35)' : isCardHover ? 'scale(1.18)' : 'scale(0.95)',
+          }}
+        />
+
         <svg
-          width="42"
-          height="42"
-          viewBox="0 0 16 16"
+          width="44"
+          height="44"
+          viewBox="-1 -2 18 19"
           shapeRendering="crispEdges"
           style={{
             transform: `${facingLeft ? 'scaleX(-1)' : 'scaleX(1)'} ${
               isClicking
-                ? 'scale(0.84) rotate(-8deg)'
+                ? 'scale(0.82) rotate(-10deg) translateY(2px)'
+                : isInteractive
+                ? 'scale(1.14) translateY(-3px)'
+                : isCardHover
+                ? 'scale(1.07) rotate(10deg) translateY(-1px)'
                 : isMoving
                 ? stepFrame === 0
                   ? 'rotate(-5deg) translateY(-1px)'
                   : 'rotate(5deg)'
                 : ''
             }`,
-            transition: 'transform 0.06s ease-out',
+            transition: 'transform 0.11s cubic-bezier(0.22, 1, 0.36, 1), filter 0.15s ease',
             filter: isDark
-              ? `drop-shadow(0 0 6px ${primaryColor}88)`
+              ? isInteractive
+                ? `drop-shadow(0 0 11px ${primaryColor}) drop-shadow(0 0 5px ${species.accent})`
+                : isCardHover
+                ? `drop-shadow(0 0 8px ${primaryColor}cc)`
+                : `drop-shadow(0 0 6px ${primaryColor}88)`
+              : isInteractive
+              ? `drop-shadow(0 4px 8px rgba(4, 120, 87, 0.45))`
               : 'drop-shadow(0 2px 4px rgba(28, 25, 23, 0.28))',
           }}
         >
-          {/* Ears / Head Crest by Species */}
+          {/* Ears / Head Crest by Species (Perks up by 1px on button/link hover!) */}
           {species.ears === 'cat' && (
             <>
-              <rect x="3" y="2" width="2" height="2" fill={primaryColor} />
-              <rect x="11" y="2" width="2" height="2" fill={primaryColor} />
-              <rect x="4" y="3" width="1" height="1" fill={species.accent} />
-              <rect x="11" y="3" width="1" height="1" fill={species.accent} />
+              <rect x="3" y={2 + earPerkOffset} width="2" height="2" fill={primaryColor} />
+              <rect x="11" y={2 + earPerkOffset} width="2" height="2" fill={primaryColor} />
+              <rect x="4" y={3 + earPerkOffset} width="1" height="1" fill={species.accent} />
+              <rect x="11" y={3 + earPerkOffset} width="1" height="1" fill={species.accent} />
             </>
           )}
           {species.ears === 'bunny' && (
             <>
-              <rect x="4" y="0" width="2" height="4" fill={primaryColor} />
-              <rect x="10" y="0" width="2" height="4" fill={primaryColor} />
-              <rect x="5" y="1" width="1" height="2" fill={species.accent} />
-              <rect x="10" y="1" width="1" height="2" fill={species.accent} />
+              <rect x="4" y={0 + earPerkOffset} width="2" height="4" fill={primaryColor} />
+              <rect x="10" y={0 + earPerkOffset} width="2" height="4" fill={primaryColor} />
+              <rect x="5" y={1 + earPerkOffset} width="1" height="2" fill={species.accent} />
+              <rect x="10" y={1 + earPerkOffset} width="1" height="2" fill={species.accent} />
             </>
           )}
           {species.ears === 'fox' && (
             <>
-              <rect x="2" y="1" width="3" height="3" fill={primaryColor} />
-              <rect x="11" y="1" width="3" height="3" fill={primaryColor} />
-              <rect x="3" y="2" width="1" height="2" fill="#f4f1ea" />
-              <rect x="12" y="2" width="1" height="2" fill="#f4f1ea" />
+              <rect x="2" y={1 + earPerkOffset} width="3" height="3" fill={primaryColor} />
+              <rect x="11" y={1 + earPerkOffset} width="3" height="3" fill={primaryColor} />
+              <rect x="3" y={2 + earPerkOffset} width="1" height="2" fill="#f4f1ea" />
+              <rect x="12" y={2 + earPerkOffset} width="1" height="2" fill="#f4f1ea" />
             </>
           )}
           {species.ears === 'owl' && (
             <>
-              <rect x="2" y="2" width="2" height="2" fill={species.accent} />
-              <rect x="12" y="2" width="2" height="2" fill={species.accent} />
+              <rect x="2" y={2 + earPerkOffset} width="2" height="2" fill={species.accent} />
+              <rect x="12" y={2 + earPerkOffset} width="2" height="2" fill={species.accent} />
             </>
           )}
           {species.ears === 'frog' && (
             <>
-              <rect x="3" y="2" width="3" height="2" fill={primaryColor} />
-              <rect x="10" y="2" width="3" height="2" fill={primaryColor} />
+              <rect x="3" y={2 + earPerkOffset} width="3" height="2" fill={primaryColor} />
+              <rect x="10" y={2 + earPerkOffset} width="3" height="2" fill={primaryColor} />
             </>
           )}
           {species.ears === 'bird' && (
             <>
-              <rect x="7" y="1" width="2" height="3" fill={species.accent} />
-              <rect x="8" y="0" width="2" height="2" fill={primaryColor} />
+              <rect x="7" y={1 + earPerkOffset} width="2" height="3" fill={species.accent} />
+              <rect x="8" y={0 + earPerkOffset} width="2" height="2" fill={primaryColor} />
             </>
           )}
 
@@ -547,11 +637,20 @@ const PixelCompanion = ({ activeTab, theme, onPetSound, petSignal }) => {
           <rect x="3" y="3" width="10" height="1" fill={primaryColor} />
           <rect x="3" y="12" width="10" height="1" fill={primaryColor} />
 
-          {/* Glowing Pixel Eyes */}
+          {/* Glowing Pixel Eyes (Widen & sparkle when hovering over interactive elements) */}
           {isBlinking ? (
             <>
               <rect x="5" y="7" width="2" height="1" fill={primaryColor} />
               <rect x="9" y="7" width="2" height="1" fill={primaryColor} />
+            </>
+          ) : isInteractive ? (
+            <>
+              <rect x="5" y="5" width="2" height="3" fill={primaryColor} />
+              <rect x="9" y="5" width="2" height="3" fill={primaryColor} />
+              <rect x="5" y="5" width="1" height="1" fill="#ffffff" />
+              <rect x="9" y="5" width="1" height="1" fill="#ffffff" />
+              <rect x="6" y="7" width="1" height="1" fill={species.accent} />
+              <rect x="10" y="7" width="1" height="1" fill={species.accent} />
             </>
           ) : (
             <>
@@ -570,24 +669,24 @@ const PixelCompanion = ({ activeTab, theme, onPetSound, petSignal }) => {
 
           {/* Animated Walking Pixel Feet */}
           <rect
-            x={isMoving && stepFrame === 0 ? '3' : '4'}
+            x={(isMoving || isInteractive) && stepFrame === 0 ? '3' : '4'}
             y="13"
             width="2"
             height="2"
             fill={primaryColor}
           />
           <rect
-            x={isMoving && stepFrame === 1 ? '11' : '10'}
+            x={(isMoving || isInteractive) && stepFrame === 1 ? '11' : '10'}
             y="13"
             width="2"
             height="2"
             fill={primaryColor}
           />
 
-          {/* Wagging Pixel Tail */}
+          {/* Wagging Pixel Tail (Wags faster / perks up on hover) */}
           <rect
             x="1"
-            y={stepFrame === 0 ? '9' : '8'}
+            y={isInteractive ? '7' : stepFrame === 0 ? '9' : '8'}
             width="1"
             height="2"
             fill={species.accent}
@@ -987,6 +1086,40 @@ export default function App() {
   const [petSignal, setPetSignal] = useState(0);
   const [isHoveringPetBadge, setIsHoveringPetBadge] = useState(false);
 
+  // Locked Cursor Pet species state (null = Auto-follows activeTab; otherwise locked to chosen species key)
+  const [lockedSpeciesKey, setLockedSpeciesKey] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('openboard_locked_pet') || null;
+    }
+    return null;
+  });
+
+  // Cycle & lock favorite animal across all tabs when clicking the "Cursor Pet" navbar button
+  const handleCycleCursorPet = () => {
+    setPetSignal((s) => s + 1);
+    setLockedSpeciesKey((prev) => {
+      let nextKey = null;
+      if (!prev) {
+        nextKey = MASCOT_KEYS[0];
+      } else {
+        const idx = MASCOT_KEYS.indexOf(prev);
+        if (idx === -1 || idx === MASCOT_KEYS.length - 1) {
+          nextKey = null; // Return to Auto mode after cycling through all 7
+        } else {
+          nextKey = MASCOT_KEYS[idx + 1];
+        }
+      }
+      if (typeof window !== 'undefined') {
+        if (nextKey) {
+          localStorage.setItem('openboard_locked_pet', nextKey);
+        } else {
+          localStorage.removeItem('openboard_locked_pet');
+        }
+      }
+      return nextKey;
+    });
+  };
+
   // Search & Filter state for Archive
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -1299,27 +1432,28 @@ export default function App() {
   const bodyText = isDark ? 'text-slate-300' : 'text-stone-700';
 
   const cardSurface = isDark
-    ? 'bg-[#0b1017]/88 border-[#1e293b] shadow-[0_8px_30px_rgba(0,0,0,0.55)]'
-    : 'bg-[#f4f1ea]/92 border-[#d4cfc3] shadow-[0_6px_22px_rgba(28,25,23,0.06)]';
+    ? 'glass-card-alive bg-[#0b1017]/82 border-[#1e293b] shadow-[0_8px_32px_rgba(0,0,0,0.58)] backdrop-blur-xl'
+    : 'glass-card-alive bg-[#f4f1ea]/88 border-[#d4cfc3] shadow-[0_6px_24px_rgba(28,25,23,0.06)] backdrop-blur-xl';
 
   const inputSurface = isDark
-    ? 'bg-[#05080c] border-[#1e293b] text-slate-100 placeholder-slate-500 focus:border-[#00ff9d] focus:shadow-[0_0_12px_rgba(0,255,157,0.2)]'
-    : 'bg-[#ebe8e0] border-[#c7c1b4] text-stone-900 placeholder-stone-500 focus:bg-[#f4f1ea] focus:border-[#047857] focus:shadow-[0_0_0_3px_rgba(4,120,87,0.12)]';
+    ? 'bg-[#05080c]/90 border-[#1e293b] text-slate-100 placeholder-slate-500 focus:border-[#00ff9d] focus:shadow-[0_0_15px_rgba(0,255,157,0.22)]'
+    : 'bg-[#ebe8e0]/90 border-[#c7c1b4] text-stone-900 placeholder-stone-500 focus:bg-[#f4f1ea] focus:border-[#047857] focus:shadow-[0_0_0_3px_rgba(4,120,87,0.12)]';
 
-  // Glassy Buttons: Solid border + translucent matching interior -> fills solid on hover
+  // Glassy Shimmer Buttons: Solid border + translucent matching interior -> fills solid on hover
   const glassGreenBtn = isDark
-    ? 'backdrop-blur-md bg-[#00ff9d]/12 border border-[#00ff9d] text-[#00ff9d] hover:bg-[#00ff9d] hover:text-[#05080c] shadow-[0_0_18px_rgba(0,255,157,0.16)] hover:shadow-[0_0_26px_rgba(0,255,157,0.45)]'
-    : 'backdrop-blur-md bg-[#047857]/10 border border-[#047857] text-[#047857] hover:bg-[#047857] hover:text-[#f4f1ea] shadow-sm hover:shadow-md';
+    ? 'shimmer-sweep backdrop-blur-md bg-[#00ff9d]/12 border border-[#00ff9d] text-[#00ff9d] hover:bg-[#00ff9d] hover:text-[#05080c] shadow-[0_0_18px_rgba(0,255,157,0.18)] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-[0.98]'
+    : 'shimmer-sweep backdrop-blur-md bg-[#047857]/10 border border-[#047857] text-[#047857] hover:bg-[#047857] hover:text-[#f4f1ea] shadow-sm hover:shadow-md active:scale-[0.98]';
 
   const glassPinkBtn = isDark
-    ? 'backdrop-blur-md bg-[#ff3366]/12 border border-[#ff3366] text-[#ff3366] hover:bg-[#ff3366] hover:text-white shadow-[0_0_18px_rgba(255,51,102,0.16)] hover:shadow-[0_0_26px_rgba(255,51,102,0.45)]'
-    : 'backdrop-blur-md bg-[#be123c]/10 border border-[#be123c] text-[#be123c] hover:bg-[#be123c] hover:text-[#f4f1ea] shadow-sm hover:shadow-md';
+    ? 'shimmer-sweep backdrop-blur-md bg-[#ff3366]/12 border border-[#ff3366] text-[#ff3366] hover:bg-[#ff3366] hover:text-white shadow-[0_0_18px_rgba(255,51,102,0.18)] hover:shadow-[0_0_28px_rgba(255,51,102,0.5)] active:scale-[0.98]'
+    : 'shimmer-sweep backdrop-blur-md bg-[#be123c]/10 border border-[#be123c] text-[#be123c] hover:bg-[#be123c] hover:text-[#f4f1ea] shadow-sm hover:shadow-md active:scale-[0.98]';
 
   const glassNeutralBtn = isDark
-    ? 'backdrop-blur-md bg-slate-400/10 border border-slate-500 text-slate-300 hover:bg-slate-200 hover:border-slate-200 hover:text-[#05080c]'
-    : 'backdrop-blur-md bg-stone-600/10 border border-stone-500 text-stone-700 hover:bg-stone-800 hover:border-stone-800 hover:text-[#f4f1ea]';
+    ? 'shimmer-sweep backdrop-blur-md bg-slate-400/10 border border-slate-500 text-slate-300 hover:bg-slate-200 hover:border-slate-200 hover:text-[#05080c] active:scale-[0.98]'
+    : 'shimmer-sweep backdrop-blur-md bg-stone-600/10 border border-stone-500 text-stone-700 hover:bg-stone-800 hover:border-stone-800 hover:text-[#f4f1ea] active:scale-[0.98]';
 
-  const currentSpeciesName = (MASCOT_SPECIES[activeTab] || MASCOT_SPECIES.home).species;
+  const effectiveSpeciesKey = lockedSpeciesKey || activeTab;
+  const currentSpeciesName = (MASCOT_SPECIES[effectiveSpeciesKey] || MASCOT_SPECIES.home).species;
 
   return (
     <div
@@ -1338,7 +1472,7 @@ export default function App() {
         )}
       />
 
-      {/* Self-contained CSS: Hide native cursor on desktop so the Pixel Animal IS the cursor */}
+      {/* Self-contained CSS: Hide native cursor, add CRT scanlines, static grain, and glassy shimmer sweeps */}
       <style>{`
         @media (min-width: 640px) and (pointer: fine) {
           html, body, a, button, input, select, textarea, label, [role="button"] {
@@ -1352,14 +1486,96 @@ export default function App() {
         .blinking-cursor {
           animation: blinkCursor 1s step-start infinite;
         }
+        @keyframes petIdleBob {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-2.5px); }
+        }
+        .pet-idle-float {
+          animation: petIdleBob 2.2s ease-in-out infinite;
+        }
+        @keyframes crtRoll {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100vh); }
+        }
+        .crt-scanbar {
+          animation: crtRoll 9s linear infinite;
+        }
+        @keyframes noiseJitter {
+          0%, 100% { transform: translate(0, 0); }
+          25% { transform: translate(-1%, 1%); }
+          50% { transform: translate(1%, -1%); }
+          75% { transform: translate(-1%, -1%); }
+        }
+        .tv-static-grain {
+          background-image: radial-gradient(rgba(0, 255, 157, 0.14) 1px, transparent 0);
+          background-size: 24px 24px;
+          animation: noiseJitter 0.35s steps(2) infinite;
+        }
+        /* Diagonal Holographic Shimmer Sweep on Glassy Buttons & Cards */
+        .shimmer-sweep, .glass-card-alive {
+          position: relative;
+          overflow: hidden;
+        }
+        .shimmer-sweep::after {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -120%;
+          width: 65%;
+          height: 200%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.22),
+            transparent
+          );
+          transform: skewX(-25deg);
+          transition: left 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+          pointer-events: none;
+        }
+        .shimmer-sweep:hover::after {
+          left: 160%;
+        }
+        @keyframes subtleCardSheen {
+          0%, 100% { border-color: rgba(0, 255, 157, 0.14); }
+          50% { border-color: rgba(0, 255, 157, 0.32); }
+        }
+        .dark .glass-card-alive {
+          animation: subtleCardSheen 5s ease-in-out infinite;
+        }
       `}</style>
+
+      {/* Subtle CRT Scanlines + Rolling Refresh Bar + TV Static Grain Overlay (Pointer-events-none) */}
+      <div className="fixed inset-0 pointer-events-none z-30 overflow-hidden">
+        {/* Fine Horizontal CRT Scanline Mesh */}
+        <div
+          className={cx(
+            'absolute inset-0',
+            isDark ? 'opacity-[0.16]' : 'opacity-[0.06]'
+          )}
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(0deg, rgba(0,0,0,0.35) 0px, rgba(0,0,0,0.35) 1px, transparent 1px, transparent 3px)',
+          }}
+        />
+        {/* Slow Rolling Phosphor Refresh Beam */}
+        <div
+          className={cx(
+            'crt-scanbar w-full h-28 bg-gradient-to-b from-transparent to-transparent',
+            isDark ? 'via-[#00ff9d]/[0.035]' : 'via-[#047857]/[0.025]'
+          )}
+        />
+        {/* Subtle Animated TV Static Micro-Grain */}
+        <div className={cx('absolute -inset-4 tv-static-grain', isDark ? 'opacity-[0.12]' : 'opacity-[0.05]')} />
+      </div>
 
       {/* Interactive Pixel Matrix + 3D Constellation Background (z-0, always visible) */}
       <BackgroundAnimation theme={theme} />
 
-      {/* Custom Pixel Animal Cursor (Replaces system cursor on desktop, zero speech bubbles) */}
+      {/* Custom Pixel Animal Cursor (Replaces system cursor on desktop, reacts to hover & locks species) */}
       <PixelCompanion
         activeTab={activeTab}
+        lockedSpeciesKey={lockedSpeciesKey}
         theme={theme}
         onPetSound={playBookmark}
         petSignal={petSignal}
@@ -1369,15 +1585,17 @@ export default function App() {
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div
           className={cx(
-            'absolute -top-32 left-1/3 w-[600px] h-[380px] rounded-full blur-[160px] transition-all duration-1000',
+            'absolute -top-32 left-1/3 w-[600px] h-[380px] rounded-full blur-[160px] transition-all duration-1000 animate-pulse',
             isDark ? 'bg-[#00ff9d]/15 opacity-25' : 'bg-emerald-600/15 opacity-25'
           )}
+          style={{ animationDuration: '6s' }}
         />
         <div
           className={cx(
-            'absolute top-1/2 -right-40 w-[500px] h-[420px] rounded-full blur-[180px]',
+            'absolute top-1/2 -right-40 w-[500px] h-[420px] rounded-full blur-[180px] animate-pulse',
             isDark ? 'bg-[#ff3366]/15 opacity-20' : 'bg-amber-600/10 opacity-25'
           )}
+          style={{ animationDuration: '8s' }}
         />
       </div>
 
@@ -1389,8 +1607,8 @@ export default function App() {
           className={cx(
             'max-w-7xl mx-auto rounded-2xl px-4 sm:px-6 py-2.5 flex items-center justify-between border backdrop-blur-xl transition-all duration-300',
             isDark
-              ? 'bg-[#090d14]/88 border-[#1e293b] shadow-[0_6px_30px_rgba(0,0,0,0.65)]'
-              : 'bg-[#f4f1ea]/92 border-[#cfc9bc] shadow-[0_4px_20px_rgba(28,25,23,0.06)]'
+              ? 'bg-[#090d14]/85 border-[#1e293b] shadow-[0_6px_30px_rgba(0,0,0,0.65)]'
+              : 'bg-[#f4f1ea]/90 border-[#cfc9bc] shadow-[0_4px_20px_rgba(28,25,23,0.06)]'
           )}
         >
           {/* Brand Logo */}
@@ -1400,9 +1618,9 @@ export default function App() {
           >
             <div
               className={cx(
-                'w-8 h-8 rounded-lg border flex items-center justify-center p-1 transition-colors',
+                'w-8 h-8 rounded-lg border flex items-center justify-center p-1 transition-all',
                 isDark
-                  ? 'bg-[#00ff9d]/10 border-[#00ff9d] group-hover:bg-[#00ff9d] group-hover:text-black'
+                  ? 'bg-[#00ff9d]/10 border-[#00ff9d] group-hover:bg-[#00ff9d] group-hover:text-black shadow-[0_0_12px_rgba(0,255,157,0.2)]'
                   : 'bg-[#047857]/10 border-[#047857] group-hover:bg-[#047857] group-hover:text-[#f4f1ea]'
               )}
             >
@@ -1452,22 +1670,26 @@ export default function App() {
             })}
           </nav>
 
-          {/* Controls: Cursor Pet Badge + Audio Synth Mute + Theme Switch */}
+          {/* Controls: Cursor Pet Badge (Click to Lock/Cycle, Hover to Reveal) + Audio Synth + Theme */}
           <div className="flex items-center gap-2">
-            {/* "Cursor Pet" Badge - Only reveals what animal it is when hovered */}
+            {/* "Cursor Pet" Badge - Only shows animal name on hover; clicking cycles & locks favorite animal */}
             <button
               type="button"
-              onClick={() => setPetSignal((s) => s + 1)}
+              onClick={handleCycleCursorPet}
               onMouseEnter={() => setIsHoveringPetBadge(true)}
               onMouseLeave={() => setIsHoveringPetBadge(false)}
-              title="Hover to see species, click to pet"
+              title="Hover to see species, click to cycle & lock your favorite animal across all tabs"
               className={cx(
                 'hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all font-mono font-bold',
                 glassGreenBtn
               )}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
-              <span>{isHoveringPetBadge ? `Cursor Pet: ${currentSpeciesName}` : 'Cursor Pet'}</span>
+              <span>
+                {isHoveringPetBadge
+                  ? `Cursor Pet: ${currentSpeciesName} (${lockedSpeciesKey ? '📌 Locked' : 'Auto'})`
+                  : 'Cursor Pet'}
+              </span>
             </button>
 
             {/* Web Audio Synth Toggle */}
@@ -1488,7 +1710,7 @@ export default function App() {
               onClick={toggleTheme}
               title="Switch theme"
               className={cx(
-                'px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5',
+                'shimmer-sweep px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5',
                 isDark
                   ? 'backdrop-blur-md bg-amber-400/12 border border-amber-400 text-amber-300 hover:bg-amber-400 hover:text-[#05080c]'
                   : 'backdrop-blur-md bg-stone-800/10 border border-stone-800 text-stone-800 hover:bg-stone-800 hover:text-[#f4f1ea]'
@@ -1562,11 +1784,12 @@ export default function App() {
               {/* Left Column: Python Terminal Code Window */}
               <div className="lg:col-span-7">
                 <div
+                  data-pet-card="true"
                   className={cx(
-                    'rounded-2xl border overflow-hidden backdrop-blur-xl transition-all duration-300',
+                    'glass-card-alive rounded-2xl border overflow-hidden backdrop-blur-xl transition-all duration-300',
                     isDark
-                      ? 'bg-[#070b10]/92 border-[#1e293b] shadow-[0_0_40px_rgba(0,255,157,0.09)]'
-                      : 'bg-[#f4f1ea]/95 border-[#cfc9bc] shadow-[0_12px_30px_rgba(28,25,23,0.07)]'
+                      ? 'bg-[#070b10]/90 border-[#1e293b] shadow-[0_0_45px_rgba(0,255,157,0.1)] hover:border-[#00ff9d]/60'
+                      : 'bg-[#f4f1ea]/92 border-[#cfc9bc] shadow-[0_12px_30px_rgba(28,25,23,0.07)] hover:border-[#047857]/60'
                   )}
                 >
                   {/* Terminal Window Bar */}
@@ -1670,7 +1893,7 @@ export default function App() {
               <div className="lg:col-span-5 space-y-6 text-left">
                 <div
                   className={cx(
-                    'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold border',
+                    'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold border backdrop-blur-md',
                     isDark
                       ? 'bg-[#00ff9d]/10 text-[#00ff9d] border-[#00ff9d]'
                       : 'bg-[#047857]/10 text-[#047857] border-[#047857]'
@@ -1748,9 +1971,10 @@ export default function App() {
               ].map((m, idx) => (
                 <div
                   key={idx}
+                  data-pet-card="true"
                   onClick={playClick}
                   className={cx(
-                    'p-5 rounded-2xl border backdrop-blur-md transition-all group cursor-pointer',
+                    'shimmer-sweep p-5 rounded-2xl border backdrop-blur-md transition-all group cursor-pointer hover:-translate-y-0.5',
                     cardSurface,
                     isDark ? 'hover:border-[#00ff9d]' : 'hover:border-[#047857]'
                   )}
@@ -1771,10 +1995,11 @@ export default function App() {
 
             {/* Featured Talk Spotlight */}
             <div
+              data-pet-card="true"
               className={cx(
                 'rounded-3xl border backdrop-blur-xl p-6 sm:p-8 flex flex-col md:flex-row gap-8 items-center transition-all relative overflow-hidden',
                 cardSurface,
-                isDark ? 'hover:border-[#00ff9d]/60' : 'hover:border-[#047857]/70'
+                isDark ? 'hover:border-[#00ff9d]/70' : 'hover:border-[#047857]/70'
               )}
             >
               <div
@@ -1899,9 +2124,10 @@ export default function App() {
                 ].map((pillar, i) => (
                   <div
                     key={i}
+                    data-pet-card="true"
                     onClick={playClick}
                     className={cx(
-                      'p-6 rounded-2xl border backdrop-blur-md transition-all hover:-translate-y-1 cursor-pointer',
+                      'shimmer-sweep p-6 rounded-2xl border backdrop-blur-md transition-all hover:-translate-y-1 cursor-pointer',
                       cardSurface,
                       isDark ? 'hover:border-[#00ff9d]' : 'hover:border-[#047857]'
                     )}
@@ -1939,6 +2165,7 @@ export default function App() {
             {/* Two Info Blocks */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div
+                data-pet-card="true"
                 className={cx(
                   'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl relative overflow-hidden transition-all',
                   cardSurface,
@@ -1949,12 +2176,13 @@ export default function App() {
                 <h3 className="text-xl font-bold tracking-tight mb-3">Peer-to-Peer Student Talks</h3>
                 <p className={cx('text-xs sm:text-sm font-sans leading-relaxed', bodyText)}>
                   Most of us spend our semesters inside our own department courses. OpenBoard is a place where you can
-                  hear what friends in other majors are excited about, whether that is Erdős probability proofs,
+                  hear what friends in other majors are excited about, whether that is Erdos probability proofs,
                   Gillespie simulations in chemistry, game theory auctions, or quantum entanglement.
                 </p>
               </div>
 
               <div
+                data-pet-card="true"
                 className={cx(
                   'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl relative overflow-hidden transition-all',
                   cardSurface,
@@ -1983,6 +2211,7 @@ export default function App() {
                 {TEAM_MEMBERS.filter((m) => m.isCoordinator).map((person, idx) => (
                   <div
                     key={idx}
+                    data-pet-card="true"
                     className={cx(
                       'p-6 rounded-2xl border backdrop-blur-xl flex flex-col sm:flex-row items-center sm:items-start gap-5 transition-all group',
                       cardSurface,
@@ -2047,9 +2276,10 @@ export default function App() {
                 {TEAM_MEMBERS.filter((m) => !m.isCoordinator).map((speaker, idx) => (
                   <div
                     key={idx}
+                    data-pet-card="true"
                     onClick={playClick}
                     className={cx(
-                      'p-4 rounded-xl border backdrop-blur-md flex flex-col items-center text-center transition-all cursor-pointer',
+                      'shimmer-sweep p-4 rounded-xl border backdrop-blur-md flex flex-col items-center text-center transition-all cursor-pointer hover:-translate-y-0.5',
                       cardSurface,
                       isDark ? 'hover:border-[#00ff9d]' : 'hover:border-[#047857]'
                     )}
@@ -2171,15 +2401,16 @@ export default function App() {
                 return (
                   <div
                     key={talk.id}
+                    data-pet-card="true"
                     onClick={() => {
                       playClick();
                       setActiveModalTalk(talk);
                     }}
                     className={cx(
-                      'group rounded-2xl border backdrop-blur-xl p-5 flex flex-col justify-between transition-all duration-300 cursor-pointer hover:-translate-y-1 relative overflow-hidden',
+                      'group rounded-2xl border backdrop-blur-xl p-5 flex flex-col justify-between transition-all duration-300 cursor-pointer hover:-translate-y-1.5 relative overflow-hidden',
                       cardSurface,
                       isDark
-                        ? 'hover:border-[#00ff9d] hover:shadow-[0_0_25px_rgba(0,255,157,0.15)]'
+                        ? 'hover:border-[#00ff9d] hover:shadow-[0_0_28px_rgba(0,255,157,0.18)]'
                         : 'hover:border-[#047857] hover:shadow-xl'
                     )}
                   >
@@ -2274,7 +2505,9 @@ export default function App() {
                               SLIDES
                             </a>
                           )}
-                          <span className={cx('text-xs', mutedText)}>→</span>
+                          <span className={cx('text-xs transition-transform group-hover:translate-x-1', mutedText)}>
+                            →
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -2304,6 +2537,7 @@ export default function App() {
               {GALLERY_ITEMS.map((item, idx) => (
                 <div
                   key={idx}
+                  data-pet-card="true"
                   onClick={() => {
                     playClick();
                     setActiveLightboxImg(item);
@@ -2375,8 +2609,9 @@ export default function App() {
               ].map((evt) => (
                 <div
                   key={evt.id}
+                  data-pet-card="true"
                   className={cx(
-                    'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl flex flex-col justify-between transition-all',
+                    'p-6 sm:p-8 rounded-2xl border backdrop-blur-xl flex flex-col justify-between transition-all hover:-translate-y-0.5',
                     cardSurface,
                     isDark ? 'hover:border-[#00ff9d]' : 'hover:border-[#047857]'
                   )}
@@ -2814,7 +3049,7 @@ export default function App() {
 
             {/* Direct Info Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className={cx('p-6 rounded-2xl border backdrop-blur-xl space-y-2', cardSurface)}>
+              <div data-pet-card="true" className={cx('p-6 rounded-2xl border backdrop-blur-xl space-y-2', cardSurface)}>
                 <div className={cx('text-xs font-mono font-bold', accentText)}>📍 VENUE</div>
                 <h4 className="font-bold text-sm">Lecture Hall Complex (LHC)</h4>
                 <p className={cx('text-xs font-mono leading-relaxed', mutedText)}>
@@ -2824,7 +3059,7 @@ export default function App() {
                 </p>
               </div>
 
-              <div className={cx('p-6 rounded-2xl border backdrop-blur-xl space-y-2', cardSurface)}>
+              <div data-pet-card="true" className={cx('p-6 rounded-2xl border backdrop-blur-xl space-y-2', cardSurface)}>
                 <div className={cx('text-xs font-mono font-bold', pinkText)}>✉ EMAILS</div>
                 <div className={cx('text-xs font-mono space-y-1.5', bodyText)}>
                   <div>
@@ -3147,11 +3382,12 @@ export default function App() {
       {activeModalTalk && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
           <div
+            data-pet-card="true"
             className={cx(
-              'max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl border p-6 sm:p-8 shadow-2xl relative font-mono',
+              'glass-card-alive max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl border p-6 sm:p-8 shadow-2xl relative font-mono',
               isDark
-                ? 'bg-[#080d14] border-[#00ff9d] text-slate-100'
-                : 'bg-[#f4f1ea] border-[#047857] text-stone-900'
+                ? 'bg-[#080d14]/95 border-[#00ff9d] text-slate-100'
+                : 'bg-[#f4f1ea]/95 border-[#047857] text-stone-900'
             )}
           >
             <button
@@ -3261,7 +3497,7 @@ export default function App() {
           <div
             onClick={(e) => e.stopPropagation()}
             className={cx(
-              'max-w-4xl w-full rounded-2xl overflow-hidden border p-2 relative font-mono',
+              'glass-card-alive max-w-4xl w-full rounded-2xl overflow-hidden border p-2 relative font-mono',
               isDark ? 'border-[#1e293b] bg-[#080d14]' : 'border-[#cfc9bc] bg-[#f4f1ea]'
             )}
           >
